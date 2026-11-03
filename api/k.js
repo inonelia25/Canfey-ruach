@@ -44,6 +44,8 @@ export default async function handler(req, res) {
   try {
     const R = roster();
     const url = new URL(req.url, 'http://x');
+    if (url.searchParams.has('ping')) { const db = makeStore(); if (!db) return send(res, 503, { db: false });
+      await db.set('kr:ping', String(Date.now())); const st = await load(db, R); return send(res, 200, { db: true, students: st.students.length, ops: st.n }); }
     const me = who(url.searchParams.get('k') || req.headers['x-kr'], R);
     if (!me) return send(res, 401, { error: 'הקישור לא תקין' });
     const db = makeStore();
