@@ -61,7 +61,7 @@
     let hk = 0;
     const hist = (s, h) => { s.hist.unshift(Object.assign({ id: hid(hk++), ts: op.ts }, h)); if (s.hist.length > HIST_MAX) s.hist.length = HIST_MAX; };
     const feed = f => { st.cls.feed.unshift(Object.assign({ id: hid(hk++), ts: op.ts }, f)); if (st.cls.feed.length > FEED_MAX) st.cls.feed.length = FEED_MAX; };
-    const add = (s, p, t, who, q, noGoal) => { s.points += p; s.wallet += p; if (!noGoal) s.goalPts += p; s.wk[T.wk] = (s.wk[T.wk] || 0) + p; hist(s, { p, t, who, q: q ? 1 : 0 }); };
+    const add = (s, p, t, who, q, noGoal) => { s.points += p; s.wallet += p; if (!noGoal) s.goalPts += p; s.wk[T.wk] = (s.wk[T.wk] || 0) + p; hist(s, { p, t, who, q: q ? 1 : 0, w: p, l: p, g: noGoal ? 0 : p }); };
     const crunch = s => { while (s.zr >= 15) { s.zr -= 15; const f = s.flavor || 'שוקולד נוגט'; s.crunches.push(f); add(s, 4, 'בונוס 15 זריזין', 'זריזין', 0, 1);
       hist(s, { p: '🍦', t: `קיבלת קראנץ' ${f}! (מס' ${s.crunches.length})`, who: 'זריזין' }); } };
 
@@ -73,20 +73,20 @@
       case 'other': { need(r === 'parent' || isT); need(own(op.s)); const s = S(op.s), t = String(op.tx || '').trim().slice(0, 140); need(t, 'כתבו מה הוא עשה');
         s.homeCount++; feed({ s: s.name, p: 3, t, who: 'הורים' }); add(s, 3, t, 'ההורים', 1); break; }
       case 'zr': { need(isT); (op.list || []).forEach(i => { const s = S(i); if (s.zrDay === T.date) return; s.zrDay = T.date; s.streak++;
-          if (s.streak >= 5) { s.zr += 4; s.streak = 0; hist(s, { p: '⚡', t: 'זריזין פרו! 5 ימים ברצף, שווה 8', who: TEACHER }); }
-          else { s.zr += 1; hist(s, { p: '☀️', t: 'זריזין, הגעת לפני 7:30', who: TEACHER }); }
+          if (s.streak >= 5) { s.zr += 4; s.streak = 0; hist(s, { p: '⚡', t: 'זריזין פרו! 5 ימים ברצף, שווה 8', who: TEACHER, z: 4 }); }
+          else { s.zr += 1; hist(s, { p: '☀️', t: 'זריזין, הגעת לפני 7:30', who: TEACHER, z: 1 }); }
           crunch(s); }); break; }
       case 'zrAdd': { need(isT); need(Array.isArray(op.list) && op.list.length <= 60);
         op.list.forEach(x => { const s = S(x.s), k = Math.round(+x.n); need(k >= -100 && k <= 300, 'מספר זריזין לא תקין'); if (!k) return;
           const tot = s.crunches.length * 15 + s.zr; need(tot + k >= 0, 'אי אפשר לרדת מתחת ל-0');
           if (k < 0) { s.zr += k; while (s.zr < 0 && s.crunches.length) { s.crunches.pop(); s.zr += 15; } }
           else s.zr += k;
-          hist(s, { p: '☀️', t: k > 0 ? `${k} זריזין מלפני האפליקציה` : `תיקון זריזין: ${k}`, who: TEACHER }); crunch(s); }); break; }
+          hist(s, { p: '☀️', t: k > 0 ? `${k} זריזין מלפני האפליקציה` : `תיקון זריזין: ${k}`, who: TEACHER, z: k }); crunch(s); }); break; }
       case 'cfgLoc': { need(isT); if (op.off) { C.loc = null; break; } const la = +op.lat, ln = +op.lng, rr = Math.round(+op.rad);
         need(Math.abs(la) <= 90 && Math.abs(ln) <= 180, 'מיקום לא תקין'); need(rr >= 50 && rr <= 2000, 'טווח לא תקין'); C.loc = { lat: la, lng: ln, r: rr }; break; }
       case 'msg': { need(isT); S(op.s).msg = String(op.tx || '').slice(0, 500); break; }
       case 'redeem': { need(r !== 'parent' && own(op.s)); const s = S(op.s), p = C.prizes.find(x => x.id === op.pz); need(p, 'הפרס לא קיים'); need(p.stock == null || p.stock > 0, 'הפרס אזל'); need(s.wallet >= p.cost, 'אין מספיק נקודות');
-        s.wallet -= p.cost; if (p.stock != null) p.stock--; hist(s, { p: '🎁', t: 'בחרת פרס: ' + p.name, who: 'בנק הפרסים' }); feed({ s: s.name, p: '🎁', t: 'ביקש פרס: ' + p.name, who: 'בנק הפרסים' }); break; }
+        s.wallet -= p.cost; if (p.stock != null) p.stock--; hist(s, { p: '🎁', t: 'בחרת פרס: ' + p.name, who: 'בנק הפרסים', w: -p.cost, pz: p.id }); feed({ s: s.name, p: '🎁', t: 'ביקש פרס: ' + p.name, who: 'בנק הפרסים' }); break; }
       case 'cfgPrizes': { need(isT); need(Array.isArray(op.list) && op.list.length <= 40); const seen = new Set();
         C.prizes = op.list.map((x, k) => { const c = Math.round(+x.cost), st0 = x.stock === '' || x.stock == null ? null : Math.round(+x.stock); need(String(x.name || '').trim(), 'לכל פרס צריך שם'); need(c > 0 && c <= 5000, 'מחיר לא תקין');
           need(st0 == null || (st0 >= 0 && st0 <= 999), 'מלאי לא תקין'); let id = String(x.id || '').slice(0, 20) || hid('p' + k); if (seen.has(id)) id = hid('p' + k); seen.add(id);
@@ -111,11 +111,27 @@
         d.w = 1; add(s, 2, 'קם בזמן ☀️', 'ההורים'); break; }
       case 'flavor': { need(r !== 'parent' && own(op.s)); need(FLAVORS.includes(op.f)); S(op.s).flavor = op.f; break; }
       case 'donate': { need(r !== 'parent' && own(op.s)); const s = S(op.s), v = +op.v; need([10, 25, 50].includes(v)); need(s.wallet >= v, 'אין מספיק נקודות');
-        s.wallet -= v; s.donated += v; st.cls.bonus += v; hist(s, { p: '💛', t: `תרמת ${v} נקודות לכיתה`, who: 'תרומה' }); break; }
+        s.wallet -= v; s.donated += v; st.cls.bonus += v; hist(s, { p: '💛', t: `תרמת ${v} נקודות לכיתה`, who: 'תרומה', w: -v, b: v }); break; }
       case 'checkin': { need(r !== 'parent' && own(op.s)); const s = S(op.s); need(!s.arr.some(x => x.d === T.date), 'כבר נרשמת היום');
         if (C.loc && !isT) { need(isFinite(+op.lat) && isFinite(+op.lng), 'צריך לאשר גישה למיקום כדי להירשם');
           need(dist(+op.lat, +op.lng, C.loc.lat, C.loc.lng) <= C.loc.r, 'אפשר להירשם רק כשנמצאים בישיבה'); }
+        if (!isT) need(T.min >= 420 && T.min <= 450, 'אפשר ללחוץ "הגעתי" רק בין 7:00 ל-7:30');
         s.arr.push({ d: T.date, t: T.min }); break; }
+      case 'adj': { need(isT); const s = S(op.s), p = Math.round(+op.p); need(p && Math.abs(p) <= 1000, 'מספר לא תקין');
+        const t = String(op.tx || '').trim().slice(0, 140) || (p > 0 ? 'תוספת נקודות' : 'הורדת נקודות');
+        need(s.wallet + p >= 0 || p > 0, 'אין לו מספיק נקודות לשימוש להוריד'); s.points = Math.max(0, s.points + p); s.wallet = Math.max(0, s.wallet + p); s.goalPts = Math.max(0, s.goalPts + p);
+        s.wk[T.wk] = (s.wk[T.wk] || 0) + p; hist(s, { p, t, who: TEACHER, w: p, l: p, g: p }); break; }
+      case 'undo': { need(isT); const s = S(op.s), h = s.hist.find(x => x.id === op.h); need(h, 'הפעולה לא נמצאה'); const sg = h.u ? 1 : -1; // undo, or bring back
+        const w = h.w != null ? h.w : (typeof h.p === 'number' ? h.p : 0), l = h.l != null ? h.l : (typeof h.p === 'number' ? h.p : 0), g = h.g != null ? h.g : l;
+        need(w || l || g || h.z || h.b, 'לפעולה הזו אין מה לבטל');
+        s.wallet = Math.max(0, s.wallet + sg * w); s.points = Math.max(0, s.points + sg * l); s.goalPts = Math.max(0, s.goalPts + sg * g);
+        if (h.b) st.cls.bonus = Math.max(0, st.cls.bonus + sg * h.b);
+        if (h.pz) { const pr = C.prizes.find(x => x.id === h.pz); if (pr && pr.stock != null) pr.stock = Math.max(0, pr.stock - sg); }
+        if (h.z) { s.zr += sg * h.z; while (s.zr < 0 && s.crunches.length) { s.crunches.pop(); s.zr += 15; } if (s.zr < 0) s.zr = 0; if (sg > 0) crunch(s); }
+        h.u = h.u ? 0 : 1; break; }
+      case 'reset': { need(isT); const s = S(op.s); const bak = JSON.parse(JSON.stringify(s)); delete bak.bak;
+        const f = newStudent(s.id, s.name); f.first = s.first; f.bak = bak; st.students[+op.s] = f; break; }
+      case 'restore': { need(isT); const s = S(op.s); need(s.bak, 'אין נתונים לשחזר'); const b = s.bak; b.name = s.name; b.first = s.first; st.students[+op.s] = b; break; }
       case 'agentSet': { need(isT); S(op.idx); st.cls.agent = { date: T.date, idx: +op.idx, status: 'pending' }; break; }
       case 'agentRes': { need(isT); let ag = st.cls.agent;
         if (!(ag && ag.date === T.date)) { S(op.idx); ag = st.cls.agent = { date: T.date, idx: +op.idx, status: 'pending' }; }
