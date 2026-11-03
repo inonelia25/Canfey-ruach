@@ -1,0 +1,981 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="theme-color" content="#0b3d4a"><meta name="apple-mobile-web-app-capable" content="yes"><link rel="apple-touch-icon" href="star.webp"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>כנפי רוח · ח׳1</title>
+<style>
+@font-face{font-family:Moshe;src:url(moshe.woff);font-weight:700}
+@font-face{font-family:Gush;src:url(el-l.woff);font-weight:100 500}
+@font-face{font-family:Gush;src:url(el-l.woff);font-weight:600 700}
+@font-face{font-family:Gush;src:url(lav.woff);font-weight:800 900}
+.name,.pts b,.zcount,.zcheer,.label,.lead,.ring .rv b,#overlay h3,.greet,.top h1,.big{font-family:Gush,sans-serif;font-weight:900}
+.label{font-size:17px!important;letter-spacing:.5px!important}
+.reveal{opacity:0;transform:translateY(24px) scale(.97);transition:opacity .7s,transform .7s cubic-bezier(.2,.9,.3,1.2)}
+.reveal.in{opacity:1;transform:none}
+.zcheer{font-size:25px!important;line-height:1.05;margin:6px 0 4px!important;background:var(--gold);-webkit-background-clip:text;background-clip:text;color:transparent!important;display:inline-block;animation:bounce 2.2s ease-in-out infinite;transform-origin:center bottom;filter:drop-shadow(0 2px 10px rgba(244,207,107,.35))}
+@keyframes bounce{0%,100%{transform:translateY(0) rotate(0)}12%{transform:translateY(-8px) rotate(-2deg) scale(1.06)}24%{transform:translateY(0) rotate(0)}32%{transform:translateY(-3px)}40%{transform:none}}
+.icewrap{position:relative;flex:none;cursor:pointer}
+.icewrap .spark{position:absolute;font-size:16px;animation:twinkle 2.4s infinite;pointer-events:none}
+@keyframes twinkle{0%,100%{opacity:0;transform:scale(.4) rotate(0)}50%{opacity:1;transform:scale(1.1) rotate(25deg)}}
+.icewrap:active .ice{transform:scale(.92) rotate(-6deg)}
+.ice{transition:transform .25s;animation:wob 4s ease-in-out infinite}
+@keyframes wob{0%,100%{transform:rotate(-3deg)}50%{transform:rotate(3deg)}}
+.pts b.bump{animation:bump .6s cubic-bezier(.3,1.8,.5,1)}
+@keyframes bump{0%{transform:scale(1)}40%{transform:scale(1.25)}100%{transform:scale(1)}}
+:root{
+--navy:#0c2747;--teal:#43c1cc;--teal2:#1c8ea2;
+--gold:linear-gradient(135deg,#7a4e0e 0%,#c8932a 20%,#f7dc8a 42%,#fff6d6 50%,#e8b84e 60%,#a06b14 82%,#e0ad45 100%);
+--goldTxt:#f4cf6b;--ink:#3a2504;
+--soft:rgba(255,255,255,.07);--line:rgba(255,255,255,.14);
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0}
+body{font-family:Gush,system-ui,sans-serif;font-weight:400;color:#fff;
+background:linear-gradient(180deg,rgba(67,193,204,.5) 0%,rgba(28,110,150,.18) 28%,rgba(8,28,58,.6) 100%),url(bg2.webp) center/cover fixed,#123d66;
+padding:env(safe-area-inset-top) 0 calc(110px + env(safe-area-inset-bottom));min-height:100vh}
+.wrap{max-width:520px;margin:0 auto;padding:16px 20px}
+button{font-family:inherit}
+.gold-t{background:var(--gold);-webkit-background-clip:text;background-clip:text;color:transparent}
+.top{display:flex;align-items:center;gap:12px}
+.top h1{font-size:19px;font-weight:700;margin:0;line-height:1.15}
+.top small{font-size:12.5px;opacity:.75;font-weight:300}
+.bell{margin-right:auto;position:relative;width:42px;height:42px;border-radius:50%;border:0;background:var(--soft);display:grid;place-items:center}
+.bell i{position:absolute;top:-2px;left:-2px;min-width:19px;height:19px;border-radius:99px;background:var(--gold);color:var(--ink);font:700 11px/19px Gush;font-style:normal;display:none}
+.bell i.on{display:block;animation:pop .5s}
+.logo{width:50px;height:50px;border-radius:50%;background:radial-gradient(circle,#fff 55%,#e9f6f8);display:grid;place-items:center;box-shadow:0 0 0 3px rgba(255,255,255,.15),0 6px 18px rgba(0,0,0,.25);overflow:hidden}
+.logo img{width:38px}
+.npanel{background:rgba(8,26,50,.93);border-radius:24px;padding:14px 18px;margin-top:12px;animation:pop .35s}
+.npanel ul{list-style:none;margin:0;padding:0}
+.npanel li{padding:9px 0;font-size:15px}
+.npanel li+li{border-top:1px solid var(--line)}
+.demo{font-size:11.5px;opacity:.55;text-align:center;margin:10px 0 0;font-weight:300}
+.label{display:flex;align-items:center;gap:12px;margin:38px 0 16px;font-size:13px;font-weight:700;letter-spacing:1.5px;color:var(--goldTxt)}
+.label:before,.label:after{content:"";flex:1;height:1px;background:linear-gradient(90deg,transparent,rgba(244,207,107,.55),transparent)}
+.label span{white-space:nowrap}
+.hero{text-align:center;padding-top:22px}
+.greet{font-size:15px;font-weight:700;min-height:20px;transition:opacity .4s}
+.name{font-size:34px;font-weight:700;line-height:1.1;margin-top:2px}
+.crest{width:min(330px,92%);aspect-ratio:900/406;position:relative;margin:18px auto 4px;filter:drop-shadow(0 10px 20px rgba(0,0,0,.4))}
+.crest>div{position:absolute;inset:0;-webkit-mask:url(crest.webp) center/contain no-repeat;mask:url(crest.webp) center/contain no-repeat}
+.crest .ghost{background:rgba(255,255,255,.14)}
+.crest .base{opacity:.4}
+.crest .fill{transition:clip-path 1.6s cubic-bezier(.2,.9,.3,1)}
+.crest .gl{background:linear-gradient(115deg,transparent 38%,rgba(255,255,255,.8) 50%,transparent 62%) 0 0/250% 100% no-repeat;animation:gl 3.8s infinite}
+@keyframes gl{0%{background-position:150% 0}55%,100%{background-position:-60% 0}}
+.crest.up{animation:pop 1s cubic-bezier(.3,1.6,.5,1)}
+.lvl{font-size:15px;font-weight:700;letter-spacing:.5px}
+.pts{display:flex;justify-content:center;align-items:baseline;gap:8px;margin:14px 0 4px}
+.pts b{font-size:64px;font-weight:700;line-height:1}
+.pts span{font-size:17px;opacity:.8}
+.track{position:relative;height:6px;border-radius:99px;background:rgba(255,255,255,.14);margin:14px 6px 0}
+.track i{position:absolute;inset:0 0 0 auto;border-radius:99px;background:var(--gold);transition:width 1.4s cubic-bezier(.2,.9,.3,1)}
+.track i:after{content:"";position:absolute;left:-7px;top:50%;width:14px;height:14px;margin-top:-7px;border-radius:50%;background:#fff6d6;box-shadow:0 0 0 4px rgba(244,207,107,.3),0 0 16px #f4cf6b}
+.track.teal i{background:linear-gradient(270deg,#1c8ea2,#9ff0f7)}
+.track.teal i:after{background:#dffbff;box-shadow:0 0 0 4px rgba(159,240,247,.3),0 0 16px #9ff0f7}
+.sub{font-size:14px;opacity:.85;margin-top:10px;font-weight:300}
+.msg{margin-top:28px;padding:16px 20px;border-radius:26px 26px 26px 6px;background:linear-gradient(135deg,rgba(244,207,107,.22),rgba(67,193,204,.14));position:relative;animation:pop .6s}
+.msg small{color:var(--goldTxt);font-weight:700;font-size:12.5px}
+.msg div{font-size:16px;margin-top:4px}
+.zr{display:flex;align-items:center;gap:18px}
+.ice{width:96px;flex:none;filter:drop-shadow(0 8px 14px rgba(0,0,0,.35))}
+.zcount{font-size:44px;font-weight:700;line-height:1}
+.zcount small{font-size:18px;opacity:.6;font-weight:300}
+.zcheer{color:var(--goldTxt);font-weight:700;font-size:16px;margin:4px 0 2px}
+.steps{display:flex;align-items:center;margin:16px 0 8px}
+.steps b{width:30px;height:30px;border-radius:50%;display:grid;place-items:center;font-size:12px;font-weight:700;background:rgba(255,255,255,.1);flex:none;color:#ffffffaa}
+.steps b.on{background:var(--gold);color:var(--ink);box-shadow:0 0 12px rgba(244,207,107,.6)}
+.steps em{flex:1;height:2px;background:rgba(255,255,255,.14)}
+.steps em.on{background:#e8b84e}
+.pro{font-size:13px;opacity:.8;font-weight:300}
+.pro b{font-weight:700;color:var(--goldTxt)}
+.ringrow{display:flex;align-items:center;gap:18px}
+.ring{width:118px;height:118px;flex:none;position:relative}
+.ring svg{transform:rotate(-90deg)}
+.ring circle{fill:none;stroke-width:10;stroke-linecap:round}
+.ring .rv{position:absolute;inset:0;display:grid;place-items:center;text-align:center;line-height:1.05}
+.ring .rv b{font-size:26px;font-weight:700}
+.ring .rv small{font-size:11px;opacity:.7;display:block}
+.ringtxt .big{font-size:17px;font-weight:700}
+.ringtxt .cheer{color:#9ff0f7;font-weight:700;margin-top:6px;font-size:15px}
+.badges{display:flex;gap:16px;overflow-x:auto;padding:4px 2px 8px;scrollbar-width:none}
+.badge{flex:none;width:76px;text-align:center;font-size:12.5px}
+.badge .ic{width:64px;height:64px;margin:0 auto 6px;border-radius:50%;display:grid;place-items:center;font-size:26px;position:relative;background:radial-gradient(circle at 35% 30%,#1f5f86,#0d2c4f)}
+.badge .ic:before{content:"";position:absolute;inset:-3px;border-radius:50%;padding:3px;background:var(--gold);-webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask-composite:exclude}
+.badge.lock .ic{filter:grayscale(1);opacity:.35}
+.badge small{display:block;opacity:.6;font-size:11px;font-weight:300}
+.tl{list-style:none;margin:0;padding:0 0 0 0;position:relative}
+.tl:before{content:"";position:absolute;right:21px;top:6px;bottom:6px;width:2px;background:linear-gradient(rgba(244,207,107,.6),rgba(244,207,107,0))}
+.tl li{display:flex;gap:14px;align-items:center;padding:9px 0;position:relative}
+.tl .dot{width:44px;height:44px;flex:none;border-radius:50%;display:grid;place-items:center;font-weight:700;font-size:15px;background:#0d2c4f;color:var(--goldTxt);box-shadow:0 0 0 2px rgba(244,207,107,.5);position:relative;z-index:1}
+.tl .who{font-size:12.5px;opacity:.6;font-weight:300}
+.tl .q{font-style:italic;opacity:.9}
+.new{animation:pop .7s cubic-bezier(.3,1.6,.5,1)}
+@keyframes pop{0%{transform:scale(.6);opacity:0}100%{transform:scale(1);opacity:1}}
+.prizes{display:flex;gap:14px;overflow-x:auto;scroll-snap-type:x mandatory;padding:6px 2px 14px;margin:0 -20px;padding-inline:20px;scrollbar-width:none}
+.prize{flex:none;width:150px;scroll-snap-align:center;text-align:center}
+.prize .img{width:130px;height:130px;margin:0 auto 10px;border-radius:50%;display:grid;place-items:center;font-size:58px;background:radial-gradient(circle at 40% 30%,rgba(255,255,255,.22),rgba(255,255,255,.04) 70%)}
+.prize b{display:block;font-size:15.5px;min-height:38px;line-height:1.2}
+.prize .cost{font-size:13px;color:var(--goldTxt);margin:2px 0 10px}
+.btn{border:0;font:700 15px Gush;border-radius:99px;padding:11px 18px;color:var(--ink);background:var(--gold);background-size:160% 100%;box-shadow:0 4px 14px rgba(200,147,42,.35),inset 0 1px 0 rgba(255,255,255,.6);cursor:pointer;width:100%;transition:transform .15s}
+.btn:active{transform:scale(.96)}
+.btn[disabled]{background:rgba(255,255,255,.1);color:#ffffff99;box-shadow:none}
+.btn.teal{background:linear-gradient(135deg,#1c8ea2,#9ff0f7 50%,#43c1cc);color:var(--navy);box-shadow:0 4px 14px rgba(67,193,204,.35)}
+.lead{font-size:24px;font-weight:700;margin:26px 0 4px}
+.leadsub{opacity:.75;font-weight:300}
+.chips{display:flex;gap:8px;overflow-x:auto;padding:2px 0 10px;scrollbar-width:none}
+.chip{flex:none;border:0;background:var(--soft);color:#fff;font-size:14px;padding:9px 16px;border-radius:99px}
+.chip.on{background:var(--gold);color:var(--ink);font-weight:700}
+.deeds{display:grid;grid-template-columns:repeat(3,1fr);gap:18px 10px;margin-top:8px}
+.deed{border:0;background:none;color:#fff;font-size:13.5px;text-align:center;cursor:pointer;line-height:1.25;padding:0}
+.deed .e{width:66px;height:66px;margin:0 auto 7px;border-radius:50%;display:grid;place-items:center;font-size:28px;background:radial-gradient(circle at 40% 30%,rgba(255,255,255,.2),rgba(255,255,255,.05));box-shadow:inset 0 0 0 1.5px rgba(244,207,107,.35);transition:transform .2s}
+.deed:active .e{transform:scale(.88)}
+.deed .p{display:block;margin-top:3px;font-size:12.5px;color:var(--goldTxt);font-weight:700}
+textarea{width:100%;border-radius:22px;border:0;background:rgba(0,0,0,.22);color:#fff;font:400 16px Gush;padding:14px 16px;resize:none;min-height:80px;outline:none}
+textarea:focus{box-shadow:0 0 0 2px rgba(244,207,107,.5)}
+textarea::placeholder{color:#ffffff77}
+input[type=range]{width:100%;accent-color:#e8b84e}
+.row{display:flex;gap:8px;align-items:center}
+.stat{display:flex;justify-content:space-between;padding:12px 0;font-size:16px}
+.stat+.stat{border-top:1px solid var(--line)}
+.zgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px 8px}
+.zs{border:0;background:none;color:#fff;font-size:14px;text-align:center;padding:0}
+.zs .av{width:56px;height:56px;margin:0 auto 6px;border-radius:50%;display:grid;place-items:center;font-size:20px;font-weight:700;background:rgba(255,255,255,.08);box-shadow:inset 0 0 0 2px rgba(255,255,255,.15);transition:all .25s}
+.zs.on .av{background:var(--gold);color:var(--ink);box-shadow:0 0 16px rgba(244,207,107,.6)}
+.zs small{display:block;opacity:.6;font-size:11px;font-weight:300}
+.nav{position:fixed;bottom:calc(14px + env(safe-area-inset-bottom));left:50%;transform:translateX(-50%);display:flex;gap:4px;padding:6px;border-radius:99px;background:rgba(8,26,50,.82);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);box-shadow:0 10px 30px rgba(0,0,0,.35);z-index:20}
+.nav button{border:0;background:none;color:#fff;font-size:15px;padding:10px 22px;border-radius:99px;opacity:.7}
+.nav button.on{background:var(--gold);color:var(--ink);opacity:1;font-weight:700}
+#toast{position:fixed;left:50%;top:calc(14px + env(safe-area-inset-top));transform:translate(-50%,-150%);background:rgba(8,26,50,.95);color:#fff;font-size:15.5px;padding:12px 22px;border-radius:99px;box-shadow:0 10px 30px rgba(0,0,0,.35),inset 0 0 0 1.5px rgba(244,207,107,.6);transition:transform .45s cubic-bezier(.3,1.5,.5,1);z-index:30;max-width:92vw;text-align:center}
+#toast.show{transform:translate(-50%,0)}
+#overlay{position:fixed;inset:0;background:radial-gradient(circle,rgba(20,60,100,.92),rgba(4,16,32,.96));display:none;place-items:center;z-index:25;text-align:center;padding:24px}
+#overlay.show{display:grid;animation:pop .5s}
+#overlay h3{font-size:32px;font-weight:700;margin:14px 0 6px}
+canvas#cf{position:fixed;inset:0;pointer-events:none;z-index:40}
+.hide{display:none!important}
+html{background:#61d0df}body{background:transparent!important}
+.sky{position:absolute;top:0;left:0;right:0;height:100vh;background:url(bg2.webp) center top/cover;-webkit-mask:linear-gradient(#000 58%,transparent);mask:linear-gradient(#000 58%,transparent);z-index:-1}
+.card{position:relative;border-radius:30px;padding:20px 18px 22px;margin-top:18px;overflow:hidden;box-shadow:0 14px 30px rgba(0,10,30,.35),inset 0 1px 0 rgba(255,255,255,.35)}
+.card:before{content:"";position:absolute;width:220px;height:220px;border-radius:50%;top:-110px;left:-70px;background:radial-gradient(circle,rgba(255,255,255,.28),transparent 70%);pointer-events:none}
+.b1{background:linear-gradient(145deg,#5cc8ff 0%,#2a9df4 55%,#1a7fd6 100%)}
+.b2{background:linear-gradient(145deg,#2fd3e0 0%,#11a8c8 55%,#0a86a8 100%)}
+.b3{background:linear-gradient(145deg,#4a8dff 0%,#2c67e6 55%,#1f4fc4 100%)}
+.b4{background:linear-gradient(145deg,#3a62d9 0%,#2747ad 55%,#1c3488 100%)}
+.b5{background:linear-gradient(145deg,#2b3f9c 0%,#1d2c78 55%,#141f5a 100%)}
+.ch{font-family:Gush,sans-serif;font-weight:900;font-size:21px;display:flex;align-items:center;gap:10px;margin-bottom:16px;text-shadow:0 2px 6px rgba(0,30,70,.25)}
+.ch i{font-style:normal;width:38px;height:38px;border-radius:50%;display:grid;place-items:center;font-size:19px;background:rgba(255,255,255,.22);box-shadow:inset 0 0 0 1.5px rgba(255,255,255,.4)}
+.card .sub,.card .pro{opacity:.95}
+.card .steps b{background:rgba(255,255,255,.22);color:#fff}
+.card .steps em{background:rgba(255,255,255,.3)}
+.card .steps b.on{background:var(--gold);color:var(--ink)}
+.card .zcount small{opacity:.8}
+.card .tl:before{background:linear-gradient(rgba(255,233,160,.8),rgba(255,233,160,0))}
+.card .tl .dot{background:rgba(0,20,60,.35)}
+.card .prizes{margin:0 -18px;padding-inline:18px}
+.card .prize .img{background:radial-gradient(circle at 40% 30%,rgba(255,255,255,.35),rgba(255,255,255,.08) 70%)}
+.card .badge .ic{background:radial-gradient(circle at 35% 30%,#3a8fe0,#173f94)}
+.card .deed .e{background:rgba(255,255,255,.2);box-shadow:inset 0 0 0 1.5px rgba(255,255,255,.45)}
+.card .deed .p,.card .prize .cost{color:#fff1b8}
+.card .chip{background:rgba(255,255,255,.2)}
+.card textarea{background:rgba(0,25,70,.3)}
+.card .zs .av{background:rgba(255,255,255,.2)}
+.ring circle:first-child{stroke:rgba(255,255,255,.25)}
+.ringtxt .cheer{color:#EAEFC8}
+.zcheer{filter:drop-shadow(0 2px 4px rgba(80,40,0,.45))!important}
+.msg{margin-top:20px}
+.lead{margin-top:30px}
+.wrap{overflow-x:clip}
+.card{margin:0 -20px!important;border-radius:0!important;box-shadow:none!important;padding:30px 22px 32px!important}
+.card:before{display:none}
+.msg+.card,.hero+.msg.hide+.card{margin-top:28px!important}
+#v-parent .card:first-of-type,#v-teacher .card:first-of-type{margin-top:22px!important}
+.wrap{padding-bottom:0}
+body{padding-bottom:0!important}
+section{padding-bottom:110px;margin:0 -20px;padding-inline:20px}
+section .card:last-child{padding-bottom:130px!important;margin-bottom:-110px!important}
+.b1{background:linear-gradient(180deg,#61d0df 0,#3bb9c7 110px,#2a9fb0 100%)}
+.b1 .ch,.b1 .zcount,.b1 .sub,.b1 .pro{text-shadow:0 1px 3px rgba(0,60,80,.35)}.b6{background:#B7D2B6}.b2{background:#A2C341}.b3{background:#DBE4A9}.b4{background:#55A38B}.b5{background:#48A3A7}
+.b2{color:#12361f}.b2 .ch{text-shadow:none}.b2 .ch i{background:rgba(255,255,255,.45);box-shadow:none}
+.b2 .ring circle:first-child{stroke:rgba(18,54,31,.15)!important}.b2 .ringtxt .cheer{color:#0D614A}
+.b2 .chip,.b2 .zs .av{background:rgba(255,255,255,.5);color:#12361f}.b2 .zs.on .av{background:var(--gold)}
+.b2 textarea,.b6 textarea,.b3 textarea,.bg textarea{background:rgba(255,255,255,.6);color:#12361f}
+.b2 textarea::placeholder,.b3 textarea::placeholder{color:#12361f88}
+.b2 .deed,.b3 .deed,.b6 .deed{color:#12361f}.b2 .deed .p,.b3 .deed .p,.b6 .deed .p{color:#0D614A}
+.b2 .deed .e,.b3 .deed .e{background:rgba(255,255,255,.5);box-shadow:none}
+.b3 .tl .dot,.b6 .tl .dot{background:#0D614A}
+.b6,.b3{color:#12361f}
+.b6 .ch,.b3 .ch{text-shadow:none}
+.b6 .ch i,.b3 .ch i{background:rgba(255,255,255,.45);box-shadow:none}
+.b6 .chip,.b3 .chip{background:rgba(255,255,255,.5);color:#12361f}
+.b6 .chip.on,.b6 .chip.peer.on{background:#0D614A;color:#fff}
+.b6 .btn[disabled]{background:rgba(13,97,74,.15);color:#12361f}
+.b3 .badge .ic{background:radial-gradient(circle at 35% 30%,#2f9a63,#0D614A)}
+.b3 .badge small{opacity:.75}
+.b2 .ring circle:first-child{stroke:rgba(255,255,255,.25)}
+.b1 .steps b{background:rgba(255,255,255,.22)}
+.chip.peer.on{background:#fff;color:#0b2a66}
+#v-student:not(.hide){display:flex;flex-direction:column}
+#v-student>.hero{order:0}#v-student>.msg{order:1}#v-student>.b1{order:2}#v-student>.bg{order:3}#v-student>.b2{order:4}#v-student>.b6{order:5}#v-student>.b4{order:6}#v-student>.b3{order:7}#v-student>.b5{order:8}
+.bg{background:#DBE4A9;color:#12361f}
+.bg .ch{text-shadow:none}.bg .ch i{background:rgba(255,255,255,.55);box-shadow:none}
+.bg .big{color:#0D614A}
+select{width:100%;font:700 16px Gush;padding:12px 16px;border-radius:99px;border:0;background:#fff;color:#12361f;appearance:none;-webkit-appearance:none}
+.goal{display:flex;align-items:center;gap:12px;padding:12px 14px;border-radius:20px;background:rgba(255,255,255,.55);margin-bottom:10px}
+.goal .tg{width:54px;height:54px;flex:none;border-radius:50%;display:grid;place-items:center;font-family:Gush;font-weight:900;font-size:20px;background:#0D614A;color:#fff}
+.goal.hit .tg{background:var(--gold);color:var(--ink)}
+.goal b{display:block;font-size:17px}
+.goal small{font-size:13px;opacity:.8}
+.goal.hit small{color:#0D614A;font-weight:700;opacity:1}
+.tg-row{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid rgba(255,255,255,.2)}
+.tg-row input{width:70px;font:700 17px Gush;padding:8px;border-radius:12px;border:0;text-align:center}
+.tg-row .btn{width:auto;padding:9px 14px;font-size:14px}
+.tg-row .who{flex:1}
+.bs{background:#48A3A7}
+.b5 .prize .img{background:radial-gradient(circle at 40% 30%,rgba(255,255,255,.4),rgba(255,255,255,.1) 70%)}
+#v-student>.bs{order:2}
+.sltimes{display:flex;gap:10px;margin:16px 0 10px}
+.sltimes label{flex:1;font-size:14px;background:rgba(255,255,255,.1);border-radius:20px;padding:10px 12px;display:flex;flex-direction:column;gap:4px}
+.sltimes input{font:900 22px Gush;color:#fff;background:none;border:0;padding:0;width:100%;color-scheme:dark}
+.slbtns{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.slb{border:0;border-radius:24px;padding:16px 8px;background:rgba(255,255,255,.12);color:#fff;font:700 15px Gush;display:flex;flex-direction:column;align-items:center;gap:4px}
+.slb span{font-size:34px}
+.slb small{font-size:12px;opacity:.75;font-weight:400}
+.slb.done{background:var(--gold);color:var(--ink)}
+.slb:active{transform:scale(.95)}
+#slCheer{color:#EAEFC8}
+.quote{margin:16px 0 4px;padding:14px 18px;border-right:3px solid #e8b84e;font:700 17px/1.55 Gush;color:#fff6d6;background:linear-gradient(90deg,transparent,rgba(232,184,78,.12))}
+.quote small{display:block;font-size:12px;font-weight:400;opacity:.7;margin-top:4px;color:#fff}
+.crb{width:50px;height:24px;background:var(--gold);-webkit-mask:url(crest.webp) center/contain no-repeat;mask:url(crest.webp) center/contain no-repeat;filter:drop-shadow(0 1px 2px rgba(0,0,0,.4))}
+.top h1,.name,.lvl,.pts span,.sub,.top small,.demo{color:#0b3d4a}
+#v-student .hero .sub{color:#0b3d4a;opacity:.85}
+.hero .greet{background:none;-webkit-background-clip:initial;background-clip:initial;color:#b07a10}
+.bell{background:rgba(11,61,74,.12)}.bell svg{stroke:#0b3d4a}
+.track{background:rgba(11,61,74,.15)!important}
+.crest .ghost{background:rgba(11,61,74,.18)!important}
+.pts b{filter:drop-shadow(0 2px 2px rgba(80,50,0,.35))}
+.arc{display:block;width:min(340px,96%);margin:8px auto -58px;overflow:visible}
+.arc .src{font-size:11px;font-weight:400;opacity:.75}
+.arc text{font:900 17px Gush;fill:#0b3d4a;letter-spacing:.3px}
+.arcsrc{font-size:12px;color:#0b3d4a;opacity:.7;margin-top:-2px}
+.lead{color:#0b3d4a}
+.lvl span,.hero .sub span{text-shadow:0 1px 2px rgba(0,0,0,.55),0 0 1px rgba(0,0,0,.6)}
+.arc text{font:700 18px Moshe,serif;fill:#0b3d4a}
+.arc .src{font:700 13px Moshe,serif;fill-opacity:.7}
+#cpop{position:fixed;inset:0;z-index:35;display:none;place-items:center;background:rgba(4,40,50,.55);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);padding:24px}
+#cpop.show{display:grid}
+#cpop .cbox{width:min(340px,100%);text-align:center;padding:26px 22px 24px;border-radius:32px;background:linear-gradient(170deg,#61d0df,#2a9fb0);color:#fff;box-shadow:0 20px 50px rgba(0,0,0,.4),inset 0 0 0 2px rgba(255,236,170,.6);animation:cpin .6s cubic-bezier(.3,1.6,.5,1)}
+#cpop.out .cbox{animation:cpout .45s ease-in forwards}
+@keyframes cpin{0%{transform:scale(.4) rotate(-8deg);opacity:0}100%{transform:none;opacity:1}}
+@keyframes cpout{to{transform:scale(.6) translateY(40px);opacity:0}}
+#cpop h3{font:900 30px/1.1 Gush;margin:8px 0 6px;background:var(--gold);-webkit-background-clip:text;background-clip:text;color:transparent;filter:drop-shadow(0 2px 2px rgba(60,30,0,.5))}
+#cpop .cice svg{width:90px;animation:wob 1.6s ease-in-out infinite}
+#cpText{font-size:17px;font-weight:700;text-shadow:0 1px 3px rgba(0,60,80,.4)}
+.flv{display:flex;gap:8px;justify-content:center;margin-top:16px;flex-wrap:wrap}
+.flv button{border:0;border-radius:99px;padding:11px 16px;font:900 15px Gush;color:#fff;box-shadow:0 4px 10px rgba(0,0,0,.25)}
+#trail{display:block;width:100%;margin:18px 0 0;overflow:visible}
+#trail .nd text{font:900 11px Gush;text-anchor:middle;dominant-baseline:central}
+#trail .cur{animation:pulse 1.6s ease-in-out infinite;transform-box:fill-box;transform-origin:center}
+@keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.25)}}
+#trail .tag{animation:bob 1.6s ease-in-out infinite}
+@keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-4px)}}
+#trail .goal{animation:wob 2.4s ease-in-out infinite;transform-box:fill-box;transform-origin:center}
+#trail .prog{transition:stroke-dasharray 1.4s cubic-bezier(.2,.9,.3,1)}
+.motto{direction:rtl;unicode-bidi:isolate;text-align:center;font:700 19px/1.5 Moshe,serif;color:#0b3d4a;margin:14px auto -6px;max-width:330px}
+.motto small{display:block;font:700 13px Moshe,serif;opacity:.7}
+.flv .fbtn{background:rgba(255,255,255,.18);box-shadow:none;border-radius:20px;padding:8px 4px 10px;width:calc(50% - 6px);display:flex;flex-direction:column;align-items:center;gap:4px}
+.flv .fbtn svg{width:46px;height:auto;animation:none}
+.flv .fbtn:active{transform:scale(.94)}
+#cpop .cbox{max-height:90vh;overflow:auto}
+.flvrow{margin-top:18px;padding:14px 12px 12px;border-radius:24px;background:rgba(255,255,255,.14)}
+.flvs{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
+.flvs button{border:0;background:rgba(255,255,255,.12);border-radius:18px;padding:8px 2px 8px;color:#fff;font:700 12.5px/1.15 Gush;display:flex;flex-direction:column;align-items:center;gap:4px;transition:transform .2s,background .2s}
+.flvs button svg{width:38px;height:auto;animation:none}
+.flvs button.on{background:#fff;color:#1b6f7c;box-shadow:0 0 0 3px #e8b84e,0 6px 14px rgba(0,0,0,.2);transform:translateY(-3px)}
+.flvs button:active{transform:scale(.93)}
+.crrow{margin-top:18px;padding:14px 14px 12px;border-radius:24px;background:rgba(255,255,255,.14)}
+.crs{display:flex;flex-wrap:wrap;gap:4px;align-items:flex-end;min-height:56px}
+.crs svg{width:30px;height:auto;animation:popin .6s cubic-bezier(.3,1.6,.5,1) both;filter:drop-shadow(0 3px 4px rgba(0,0,0,.2))}
+.crs .nx{width:30px;opacity:.55}
+.crs .empty{font-size:14px;opacity:.85;font-weight:700;align-self:center}
+@keyframes popin{0%{transform:scale(0) rotate(-20deg)}100%{transform:none}}
+#ovMedal .crs svg{width:90px}
+.bx{background:radial-gradient(circle at 80% 0%,#1d5b66 0%,#0c2f38 55%,#081f27 100%);color:#fff}
+#v-student>.bx{order:2}
+.agrow{display:flex;align-items:center;gap:14px}
+.agwrap{position:relative;width:130px;flex:none}
+.agent{width:130px;display:block;filter:drop-shadow(0 8px 16px rgba(0,0,0,.45))}
+.agent .glint{animation:glint 3.2s ease-in-out infinite}
+@keyframes glint{0%,60%{transform:translateX(0) skewX(-20deg)}100%{transform:translateX(220px) skewX(-20deg)}}
+.agq{position:absolute;top:-6px;left:-4px;width:40px;height:40px;border-radius:50%;background:var(--gold);color:#3a2504;font:900 26px/40px Gush;text-align:center;animation:bob 2s ease-in-out infinite;box-shadow:0 4px 12px rgba(0,0,0,.4)}
+@keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
+.agtitle{font:900 24px/1.15 Gush}
+.agsub{font-size:17px;margin-top:6px;color:#9ff0f7;font-weight:700}
+.mission{margin-top:16px;padding:14px 16px;border-radius:20px;background:rgba(255,255,255,.08);font-size:15px;line-height:1.55;border-right:3px solid #e8b84e}
+.gt{color:#f4cf6b}
+.agrev{margin-top:12px;font-size:14px;opacity:.9}
+.agrev .tag{display:inline-block;margin:4px 0 0 6px;padding:5px 12px;border-radius:99px;background:rgba(244,207,107,.18);color:#ffe39a;font-weight:700}
+.agsecret{padding:16px;border-radius:20px;background:rgba(255,255,255,.08);text-align:center;cursor:pointer;font-size:16px}
+.agsecret .nm{display:none;font:900 30px Gush;color:#f4cf6b}
+.agsecret.show .nm{display:block}.agsecret.show .hid{display:none}
+.agno{background:rgba(255,255,255,.14)!important;color:#fff!important;box-shadow:none!important}
+.agnew{margin-top:12px;width:100%;border:0;background:none;color:#9ff0f7;font:700 14px Gush;text-decoration:underline}
+#agOv{position:fixed;inset:0;z-index:36;display:none;place-items:center;padding:22px;background:radial-gradient(circle,rgba(13,60,70,.92),rgba(3,15,22,.97))}
+#agOv.show{display:grid}
+#agOv .box{text-align:center;max-width:360px;animation:cpin .6s cubic-bezier(.3,1.6,.5,1)}
+#agOv .agent{width:180px;margin:0 auto}
+#agOv h3{font:900 34px/1.15 Gush;margin:14px 0 6px}
+#agOv .nm{font:900 52px Gush;background:var(--gold);-webkit-background-clip:text;background-clip:text;color:transparent;filter:drop-shadow(0 3px 3px rgba(80,40,0,.5));letter-spacing:1px}
+#agOv p{font-size:17px;line-height:1.5;opacity:.92;margin:10px 0}
+#agOv .lock{font-size:64px;margin:6px 0}
+#agOv .typing::after{content:'▍';animation:blink .8s steps(1) infinite}
+@keyframes blink{50%{opacity:0}}
+.top{margin:-16px -20px 0;padding:calc(10px + env(safe-area-inset-top)) 20px 10px;background:#fff;box-shadow:0 4px 18px rgba(0,30,50,.18);position:relative;z-index:2}
+body{padding-top:0!important}
+.top h1{color:#0b3d4a!important;font-size:24px!important;font-weight:900!important}
+.top h1 .cls{font-size:16px;font-weight:700;color:#a06b14;margin-right:4px}
+.top small{color:#0b3d4a!important;opacity:.7!important}
+.top .bell{background:#eef7f8!important}.top .bell svg{stroke:#0b3d4a!important}
+.logo2{width:52px;height:auto;display:block}
+.demo{margin-top:12px!important}
+.name,.pts b,.zcount,.zcheer,.lead,.ring .rv b,#overlay h3,.big,.ch,.agtitle,#cpop h3,#agOv h3,#agOv .nm,.top h1,.goal .tg,.dot,.slb{font-weight:900!important}
+.top h1 .cls{font-weight:600!important}
+.hi{font:400 22px Gush;color:#0b3d4a;margin-top:6px;letter-spacing:.3px}
+.bigname{position:relative;display:inline-block;margin:2px auto 0;padding:0 10px}
+.bigname #bigName{display:block;font:900 64px/1.05 Gush!important;color:#0b3d4a;text-shadow:0 3px 0 rgba(255,255,255,.55),0 8px 22px rgba(0,60,80,.25);animation:namein .9s cubic-bezier(.3,1.6,.5,1) both}
+@keyframes namein{0%{transform:scale(.6) translateY(10px);opacity:0}100%{transform:none;opacity:1}}
+.swoosh{display:block;width:100%;height:20px;margin-top:-4px}
+.swoosh path{stroke-dasharray:420;stroke-dashoffset:420;animation:draw 1s .5s ease-out forwards}
+@keyframes draw{to{stroke-dashoffset:0}}
+#greet{font-size:16px!important;margin-top:8px;min-height:20px}
+.hero .name{display:none}
+.life{font-size:13.5px;color:#0b3d4a;opacity:.85;margin-top:2px}.life b{font-weight:900}
+.bw{background:#EAEFC8;color:#12361f}
+#v-student>.bw{order:8}
+.bw .ch{text-shadow:none}.bw .ch i{background:rgba(255,255,255,.7);box-shadow:none}
+.wkhead{display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:6px}
+.wkhead .now{font:900 40px/1 Gush}.wkhead .now small{font:400 15px Gush;margin-right:4px}
+.trend{font:700 15px Gush;padding:6px 12px;border-radius:99px}
+.trend.up{background:#d6efc4;color:#2f6f1f}.trend.down{background:#f6e1c8;color:#8a4b0c}
+#wkChart{width:100%;display:block}
+#wkChart .bar{transition:all .9s cubic-bezier(.2,.9,.3,1)}
+.wkfoot{display:flex;gap:8px;flex-wrap:wrap;font-size:14px;margin-top:4px}
+.wkfoot span{background:rgba(255,255,255,.7);padding:6px 12px;border-radius:99px}
+.donate{margin-top:6px;padding:16px;border-radius:24px;background:rgba(255,255,255,.14)}
+.donate .row button{flex:1;border:0;border-radius:99px;padding:11px 0;font:900 16px Gush;background:rgba(255,255,255,.2);color:#fff}
+.donate .row button:active{transform:scale(.95)}
+.checkin{margin-top:16px;text-align:center}
+.ba{background:#C3D48B;color:#12361f}.ba .ch{text-shadow:none}.ba .ch i{background:rgba(255,255,255,.6);box-shadow:none}
+#v-student>.ba{order:5}
+.aw{font:700 44px/1.1 Moshe,serif;text-align:center;color:#0D614A;margin-top:4px}
+.am{text-align:center;font-size:17px;margin-top:6px}
+.brep{background:#fff;color:#0b3d4a}.brep .ch{text-shadow:none}.brep .ch i{background:#eef7f8;box-shadow:none}
+.binit{background:linear-gradient(160deg,#2b3f9c,#1d2c78);color:#fff}
+.bgrp{background:#C3D48B;color:#12361f}.bgrp .ch{text-shadow:none}.bgrp .ch i{background:rgba(255,255,255,.6);box-shadow:none}
+.bgrp .chip{background:rgba(255,255,255,.55);color:#12361f}.bgrp .chip.on{background:#0D614A;color:#fff}
+.chips.wrap{flex-wrap:wrap;overflow:visible}
+.seg{display:inline-flex;background:#eef7f8;border-radius:99px;padding:4px;margin-bottom:10px}
+.seg button{border:0;background:none;padding:7px 18px;border-radius:99px;font:700 14px Gush;color:#0b3d4a}
+.seg button.on{background:#0b3d4a;color:#fff}
+.rstats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:8px}
+.rstats div{background:#f2f8f8;border-radius:16px;padding:10px 6px;text-align:center;font-size:12px}
+.rstats b{display:block;font:900 22px Gush;color:#0b3d4a}
+.rtrend{margin-top:10px;padding:10px 14px;border-radius:14px;font-weight:700;font-size:15px}
+.rtrend.up{background:#e3f4da;color:#2f6f1f}.rtrend.down{background:#fbeadb;color:#8a4b0c}
+.clsrow{display:flex;align-items:center;gap:8px;padding:7px 0;border-bottom:1px solid #eef3f4;font-size:14px}
+.clsrow .nm{flex:1}.clsrow .bar{width:80px;height:8px;border-radius:99px;background:#eef3f4;overflow:hidden}.clsrow .bar i{display:block;height:100%;background:#43a36a}
+.vals{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px}
+.vals button{border:0;border-radius:99px;padding:9px 14px;font:700 14px Gush;color:#12202a;opacity:.55}
+.vals button.on{opacity:1;box-shadow:0 0 0 3px #fff}
+.inp{width:100%;border:0;border-radius:16px;padding:12px 14px;font:400 16px Gush;background:rgba(255,255,255,.15);color:#fff;outline:none}
+.inp::placeholder{color:#ffffffaa}
+.chk{display:flex;align-items:center;gap:8px;margin:12px 2px;font-weight:700}
+.chk input{width:22px;height:22px;accent-color:#e8b84e}
+#valTags{display:flex;flex-wrap:wrap;gap:6px;margin-top:12px}
+#valTags span{padding:6px 12px;border-radius:99px;font-weight:700;font-size:13px;color:#12202a}
+.ch{font-size:19px!important;letter-spacing:.2px;margin-bottom:14px!important}
+.ch i{display:none!important}
+.ch:before{content:"";display:inline-block;width:4px;height:20px;border-radius:2px;background:linear-gradient(#f7dc8a,#a06b14);margin-left:2px}
+.card{padding:28px 22px 30px!important}
+.zcheer{animation:none!important;font-size:22px!important}
+.icewrap .spark{display:none}
+.ice{animation:wob 6s ease-in-out infinite}
+@keyframes wob{0%,100%{transform:rotate(-1.5deg)}50%{transform:rotate(1.5deg)}}
+.btn{box-shadow:0 2px 8px rgba(160,107,20,.25),inset 0 1px 0 rgba(255,255,255,.5)!important;letter-spacing:.2px}
+.agq{animation:none}
+.badge .ic{font-size:22px}
+.demo{opacity:.45!important}
+.sub,.pro,.mission{line-height:1.55}
+.nav{padding:5px!important}.nav button{font-size:14px!important;padding:9px 20px!important}
+#greet{opacity:.85}
+.prize .img{width:112px!important;height:112px!important;font-size:48px!important}
+.tl:before{display:none!important}
+.awrow{display:flex;justify-content:space-between;align-items:baseline;gap:10px;padding:8px 4px;border-bottom:1px solid rgba(18,54,31,.12)}
+.aww{font:700 24px Moshe,serif;color:#0D614A}.awm{font-size:15px;text-align:left}
+#awWord,#pAwWord{font:inherit!important;text-align:right!important}
+.aerow{display:flex;gap:6px;margin-bottom:6px}.aerow input{flex:1;min-width:0;border:0;border-radius:12px;padding:9px 10px;font:400 15px Gush;background:rgba(255,255,255,.7)}.aerow input:first-child{font:700 17px Moshe,serif}
+.aerow button{border:0;background:rgba(18,54,31,.12);border-radius:10px;width:34px}
+</style>
+</head>
+<body>
+<div class="sky"></div><canvas id="cf"></canvas>
+<div id="toast"></div>
+<div id="agOv" onclick="if(this.dataset.ready)this.classList.remove('show')"><div class="box" id="agBox"></div></div>
+<div id="cpop" onclick="if(!this.classList.contains('pick'))closePop()"><div class="cbox"><div class="cice" id="cpIce"></div><h3 id="cpTitle"></h3><div id="cpText"></div><div class="flv" id="cpFlv"></div></div></div>
+<div id="overlay" onclick="this.classList.remove('show')"><div><div id="ovMedal"></div><h3 id="ovTitle" class="gold-t"></h3><div id="ovText" style="font-size:17px;opacity:.85"></div><br><button class="btn" style="width:auto;padding:12px 40px">יאללה!</button></div></div>
+<nav class="nav">
+<button data-r="student" class="on">תלמיד</button>
+<button data-r="parent">הורה</button>
+<button data-r="teacher">מורה</button>
+</nav>
+<div class="wrap">
+<div class="top">
+<div><h1>כנפי רוח <span class="cls">ח׳1</span></h1><small>הישיבה התיכונית קרית אתא · המחנך ינון אליה</small></div>
+<button class="bell" id="bell" aria-label="התראות"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="#fff" stroke-width="1.8"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg><i id="bellN"></i></button>
+<img class="logo2" src="star.webp" alt="הישיבה התיכונית קרית אתא">
+</div>
+<div class="npanel hide" id="npanel"><ul id="nlist"></ul></div>
+<div class="demo">גרסת תצוגה · הנתונים לדוגמה</div>
+<!-- STUDENT -->
+<section id="v-student">
+<div class="hero">
+<div class="hi"><span id="tod"></span>,</div>
+<div class="bigname"><span class="sname" id="bigName"></span><svg class="swoosh" viewBox="0 0 300 30" preserveAspectRatio="none"><defs><linearGradient id="swg" x1="0" x2="1"><stop offset="0" stop-color="#a06b14"/><stop offset=".5" stop-color="#ffe39a"/><stop offset="1" stop-color="#c8932a"/></linearGradient></defs><path d="M6,20 C70,4 160,6 294,14 C200,14 110,18 40,26" fill="none" stroke="url(#swg)" stroke-width="7" stroke-linecap="round"/></svg></div>
+<div class="greet gold-t" id="greet"></div>
+<div class="motto">כָּל מַה שֶּׁהָאָדָם גָּדֵל, מִתְגַּדֵּל הָעוֹלָם כֻּלּוֹ עִמּוֹ<small>הרב קוק</small></div><div id="medal"></div>
+<div class="lvl" id="lvlName"></div>
+<div class="pts"><b class="gold-t" id="ptsNum">0</b><span>נקודות לשימוש</span></div><div class="life" id="life"></div>
+<div class="track"><i id="lvlBar" style="width:0"></i></div>
+<div class="sub" id="lvlNext"></div>
+</div>
+<div class="msg hide" id="msgCard"><small>הודעה מהמחנך ינון אליה</small><div id="msgText"></div></div>
+<div class="card b1" data-burst="1">
+<div class="ch"><i>☀️</i>זריזין מקדימים למצוות</div>
+<div class="zr">
+<div class="icewrap" id="icewrap"><svg class="ice" id="ice" viewBox="0 0 100 170"></svg><span class="spark" style="top:-4px;right:-6px">✨</span><span class="spark" style="top:40%;left:-14px;animation-delay:.8s">⭐</span><span class="spark" style="bottom:30%;right:-12px;animation-delay:1.6s">✨</span></div>
+<div style="flex:1">
+<div class="zcount"><span id="zrNum">0</span><small> / 15</small></div>
+<div class="zcheer" id="zrCheer"></div>
+<div class="sub" style="margin:0" id="zrLeft"></div><div class="sub" style="margin:4px 0 0;font-weight:700" id="zrFlavor"></div>
+</div>
+</div>
+<div class="checkin"><button class="btn" id="ciBtn">✋ הגעתי לתפילה</button><div class="sub" id="ciMsg" style="margin:8px 0 0;font-weight:700"></div></div>
+<div class="flvrow"><div class="sub" style="margin:0 0 8px;font-weight:700">איזה קראנץ' אתה רוצה? 🍦</div><div class="flvs" id="flvs"></div></div>
+<div class="steps" id="streak"></div>
+<div class="pro">5 ימים ברצף = <b>זריזין פרו ⚡</b> שווה 8</div>
+<div class="crrow"><div class="row" style="justify-content:space-between;margin-bottom:8px"><b style="font-size:16px">הקראנצ'ים שלי</b><span class="sub" style="margin:0;font-weight:700" id="crN"></span></div><div class="crs" id="crs"></div></div>
+</div>
+<div class="card bx" id="agentCard">
+<div class="ch"><i>🕶️</i>הסוכן X</div>
+<div class="agrow"><div class="agwrap" id="agWrap"><svg viewBox="0 0 200 230" class="agent"><defs>
+<radialGradient id="agGlow"><stop offset="0" stop-color="#43c1cc" stop-opacity=".55"/><stop offset="1" stop-color="#43c1cc" stop-opacity="0"/></radialGradient>
+<linearGradient id="agCoat" x1="0" x2="1"><stop offset="0" stop-color="#1a2a33"/><stop offset=".5" stop-color="#2b3f4a"/><stop offset="1" stop-color="#141f26"/></linearGradient>
+<linearGradient id="agFace" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2e4450"/><stop offset="1" stop-color="#1b2a33"/></linearGradient>
+<linearGradient id="agGold" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fff6d6"/><stop offset=".45" stop-color="#e8b84e"/><stop offset="1" stop-color="#a06b14"/></linearGradient>
+<linearGradient id="agLens" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#0b1418"/><stop offset=".55" stop-color="#1f3b45"/><stop offset="1" stop-color="#0b1418"/></linearGradient>
+<clipPath id="agLensClip"><path d="M58,104 h36 q3,0 3,4 q-2,16 -18,16 q-14,0 -21,-15 q-1,-5 0,-5z M106,104 h36 q2,0 1,5 q-7,15 -21,15 q-16,0 -18,-16 q0,-4 2,-4z"/></clipPath></defs>
+<circle cx="100" cy="110" r="96" fill="url(#agGlow)"/>
+<path d="M30,230 Q34,170 70,160 L100,184 L130,160 Q166,170 170,230Z" fill="url(#agCoat)"/>
+<path d="M70,160 L58,150 L86,200 L100,184Z M130,160 L142,150 L114,200 L100,184Z" fill="#33505d"/>
+<path d="M86,166 L100,184 L114,166 L108,162 L100,170 L92,162Z" fill="#eef4f6"/>
+<path d="M96,172 L104,172 L107,214 L100,224 L93,214Z" fill="#0b1418"/>
+<g transform="translate(140,196) rotate(-12)"><circle r="13" fill="url(#agGold)"/><text y="5.5" text-anchor="middle" font-size="16" font-weight="900" fill="#3a2504" font-family="Gush,sans-serif">X</text></g>
+<rect x="88" y="138" width="24" height="24" fill="#22343e"/>
+<ellipse cx="100" cy="112" rx="40" ry="46" fill="url(#agFace)"/>
+<path d="M50,82 Q100,70 150,82 L146,92 Q100,84 54,92Z" fill="#0b1418"/>
+<path d="M66,84 Q68,40 100,38 Q132,40 134,84 Q100,76 66,84Z" fill="#111c22"/>
+<path d="M67,74 Q100,66 133,74 L134,82 Q100,74 66,82Z" fill="url(#agGold)"/>
+<path d="M56,104 h88 v4 h-88z" fill="#0b1418"/>
+<path d="M58,104 h36 q3,0 3,4 q-2,16 -18,16 q-14,0 -21,-15 q-1,-5 0,-5z M106,104 h36 q2,0 1,5 q-7,15 -21,15 q-16,0 -18,-16 q0,-4 2,-4z" fill="url(#agLens)" stroke="#e8b84e" stroke-width="1.6"/>
+<g clip-path="url(#agLensClip)"><rect class="glint" x="-40" y="96" width="14" height="40" fill="#fff" opacity=".55" transform="skewX(-20)"/></g>
+<path d="M88,138 Q100,144 114,136" stroke="#0b1418" stroke-width="3" fill="none" stroke-linecap="round"/>
+</svg><div class="agq" id="agQ">?</div></div>
+<div style="flex:1"><div class="agtitle" id="agTitle">הסוכן היומי כבר נבחר...</div><div class="agsub" id="agSub">האם זה אתה? 👀</div></div></div>
+<div class="mission"><b>🎯 המשימה של הסוכן:</b> להגיע בזריזות לתפילה ולהתפלל כמו שצריך לאורך כל התפילה.<br><span style="opacity:.8">עמד במשימה? השם שלו נחשף לכל הכיתה, וכל הכיתה מקבלת <b class="gt">+10</b>.</span></div>
+<div class="agrev" id="agRev"></div>
+</div>
+<div class="card bs">
+<div class="ch"><i>🌙</i>השינה שלי</div>
+<div class="zr">
+<svg id="moon" viewBox="0 0 100 100" width="96" height="96"></svg>
+<div style="flex:1">
+<div class="zcount"><span id="slNum">0</span><small> / 5 לילות</small></div>
+<div class="sub" style="margin:4px 0 0;font-weight:700" id="slCheer"></div>
+</div>
+</div>
+<div class="quote">״יִתְגַּבֵּר כַּאֲרִי לַעֲמֹד בַּבֹּקֶר לַעֲבוֹדַת בּוֹרְאוֹ, שֶׁיְּהֵא הוּא מְעוֹרֵר הַשַּׁחַר״<small>שולחן ערוך, אורח חיים א, א</small></div>
+<div class="sltimes">
+<label>🛏️ הולך לישון<input type="time" id="slBed" value="23:00"></label>
+<label>⏰ קם<input type="time" id="slWake" value="06:45"></label>
+</div>
+<div class="pro">בזמן = עד 23:30, שווה <b>+5</b> כל לילה · 5 לילות ברצף = <b>+5 בונוס</b> ותג "ישן כמו אלוף"</div>
+</div>
+<div class="card bg">
+<div class="ch"><i>🎯</i>היעדים שלי במבחנים</div>
+<div class="sub" style="margin:-8px 0 14px">הצב לעצמך יעד לכל מבחן. עמדת ביעד? <b>+8 למדליה</b> ועוד <b>5 בונוס</b> על המבחן.</div>
+<div id="goalList"></div>
+<div class="gform">
+<select id="gSub"></select>
+<div class="row" style="margin:12px 2px 2px"><span>היעד שלי:</span><b class="big" style="font-size:34px;margin-right:auto" id="gVal">85</b></div>
+<input type="range" min="65" max="100" step="5" value="85" id="gRange"><div class="sub" style="margin:4px 0 0;font-size:13px">היעד המינימלי הוא 65</div>
+<button class="btn" style="margin-top:12px" id="gAdd">הצב יעד</button>
+</div>
+</div>
+<div class="card b6">
+<div class="ch"><i>🤝</i>תן כוח לחבר</div>
+<div class="sub" style="margin:-8px 0 12px">ראית חבר שעשה משהו טוב? פעם ביום אתה יכול לתת לו 5 נקודות.</div>
+<div class="chips" id="peerChips"></div>
+<div class="chips" id="peerWhy"></div>
+<button class="btn" id="peerBtn" style="margin-top:6px">שלח לחבר</button>
+</div>
+<div class="card b2">
+<div class="ch"><i>🏆</i>היעד של כל הכיתה</div>
+<div class="ringrow">
+<div class="ring" id="ring"></div>
+<div class="ringtxt"><div class="big" id="clsPrize"></div><div class="sub" style="margin-top:4px" id="clsLeft"></div><div class="cheer" id="clsCheer"></div></div>
+</div>
+</div>
+<div class="card b3">
+<div class="ch"><i>🎖️</i>התגים שלי</div>
+<div class="badges" id="badges"></div><div id="valTags"></div>
+</div>
+<div class="card ba">
+<div class="ch"><i>📜</i>מילים בארמית</div>
+<div class="aw" id="awWord"></div><div class="am" id="awMean"></div>
+<div class="sub" id="awNote" style="margin-top:10px">תגיד אותן להורים בעל פה, והם יסמנו לך <b>+2</b>.</div>
+</div>
+<div class="card b4">
+<div class="ch"><i>✨</i>מה עשיתי לאחרונה</div>
+<ul class="tl" id="hist"></ul>
+</div>
+<div class="card bw">
+<div class="ch"><i>📈</i>ההתקדמות שלי</div>
+<div class="wkhead" id="wkHead"></div>
+<svg id="wkChart" viewBox="0 0 340 190"></svg>
+<div class="wkfoot" id="wkFoot"></div>
+</div>
+<div class="card b5">
+<div class="ch"><i>🎁</i>בנק הפרסים</div>
+<div class="prizes" id="prizes"></div>
+<div class="donate"><b>💛 לתרום לכיתה</b><div class="sub" style="margin:4px 0 10px">הנקודות שתתרום נכנסות ליעד של כל הכיתה.</div>
+<div class="row" style="gap:8px" id="donBtns"></div><div class="sub" style="margin-top:8px" id="donSum"></div></div>
+</div>
+</section>
+<!-- PARENT -->
+<section id="v-parent" class="hide">
+<div class="lead">שלום להורים של <span class="sname gold-t"></span></div>
+<div class="leadsub">ראיתם משהו טוב בבית? סמנו, והנקודות נכנסות מיד.</div>
+<div class="card b1"><div class="ch"><i>🏡</i>מה הוא עשה?</div><div class="deeds" id="homeDeeds"></div></div>
+<div class="card b2"><div class="ch"><i>✍️</i>משהו אחר שהוא עשה</div>
+<textarea id="otherTxt" placeholder="למשל: הכין ארוחת ערב לכל המשפחה"></textarea>
+<div class="row" style="margin:14px 4px 4px"><span>כל עזרה בבית שווה</span><b class="gold-t big" style="font-size:32px;margin-right:auto" id="otherVal">3</b></div>
+<input type="range" min="3" max="3" value="3" id="otherRange" style="display:none">
+<button class="btn" style="margin-top:14px" id="otherBtn">שלחו נקודות</button></div>
+<div class="card bs"><div class="ch"><i>🌙</i>שינה</div>
+<div class="sub" style="margin:-8px 0 14px">היעד של <span class="sname"></span>: לישון ב-<b id="pBed"></b>, לקום ב-<b id="pWake"></b></div>
+<div class="slbtns"><button class="slb" id="slBedBtn"><span>🌙</span>הלך לישון בזמן<small>+5 · עד 23:30</small></button>
+<button class="slb" id="slWakeBtn"><span>☀️</span>קם בזמן<small>+2 · לסמן בבוקר</small></button></div></div>
+<div class="card ba"><div class="ch"><i>📜</i>מילים בארמית</div>
+<div class="aw" id="pAwWord"></div><div class="am" id="pAwMean"></div>
+<button class="btn" id="pAwBtn" style="margin-top:12px">✓ אמר לי את המילים בעל פה (+2)</button></div>
+<div class="card brep"><div class="ch"><i>⏰</i>שעות ההגעה לתפילה</div>
+<div class="seg" data-tgt="p"><button class="on" data-per="week">שבוע</button><button data-per="month">חודש</button></div>
+<div id="pRep"></div></div>
+<div class="card b4"><div class="ch"><i>📈</i>ההתקדמות</div>
+<div class="stat"><span>נקודות</span><b id="pPts"></b></div>
+<div class="stat"><span>מדליה</span><b id="pLvl"></b></div>
+<div class="stat"><span>זריזין</span><b id="pZr"></b></div></div>
+</section>
+<!-- TEACHER -->
+<section id="v-teacher" class="hide">
+<div class="lead">בוקר טוב, <span class="gold-t">המחנך ינון אליה</span></div>
+<div class="card b1"><div class="ch"><i>⚡</i>נקודות מהירות</div>
+<div class="chips" id="stuChips"></div>
+<div class="chips" id="catChips"></div>
+<div class="deeds" id="tDeeds"></div></div>
+<div class="card bx"><div class="ch"><i>🕶️</i>הסוכן X של היום</div>
+<div class="agsecret" id="agSecret" onclick="this.classList.toggle('show')"><span class="hid">🔒 לחץ כדי לראות מי הסוכן (רק אתה רואה)</span><span class="nm" id="agName"></span></div>
+<div class="row" style="gap:10px;margin-top:14px"><button class="btn" id="agYes">✓ עמד במשימה</button><button class="btn agno" id="agNo">✗ לא עמד</button></div>
+<button class="agnew" id="agNew">🎲 הגרלת סוכן חדש (למחר)</button></div>
+<div class="card b2"><div class="ch"><i>☀️</i>זריזין היום · לפני 7:30</div>
+<div class="zgrid" id="zGrid"></div>
+<button class="btn" style="margin-top:18px" id="zSave">אישור זריזין להיום</button></div>
+<div class="card binit"><div class="ch"><i>✨</i>יוזמה מבורכת · <span class="sname"></span></div>
+<div class="sub" style="margin:-6px 0 10px">באה ממנו · נוגעת באחרים · מבטאת ערך · יצאה לפועל</div>
+<div class="vals" id="valChips"></div>
+<input id="initTxt" class="inp" placeholder="מה היוזמה? (למשל: ארגן חברותא לפני המבחן)">
+<label class="chk"><input type="checkbox" id="initDone"> היוזמה יצאה לפועל</label>
+<button class="btn" id="initBtn" disabled>תן יוזמה מבורכת +10</button></div>
+<div class="card bgrp"><div class="ch"><i>👥</i>לומדים בחבורה למבחן</div>
+<div class="sub" style="margin:-6px 0 10px">קבעתם ללמוד ביחד? כל אחד מקבל <b>10 נקודות</b>, והחבורה מקבלת פינוק ללימוד עלינו!</div>
+<div class="chips wrap" id="grpChips"></div>
+<div class="row" style="gap:8px;margin:10px 0" id="treats"></div>
+<button class="btn" id="grpBtn">אשר פינוק לחבורה</button></div>
+<div class="card brep"><div class="ch"><i>⏰</i>דוח הגעה לתפילה</div>
+<div class="seg" data-tgt="t"><button class="on" data-per="week">שבוע</button><button data-per="month">חודש</button></div>
+<div id="tRep"></div>
+<button class="btn" id="repCopy" style="margin-top:12px">📋 העתק סיכום לשליחה להורים</button>
+<div class="sub" style="margin:16px 0 6px;font-weight:700">כל הכיתה · ממוצע החודש</div><div id="clsRep"></div></div>
+<div class="card ba"><div class="ch"><i>📜</i>מילים בארמית · עריכה</div>
+<div class="sub" style="margin:-6px 0 10px">המילים שהתלמידים לומדים בעל פה (עד 10). מה שתשנה כאן מתעדכן אצל התלמידים וההורים.</div>
+<div id="aramEd"></div>
+<button class="btn" id="aramAdd" style="margin-top:10px">+ הוסף מילה</button></div>
+<div class="card b3"><div class="ch"><i>💌</i>הודעת הפתעה</div>
+<textarea id="tMsg" placeholder="שמתי לב שעזרת לחבר היום, כל הכבוד!"></textarea>
+<button class="btn" style="margin-top:10px" id="tMsgBtn">שלח ל<span class="sname"></span></button></div>
+<div class="card b4"><div class="ch"><i>🎯</i>יעדים במבחנים · הזנת ציון</div>
+<div id="tGoals"></div></div>
+<div class="card b5"><div class="ch"><i>🏠</i>מה ההורים סימנו</div>
+<ul class="tl" id="tFeed"></ul></div>
+</section>
+</div>
+<script>
+const GOLD='linear-gradient(160deg,#7a4e0e 0%,#c8932a 22%,#f7dc8a 44%,#fff6d6 52%,#e8b84e 62%,#a06b14 84%,#e0ad45 100%)';
+const LEVELS=[
+{name:'טורקיז',min:0,g:'linear-gradient(160deg,#0f6f83 0%,#43c1cc 35%,#c9fbff 52%,#43c1cc 66%,#156f86 100%)',t:'#9ff0f7'},
+{name:'כסף',min:100,g:'linear-gradient(160deg,#5f6b77 0%,#b9c4ce 30%,#ffffff 50%,#c3ccd5 64%,#6c7783 100%)',t:'#e3e9ee'},
+{name:'זהב',min:250,g:GOLD,t:'#f4cf6b'},
+{name:'יהלום',min:500,g:'linear-gradient(160deg,#5b6fd6 0%,#b8e6ff 30%,#ffffff 48%,#c7b8ff 62%,#6fd3ff 80%,#4a5fc9 100%)',t:'#cfe9ff'}
+];
+const STUDENTS=["אברהם לוי", "אהרן אוחיון", "אלחנן זכאי", "בנימין גבאי", "דניאל אלמוג", "יהודה חדד", "יצחק פרץ", "יעקב דהן", "משה ביטון", "נחום רביבו", "שמואל עמר", "שמעון אטיאס"];
+const FIRST={"אברהם לוי": "אברהם", "אהרן אוחיון": "אהרן", "אלחנן זכאי": "אלחנן", "בנימין גבאי": "בנימין", "דניאל אלמוג": "דניאל", "יהודה חדד": "יהודה", "יצחק פרץ": "יצחק", "יעקב דהן": "יעקב", "משה ביטון": "משה", "נחום רביבו": "נחום", "שמואל עמר": "שמואל", "שמעון אטיאס": "שמעון"};
+const CATS={
+'חברותא ועזרה לחבר':[['🤝','עזר לחבר בשיעור',5],['📖','למד עם חבר (חברותא)',10],['💡','הסביר לחבר חומר',5],['💬','ניגש לחבר שהיה לבד',5]],
+'גמרא':[['🗣️','אמר שקלא וטריא של עמוד גמרא',20]],
+'לימודים':[['📚','הכין שיעורי בית',3],['✋','השתתפות פעילה',3],['📜','חזר על תורה בבית',5]],
+'כיתה':[['🧹','סידר את הכיתה',3],['🎧','שקט ומרוכז',2],['📘','הגיע בזמן (גם אחרי הפסקה) עם ספר, מחברת וכלי כתיבה בלבד',3],['⏰','הגיע בזמן',2],['🙋','התנדב לתפקיד',4]],
+'ערכים':[['🙏','כבוד לצוות',4],['💛','מעשה חסד',6],['🕊️','השכין שלום',6],['🎯','התמדה ומאמץ',5]],
+'מבחנים':[['📝','מעל 80 במבחן',6],['🏅','מעל 90 במבחן',10],['💯','100 במבחן',15]],
+'הפתעה':[['⭐','שמתי לב!',5],['🌟','משהו מיוחד',8]]
+};
+const HOME=[['👶','שמר על האחים',3],['🍽️','שטף כלים',3],['🧽','עזר לנקות',3],['🛒','עזר בקניות',3],['🛏️','סידר את החדר',3],['🕯️','הכנות לשבת',3]];
+const PRIZES=[['🎟️','שובר לקיוסק 20 ש״ח',100],['🍦','גלידה',40],['🎧','שיר בהפסקה',30],['🪑','לשבת ליד חבר שבוע',60],['📝','פטור משיעורי בית',80],['🍕','פיצה אישית',120],['⚽','כדור כדורגל',150]];
+const BADGES=[['🤝','חבר אמיתי',s=>s.count['עזר לחבר בשיעור']>=3,'3 עזרות לחבר'],['📖','חברותא',s=>s.count['למד עם חבר']>=3,'3 לימודים עם חבר'],['CREST','זריז',s=>s.zr>=5,'5 זריזין'],['🏡','עמוד התווך',s=>s.homeCount>=5,'5 מעשים בבית'],['🔥','על הגל',s=>s.points>=150,'150 נקודות'],['🌙','ישן כמו אלוף',s=>s.sleepBadge,'5 לילות בזמן']];
+const CLASS_GOAL=1500, CLASS_PRIZE='פיצה לכל הכיתה 🍕';
+const GREETS=['יא זריז!','אשריך!','תמשיך ככה','כל הכבוד, אלוף','יישר כוח!','רואים את המאמץ'];
+const ZR_CHEER=['יא זריז!','בוקר טוב, אשריך!','תמשיך ככה, זריז!','מקדים למצוות!'];
+const state={cur:0,students:STUDENTS.map((n,i)=>({name:n,points:[132,88,210,64,175,240,95,120,58][i%9],zr:[11,6,3,13,8,9,2,7,5][i%9],streak:[3,1,0,4,2,0,1,3,0][i%9],count:{'עזר לחבר בשיעור':2,'למד עם חבר':1},homeCount:2,hist:[
+{p:5,t:'עזר לחבר בשיעור',who:'המחנך ינון אליה'},{p:4,t:'שטף כלים',who:'אמא'},{p:'⚡',t:'זריזין פרו, 5 ימים ברצף',who:'המחנך ינון אליה'},{p:6,t:'הכין ארוחת ערב לכל המשפחה',who:'אבא',q:true}],msg:''})),
+zToday:new Set(),feed:[{s:'אברהם',p:4,t:'שטף כלים',who:'אמא'},{s:'שמואל',p:6,t:'הכין ארוחת ערב לכל המשפחה',who:'אבא'},{s:'בנימין',p:5,t:'שמר על האחים',who:'אמא'}]};
+const me=()=>state.students[state.cur];
+const $=id=>document.getElementById(id);
+const esc=t=>String(t).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const lvlOf=p=>{let l=0;LEVELS.forEach((L,i)=>{if(p>=L.min)l=i});return l};
+function crestHTML(l,frac,full){const L=LEVELS[l],N=LEVELS[l+1];
+if(full||!N)return `<div class="crest up"><div class="fill" style="background:${L.g}"></div><div class="gl"></div></div>`;
+return `<div class="crest"><div class="ghost"></div><div class="base" style="background:${L.g}"></div><div class="fill" id="crestFill" style="background:${N.g};clip-path:inset(100% 0 0 0)" data-to="${(1-frac)*100}"></div><div class="gl"></div></div>`}
+// placeholder ice-cream bar (will be replaced by drawn flavors)
+const ICE={
+'וניל עוגיות':{coat:['#fbf3dc','#e9dcb4'],bit:'#f6e7bf',bitD:'#d9c38f',in:'#fffaf0',core:null,cookie:true},
+'וניל נוגט':{coat:['#fbf3dc','#e9dcb4'],bit:'#f3e3b6',bitD:'#d6bd84',in:'#fff6e2',core:'#b8752f'},
+'שוקולד נוגט':{coat:['#8a5330','#5a321a'],bit:'#a8683c',bitD:'#4a2812',in:'#6e3f22',core:'#c9853f'},
+'אגוזי לוז':{coat:['#fbf3dc','#e9dcb4'],bit:'#6b4024',bitD:'#4a2a16',in:'#7a4a2a',core:'#e8d3a8'}};
+let iceN=0;
+function iceSVG(n,flavor,noId){const F=ICE[flavor]||ICE['שוקולד נוגט'],k='i'+(iceN++),f=Math.min(n/15,1),top=12,h=110,y=top+h*(1-f);
+let sd=11;const rnd=()=>(sd=(sd*9301+49297)%233280)/233280;
+const bump=(cx,cy,r,c1,c2)=>`<circle cx="${(cx+r*.25).toFixed(1)}" cy="${(cy+r*.3).toFixed(1)}" r="${r.toFixed(1)}" fill="#000" opacity=".18"/><circle cx="${cx.toFixed(1)}" cy="${cy.toFixed(1)}" r="${r.toFixed(1)}" fill="url(#${k}${c2?'d':'l'})"/>`;
+let bumps='';for(let i=0;i<95;i++){const cx=19+rnd()*62,cy=top+2+rnd()*(h-4),r=1.5+rnd()*1.9;bumps+=bump(cx,cy,r,0,i%4===0)}
+const cookies=F.cookie?[[60,30,3.4],[70,40,2.8],[54,40,2.3],[66,22,2],[58,50,2.6],[74,52,2],[48,30,1.8]].map(c=>`<path d="M${c[0]-c[2]},${c[1]} l${c[2]*.6},-${c[2]} l${c[2]*1.2},${c[2]*.3} l${c[2]*.3},${c[2]*1.1} l-${c[2]*1.3},${c[2]*.5}z" fill="#2a2420"/>`).join(''):'';
+const B='M46,0 L46,10 Q50,17 55,14 Q58,22 64,20 Q66,28 72,27 Q73,35 79,35 Q80,43 86,44 L100,46 L100,0 Z';
+return `<svg class="ice" ${noId?'':'id="ice"'} viewBox="0 0 100 172"><defs>
+<clipPath id="${k}b"><path d="M24,${top} H76 Q83,${top} 83,${top+8} V${top+h-14} Q83,${top+h} 69,${top+h} H31 Q17,${top+h} 17,${top+h-14} V${top+8} Q17,${top} 24,${top} Z"/></clipPath>
+<clipPath id="${k}f"><rect x="0" y="${y}" width="100" height="172" style="transition:y 1.4s"/></clipPath>
+<mask id="${k}o"><rect width="100" height="172" fill="#fff"/><path d="${B}" fill="#000"/></mask>
+<mask id="${k}i"><rect width="100" height="172" fill="#fff"/><path d="${B}" transform="translate(-9,9)" fill="#000"/></mask>
+<linearGradient id="${k}c" x1="0" x2="1"><stop offset="0" stop-color="${F.coat[1]}"/><stop offset=".28" stop-color="${F.coat[0]}"/><stop offset=".6" stop-color="${F.coat[0]}"/><stop offset="1" stop-color="${F.coat[1]}"/></linearGradient>
+<linearGradient id="${k}v" x1="0" y1="0" x2="0" y2="1"><stop offset=".7" stop-color="#000" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity=".22"/></linearGradient>
+<radialGradient id="${k}l" cx=".35" cy=".3" r=".75"><stop offset="0" stop-color="#fff" stop-opacity=".9"/><stop offset=".35" stop-color="${F.bit}"/><stop offset="1" stop-color="${F.bitD}"/></radialGradient>
+<radialGradient id="${k}d" cx=".35" cy=".3" r=".75"><stop offset="0" stop-color="#fff" stop-opacity=".7"/><stop offset=".4" stop-color="${F.bitD}"/><stop offset="1" stop-color="${F.bitD}"/></radialGradient>
+<linearGradient id="${k}n" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fff" stop-opacity=".5"/><stop offset=".3" stop-color="${F.core||'#000'}"/><stop offset="1" stop-color="#5a3010"/></linearGradient>
+<linearGradient id="${k}s" x1="0" x2="1"><stop offset="0" stop-color="#f3dcae"/><stop offset=".5" stop-color="#e2c38c"/><stop offset="1" stop-color="#c9a46a"/></linearGradient></defs>
+<rect x="43" y="110" width="14" height="58" rx="7" fill="url(#${k}s)"/><path d="M47,128 v34 M52,124 v38" stroke="#b8935a" stroke-width=".6" opacity=".6"/><rect x="43" y="118" width="14" height="6" fill="#000" opacity=".12"/>
+<path d="M24,${top} H76 Q83,${top} 83,${top+8} V${top+h-14} Q83,${top+h} 69,${top+h} H31 Q17,${top+h} 17,${top+h-14} V${top+8} Q17,${top} 24,${top} Z" fill="rgba(255,255,255,.14)" stroke="rgba(255,255,255,.5)" stroke-width="1.4" stroke-dasharray="4 4" ${f>=1?'opacity="0"':''}/>
+<g clip-path="url(#${k}f)"><g mask="url(#${k}o)"><g clip-path="url(#${k}b)">
+<rect x="10" y="0" width="90" height="140" fill="${F.in}"/>
+${Array.from({length:18},()=>`<circle cx="${(44+rnd()*40).toFixed(1)}" cy="${(4+rnd()*50).toFixed(1)}" r="${(.6+rnd()).toFixed(1)}" fill="#fff" opacity=".35"/>`).join('')}
+${F.core?`<rect x="54" y="12" width="26" height="40" rx="11" transform="rotate(-18 67 32)" fill="url(#${k}n)"/>`:''}${cookies}
+<g mask="url(#${k}i)"><rect x="10" y="0" width="90" height="140" fill="url(#${k}c)"/>${bumps}<rect x="10" y="0" width="90" height="140" fill="url(#${k}v)"/>
+<path d="M26,${top+6} Q24,${top+50} 27,${top+h-12}" stroke="#fff" stroke-width="5" stroke-linecap="round" opacity=".25" fill="none"/></g>
+<path d="${B}" transform="translate(-9,9)" fill="none" stroke="${F.coat[1]}" stroke-width="2.2"/>
+</g></g></g>
+${f>=1?'<text x="50" y="9" text-anchor="middle" font-size="13">✨</text>':''}</svg>`}
+function ringSVG(v,goal){const r=50,c=2*Math.PI*r,f=Math.min(v/goal,1);return `<svg viewBox="0 0 118 118" width="118" height="118"><defs><linearGradient id="rg" x1="0" x2="1"><stop offset="0" stop-color="#0D614A"/><stop offset="1" stop-color="#55A38B"/></linearGradient></defs>
+<circle cx="59" cy="59" r="${r}" stroke="rgba(255,255,255,.12)"/><circle cx="59" cy="59" r="${r}" stroke="url(#rg)" stroke-dasharray="${c}" stroke-dashoffset="${c*(1-f)}" style="transition:stroke-dashoffset 1.4s"/></svg>
+<div class="rv"><div><b>${Math.round(f*100)}%</b><small>${v} / ${goal}</small></div></div>`}
+function toast(t){const e=$('toast');e.textContent=t;e.classList.add('show');clearTimeout(e._t);e._t=setTimeout(()=>e.classList.remove('show'),2400)}
+// confetti
+const cv=$('cf'),cx=cv.getContext('2d');let parts=[];
+function size(){cv.width=innerWidth*devicePixelRatio;cv.height=innerHeight*devicePixelRatio}size();addEventListener('resize',size);
+function confetti(n=120){const cols=['#f7dc8a','#e8b84e','#fff6d6','#43c1cc','#9ff0f7','#ffffff'];const d=devicePixelRatio;for(let i=0;i<n;i++)parts.push({x:cv.width/2,y:cv.height*.32,vx:(Math.random()-.5)*22*d,vy:(Math.random()*-18-4)*d,s:(Math.random()*6+4)*d,c:cols[i%cols.length],r:Math.random()*6,vr:(Math.random()-.5)*.4,life:0});if(!loop.on){loop.on=1;loop()}}
+function loop(){cx.clearRect(0,0,cv.width,cv.height);parts.forEach(p=>{p.vy+=.5*devicePixelRatio;p.vx*=.99;p.x+=p.vx;p.y+=p.vy;p.r+=p.vr;p.life++;cx.save();cx.translate(p.x,p.y);cx.rotate(p.r);cx.fillStyle=p.c;cx.fillRect(-p.s/2,-p.s/4,p.s,p.s/2);cx.restore()});parts=parts.filter(p=>p.y<cv.height+40&&p.life<300);if(parts.length)requestAnimationFrame(loop);else{loop.on=0;cx.clearRect(0,0,cv.width,cv.height)}}
+// notifications
+const notes=[];let unread=0;
+function notify(st,pa){notes.unshift({s:st,p:pa});unread++;const b=$('bellN');b.textContent=unread;b.classList.remove('on');void b.offsetWidth;b.classList.add('on');renderNotes()}
+function renderNotes(){const role=document.querySelector('.nav .on').dataset.r;$('nlist').innerHTML=notes.slice(0,8).map(n=>`<li>${esc(role==='parent'?n.p:n.s)}</li>`).join('')||'<li style="opacity:.6">אין התראות חדשות</li>'}
+$('bell').onclick=()=>{$('npanel').classList.toggle('hide');unread=0;$('bellN').classList.remove('on');renderNotes()};
+function tod(){const h=new Date().getHours();return h>=5&&h<12?'בוקר טוב':h>=12&&h<18?'אחר צהריים טובים':h>=18&&h<22?'ערב טוב':'לילה טוב'}
+let gi=0;function greet(){$('tod').textContent=tod();const e=$('greet');e.style.opacity=0;setTimeout(()=>{e.textContent=GREETS[gi++%GREETS.length];e.style.opacity=1},400)}
+setInterval(greet,4000);
+function award(idx,p,t,who,quote){const s=state.students[idx];const before=lvlOf(s.points);s.points+=p;s.wallet+=p;s.goalPts=(s.goalPts||0)+p;s.weeks[s.weeks.length-1]+=p;
+s.count[t]=(s.count[t]||0)+1;s.hist.unshift({p,t,who,q:quote,fresh:1});
+const after=lvlOf(s.points);render();notify(`קיבלת +${p} נקודות: ${t}`,`יישר כוח! ${s.name} קיבל +${p}: ${t}`);confetti(p>=6?160:90);
+if(after>before)setTimeout(()=>levelUp(after,s.name),700)}
+function levelUp(l,name){$('ovMedal').innerHTML=crestHTML(l,1,true);$('ovTitle').textContent='עלית רמה!';$('ovText').textContent=`${name}, הגעת למדליית ${LEVELS[l].name}`;$('overlay').classList.add('show');confetti(220)}
+const classTotal=()=>state.students.reduce((a,s)=>a+(s.goalPts||0),0)+(state.classBonus||0);
+function animNum(el,to){const from=+el.textContent||0;if(from===to){el.textContent=to;return}const t0=performance.now();(function f(t){const k=Math.min((t-t0)/700,1);el.textContent=Math.round(from+(to-from)*(1-Math.pow(1-k,3)));if(k<1)requestAnimationFrame(f)})(t0)}
+function render(){
+const s=me(),l=lvlOf(s.points),L=LEVELS[l],N=LEVELS[l+1];
+document.querySelectorAll('.sname').forEach(e=>e.textContent=s.name);if($('bigName'))$('bigName').textContent=FIRST[s.name]||s.name;
+const frac=N?(s.points-L.min)/(N.min-L.min):1;
+$('medal').innerHTML=crestHTML(l,frac);const cf=$('crestFill');
+if(cf){const prev=render._cur===state.cur&&render._f!==undefined?render._f:100;cf.style.transition='none';cf.style.clipPath=`inset(${prev}% 0 0 0)`;requestAnimationFrame(()=>requestAnimationFrame(()=>{cf.style.transition='';cf.style.clipPath=`inset(${cf.dataset.to}% 0 0 0)`}));render._f=+cf.dataset.to;render._cur=state.cur}
+$('lvlName').innerHTML=`מדליית <span style="color:${L.t}">${L.name}</span>`;
+const pn=$('ptsNum');if(+pn.textContent!==s.wallet&&pn.textContent!=='0'){pn.classList.remove('bump');void pn.offsetWidth;pn.classList.add('bump')}animNum(pn,s.wallet);$('life').innerHTML=`סה״כ צברת מתחילת השנה: <b>${s.points}</b> · המדליה לא יורדת לעולם 🏅`;
+$('lvlBar').style.width=(frac*100)+'%';
+$('lvlNext').innerHTML=N?`הסמל מתמלא ב<span style="color:${N.t}">${N.name}</span> · עוד ${N.min-s.points} נקודות`:'הגעת לפסגה 💎';
+// zrizin
+$('zrNum').textContent=Math.min(s.zr,15);$('ice').outerHTML=iceSVG(s.zr,s.flavor);
+$('zrCheer').textContent=s.zr>=15?'הקראנץ\' שלך!':ZR_CHEER[s.zr%ZR_CHEER.length];$('zrFlavor').textContent=s.flavor?'הטעם שלך: '+s.flavor+' 🍦':'';
+$('zrLeft').textContent=s.zr>=15?'הקראנץ\' שלך מחכה! 🍦':`עוד ${15-s.zr} לקראנץ'`;
+$('streak').innerHTML=['א׳','ב׳','ג׳','ד׳','ה׳'].map((d,i)=>(i?`<em class="${i<s.streak?'on':''}"></em>`:'')+`<b class="${i<s.streak?'on':''}">${d}</b>`).join('');
+// class
+const ct=classTotal();$('ring').innerHTML=ringSVG(ct,CLASS_GOAL);$('clsPrize').textContent=CLASS_PRIZE;
+$('clsLeft').textContent=ct>=CLASS_GOAL?'':`עוד ${CLASS_GOAL-ct} נקודות`;
+$('clsCheer').textContent=ct>=CLASS_GOAL?'הגענו! 🎉':'אתם מתקרבים ליעד 💪';
+$('msgCard').classList.toggle('hide',!s.msg);$('msgText').textContent=s.msg;
+$('badges').innerHTML=BADGES.map(b=>{const ok=b[2](s);return `<div class="badge ${ok?'':'lock'}"><div class="ic">${b[0]==='CREST'?'<span class="crb"></span>':b[0]}</div>${b[1]}<small>${ok?'הושג':b[3]}</small></div>`}).join('');
+$('hist').innerHTML=s.hist.slice(0,7).map(h=>`<li class="${h.fresh?'new':''}"><div class="dot">${typeof h.p==='number'?'+'+h.p:h.p}</div><div><div class="${h.q?'q':''}">${h.q?'"'+esc(h.t)+'"':esc(h.t)}</div><div class="who">${esc(h.who)}</div></div></li>`).join('');
+s.hist.forEach(h=>h.fresh=0);
+$('prizes').innerHTML=PRIZES.map((p,i)=>`<div class="prize"><div class="img">${p[0]}</div><b>${p[1]}</b><div class="cost">${p[2]} נקודות</div><button class="btn" ${s.wallet<p[2]?'disabled':''} onclick="redeem(${i})">${s.wallet<p[2]?'עוד '+(p[2]-s.wallet):'אני רוצה!'}</button></div>`).join('');
+$('pPts').textContent=s.wallet+' (סה״כ '+s.points+')';$('pLvl').textContent=L.name;$('pZr').textContent=Math.min(s.zr,15)+' / 15';
+$('stuChips').innerHTML=state.students.map((x,i)=>`<button class="chip ${i===state.cur?'on':''}" onclick="pick(${i})">${x.name}</button>`).join('');
+$('zGrid').innerHTML=state.students.map((x,i)=>`<button class="zs ${state.zToday.has(i)?'on':''}" onclick="zt(${i})"><div class="av">${x.name[0]}</div>${x.name}<small>${todayArr(x)?'🕒 '+fmtT(todayArr(x).t)+' · ':''}${x.zr}/15 · רצף ${x.streak}${x.crunches&&x.crunches.length?' · 🍦'+x.crunches.length:''}${x.flavor?' · '+x.flavor:''}</small></button>`).join('');
+$('tFeed').innerHTML=state.feed.slice(0,6).map(f=>`<li><div class="dot">+${f.p}</div><div><div>${esc(f.s)}: ${esc(f.t)}</div><div class="who">${esc(f.who)}</div></div></li>`).join('');
+}
+function pick(i){state.cur=i;render()}
+let cat='חברותא ועזרה לחבר';
+function renderCats(){$('catChips').innerHTML=Object.keys(CATS).map(c=>`<button class="chip ${c===cat?'on':''}" data-c="${c}">${c}</button>`).join('');
+$('tDeeds').innerHTML=CATS[cat].map(d=>`<button class="deed" data-t="${d[1]}" data-p="${d[2]}"><span class="e">${d[0]}</span>${d[1]}<span class="p">+${d[2]}</span></button>`).join('')}
+$('catChips').onclick=e=>{const c=e.target.closest('[data-c]');if(c){cat=c.dataset.c;renderCats()}};
+$('tDeeds').onclick=e=>{const d=e.target.closest('.deed');if(!d)return;award(state.cur,+d.dataset.p,d.dataset.t,'המחנך ינון אליה');toast(`+${d.dataset.p} ל${me().name} · ${d.dataset.t}`)};
+$('homeDeeds').innerHTML=HOME.map(d=>`<button class="deed" data-t="${d[1]}" data-p="${d[2]}"><span class="e">${d[0]}</span>${d[1]}<span class="p">+${d[2]}</span></button>`).join('');
+$('homeDeeds').onclick=e=>{const d=e.target.closest('.deed');if(!d)return;const s=me();s.homeCount++;state.feed.unshift({s:s.name,p:+d.dataset.p,t:d.dataset.t,who:'הורים'});award(state.cur,+d.dataset.p,d.dataset.t,'ההורים');toast(`תודה! ${s.name} קיבל +${d.dataset.p}`)};
+$('otherRange').oninput=e=>$('otherVal').textContent=e.target.value;
+$('otherBtn').onclick=()=>{const t=$('otherTxt').value.trim();if(!t){toast('כתבו מה הוא עשה ✍️');return}const p=+$('otherRange').value,s=me();s.homeCount++;state.feed.unshift({s:s.name,p,t,who:'הורים'});award(state.cur,p,t,'ההורים',true);$('otherTxt').value='';toast(`נשלח! +${p} ל${s.name}`)};
+function zt(i){state.zToday.has(i)?state.zToday.delete(i):state.zToday.add(i);render()}
+$('zSave').onclick=()=>{if(!state.zToday.size){toast('סמן מי הגיע לפני 7:30');return}
+state.zToday.forEach(i=>{const s=state.students[i];s.streak++;
+if(s.streak>=5){s.zr+=4;s.streak=0;s.hist.unshift({p:'⚡',t:'זריזין פרו! 5 ימים ברצף, שווה 8',who:'המחנך ינון אליה',fresh:1})}
+else{s.zr+=1;s.hist.unshift({p:'☀️',t:'זריזין, הגעת לפני 7:30',who:'המחנך ינון אליה',fresh:1})}
+earnCrunch(i);
+notify(`בוקר טוב ${s.name}! יא זריז, קיבלת כרטיס זריזין ☀️`,`יישר כוח לבן שלכם ${s.name} שהגיע היום בזמן לתפילה ☀️`)});
+const n=state.zToday.size;state.zToday.clear();render();confetti(140);toast(`☀️ זריזין ל-${n} תלמידים`)};
+$('tMsgBtn').onclick=()=>{const t=$('tMsg').value.trim();if(!t)return;me().msg=t;$('tMsg').value='';render();notify('הודעה חדשה מהמחנך ינון אליה 💌','');toast(`ההודעה נשלחה ל${me().name}`)};
+function redeem(i){const s=me(),p=PRIZES[i];if(s.wallet<p[2])return;s.wallet-=p[2];s.hist.unshift({p:'🎁',t:'בחרת פרס: '+p[1],who:'בנק הפרסים',fresh:1});render();
+$('ovMedal').innerHTML=`<div style="font-size:96px">${p[0]}</div>`;$('ovTitle').textContent='הבקשה נשלחה!';$('ovText').textContent=`המחנך ינון אליה יקבל הודעה על ה${p[1]} שלך`;$('overlay').classList.add('show');confetti(200)}
+document.querySelector('.nav').onclick=e=>{const b=e.target.closest('button');if(!b)return;document.querySelectorAll('.nav button').forEach(x=>x.classList.toggle('on',x===b));['student','parent','teacher'].forEach(r=>$('v-'+r).classList.toggle('hide',r!==b.dataset.r));renderNotes();scrollTo({top:0,behavior:'smooth'})};
+renderCats();render();greet();
+// peer kudos
+const WHY=['עזר לי בשיעור','למד איתי','היה חבר טוב','שיתף אותי','עודד אותי'];let peerTo=null,peerWhy=WHY[0];
+function renderPeer(){const s=me();$('peerChips').innerHTML=state.students.map((x,i)=>i===state.cur?'':`<button class="chip peer ${peerTo===i?'on':''}" data-i="${i}">${x.name}</button>`).join('');
+$('peerWhy').innerHTML=WHY.map(w=>`<button class="chip ${w===peerWhy?'on':''}" data-w="${w}">${w}</button>`).join('');
+const b=$('peerBtn');b.disabled=!!s.gaveToday;b.textContent=s.gaveToday?'כבר נתת היום, מחר עוד פעם 💙':(peerTo===null?'בחר חבר':`שלח ל${state.students[peerTo].name} +5`)}
+$('peerChips').onclick=e=>{const c=e.target.closest('[data-i]');if(c){peerTo=+c.dataset.i;renderPeer()}};
+$('peerWhy').onclick=e=>{const c=e.target.closest('[data-w]');if(c){peerWhy=c.dataset.w;renderPeer()}};
+$('peerBtn').onclick=()=>{const s=me();if(s.gaveToday||peerTo===null)return;const f=state.students[peerTo];s.gaveToday=1;
+f.points+=5;f.wallet+=5;f.goalPts=(f.goalPts||0)+5;f.weeks[f.weeks.length-1]+=5;f.hist.unshift({p:5,t:peerWhy,who:'מחבר: '+s.name,fresh:1});notify(`${s.name} נתן לך כוח: ${peerWhy} (+5)`,`${f.name} קיבל כוח מחבר: ${peerWhy}`);
+render();burstAt($('peerBtn'),70);toast(`יישר כוח! שלחת ל${f.name} +5 💙`);peerTo=null;renderPeer()};
+const _render=render;render=function(){_render();if($('peerChips'))renderPeer()};renderPeer();
+// test goals
+const SUBJ=['תורה','גמרא','משנה','נביא','מתמטיקה','אנגלית','לשון','מדעים','היסטוריה','גיאוגרפיה'];
+state.students.forEach((s,i)=>s.goals=i===0?[{sub:'תורה',target:85,grade:null},{sub:'מתמטיקה',target:80,grade:88}]:(i%3===0?[{sub:'גמרא',target:80,grade:null}]:[]));
+$('gSub').innerHTML=SUBJ.map(x=>`<option>${x}</option>`).join('');
+$('gRange').oninput=e=>$('gVal').textContent=e.target.value;
+function gradePts(g){return g>=100?15:g>=90?10:g>=80?6:0}
+function renderGoals(){const s=me();
+$('goalList').innerHTML=s.goals.map(g=>{const hit=g.grade!=null&&g.grade>=g.target;return `<div class="goal ${hit?'hit':''}"><div class="tg">${g.target}</div><div><b>${g.sub}</b><small>${g.grade==null?'היעד שלך: '+g.target+' · בהצלחה! 💪':hit?'קיבלת '+g.grade+', עמדת ביעד! 🎉':'קיבלת '+g.grade+', כמעט! בפעם הבאה 💪'}</small></div></div>`}).join('');
+const rows=[];state.students.forEach((x,i)=>x.goals.forEach((g,j)=>{if(g.grade==null)rows.push(`<div class="tg-row"><div class="who"><b>${x.name}</b> · ${g.sub}<br><small style="opacity:.8">יעד: ${g.target}</small></div><input type="number" min="0" max="100" placeholder="ציון" id="gr-${i}-${j}"><button class="btn" onclick="setGrade(${i},${j})">עדכן</button></div>`)}));
+$('tGoals').innerHTML=rows.join('')||'<div class="sub">אין יעדים פתוחים כרגע</div>'}
+$('gAdd').onclick=()=>{const s=me();s.goals.unshift({sub:$('gSub').value,target:+$('gRange').value,grade:null});renderGoals();burstAt($('gAdd'),50);toast(`יעד חדש: ${$('gRange').value} ב${$('gSub').value}. אתה יכול! 💪`);notify('',`${s.name} הציב יעד: ${$('gRange').value} ב${$('gSub').value}`)};
+function setGrade(i,j){const el=$(`gr-${i}-${j}`),v=+el.value;if(!el.value||v<0||v>100){toast('הזן ציון בין 0 ל-100');return}
+const x=state.students[i],g=x.goals[j];g.grade=v;const gp=gradePts(v);
+if(v>=g.target){award(i,8,`עמד ביעד ב${g.sub} (${v}/${g.target}), למדליה`,'המחנך ינון אליה');award(i,5,`בונוס מבחן ב${g.sub}`,'המחנך ינון אליה');toast(`${x.name} עמד ביעד! +8 למדליה ו-5 בונוס 🎯`)}else{render();toast(`עודכן: ${x.name} קיבל ${v}`)}
+renderGoals()}
+const _render2=render;render=function(){_render2();if($('goalList'))renderGoals()};renderGoals();
+// sleep
+state.students.forEach((s,i)=>{s.sleep={bed:'23:30',wake:'06:45',nights:[3,1,4,0,2,4,1,3,2][i%9],today:{}}});
+function moonSVG(n){const f=Math.min(n/5,1),h=80*f;return `<defs><clipPath id="mc"><path d="M62 10a40 40 0 1 0 28 62A34 34 0 0 1 62 10z"/></clipPath></defs>
+<path d="M62 10a40 40 0 1 0 28 62A34 34 0 0 1 62 10z" fill="rgba(255,255,255,.12)" stroke="rgba(255,255,255,.4)" stroke-width="1.5"/>
+<rect x="0" y="${90-h}" width="100" height="${h}" fill="#f7dc8a" clip-path="url(#mc)" style="transition:all 1.2s"/>
+<circle cx="80" cy="22" r="2.5" fill="#fff" opacity=".9"/><circle cx="90" cy="40" r="1.6" fill="#fff" opacity=".7"/><circle cx="72" cy="8" r="1.4" fill="#fff" opacity=".6"/>`}
+const SL_CHEER=['לילה טוב, מחר בוקר זריז! ☀️','שינה טובה = בוקר טוב','עוד קצת והירח מלא 🌙','אלוף! ממשיכים ככה'];
+function renderSleep(){const s=me(),sl=s.sleep;$('moon').innerHTML=moonSVG(sl.nights);$('slNum').textContent=sl.nights;
+$('slCheer').textContent=sl.nights>=4?SL_CHEER[2]:SL_CHEER[sl.nights%2];
+$('slBed').value=sl.bed;$('slWake').value=sl.wake;$('pBed').textContent=sl.bed;$('pWake').textContent=sl.wake;
+$('slBedBtn').classList.toggle('done',!!sl.today.bed);$('slWakeBtn').classList.toggle('done',!!sl.today.wake)}
+$('slBed').onchange=e=>{me().sleep.bed=e.target.value;renderSleep();toast('יעד שינה עודכן: '+e.target.value+' 🌙')};
+$('slWake').onchange=e=>{me().sleep.wake=e.target.value;renderSleep();toast('יעד קימה עודכן: '+e.target.value+' ⏰')};
+$('slBedBtn').onclick=()=>{const s=me(),sl=s.sleep;if(sl.today.bed)return;sl.today.bed=1;sl.nights++;
+award(state.cur,5,'הלך לישון בזמן 🌙','ההורים');notify(`לילה טוב ${s.name}! +5 על שינה בזמן 🌙`,`${s.name} הלך לישון בזמן`);
+if(sl.nights>=5){sl.nights=0;s.sleepBadge=1;setTimeout(()=>{award(state.cur,5,'5 לילות בזמן! ישן כמו אלוף 🌙','בונוס שינה');toast('🌙 5 לילות ברצף! +5 בונוס')},900)}else toast(`לילה טוב! ${s.name} קיבל +5 🌙`);renderSleep()};
+$('slWakeBtn').onclick=()=>{const s=me(),sl=s.sleep;if(sl.today.wake)return;sl.today.wake=1;award(state.cur,2,'קם בזמן ☀️','ההורים');notify(`בוקר טוב ${s.name}! קמת בזמן, +2 ☀️`,`${s.name} קם בזמן`);toast(`בוקר טוב! ${s.name} קיבל +2 ☀️`);renderSleep()};
+const _render3=render;render=function(){_render3();if($('moon'))renderSleep()};renderSleep();
+// size the texture so it fades (ombre) into the first band
+function fitSky(){const sec=[...document.querySelectorAll('section')].find(x=>!x.classList.contains('hide'));if(!sec)return;const c=sec.querySelector('.card');if(!c)return;
+const top=c.getBoundingClientRect().top+scrollY;document.querySelector('.sky').style.height=top+'px'}
+addEventListener('load',fitSky);addEventListener('resize',fitSky);setTimeout(fitSky,300);
+document.querySelector('.nav').addEventListener('click',()=>setTimeout(fitSky,50));
+// Rav Kook arc, placed word by word so it reads right-to-left on every phone
+(function arc(){const g=$('arcWords'),path=$('arcp');if(!g)return;const NS='http://www.w3.org/2000/svg';
+const words='כָּל מַה שֶּׁהָאָדָם גָּדֵל, מִתְגַּדֵּל הָעוֹלָם כֻּלּוֹ עִמּוֹ'.split(' ');
+function layout(){g.innerHTML='';const L=path.getTotalLength(),gap=7;const els=words.map((w,i)=>{const t=document.createElementNS(NS,'text');t.textContent=w;g.appendChild(t);return t});
+const ws=els.map(t=>t.getComputedTextLength());const total=ws.reduce((a,b)=>a+b,0)+gap*(ws.length-1);
+let pos=L/2+total/2; // start on the right end, move left
+els.forEach((t,i)=>{const mid=pos-ws[i]/2;const pt=path.getPointAtLength(mid),a=path.getPointAtLength(Math.max(0,mid-1)),b=path.getPointAtLength(Math.min(L,mid+1));
+const ang=Math.atan2(b.y-a.y,b.x-a.x)*180/Math.PI;t.setAttribute('x',pt.x);t.setAttribute('y',pt.y);t.setAttribute('text-anchor','middle');t.setAttribute('transform',`rotate(${ang} ${pt.x} ${pt.y})`);pos-=ws[i]+gap});}
+layout();if(document.fonts)document.fonts.ready.then(layout);})();
+// crunch popups at 10 and 12
+const FLAVORS=Object.keys(ICE);
+let popT;
+function closePop(){const c=$('cpop');c.classList.add('out');setTimeout(()=>c.classList.remove('show','out','pick'),450)}
+function crunchPop(kind){const s=me(),c=$('cpop');clearTimeout(popT);$('cpIce').innerHTML=iceSVG(s.zr,s.flavor,1);
+if(kind===12){$('cpTitle').textContent='עוד קצת והקראנץ\' שלך!';$('cpText').textContent=`כבר ${Math.min(s.zr,15)} זריזין! אתה יכול להתחיל לבחור את הטעם של הגלידה:`;
+$('cpFlv').innerHTML=FLAVORS.map(f=>`<button class="fbtn" onclick="pickFlavor('${f}')">${iceSVG(15,f,1).replace('<text x="50" y="9" text-anchor="middle" font-size="13">✨</text>','')}<span>${f}</span></button>`).join('');c.classList.add('pick')}
+else{$('cpTitle').textContent='עוד קצת והקראנץ\' שלך!';$('cpText').textContent=`הגעת ל-${Math.min(s.zr,15)} זריזין, עוד ${15-s.zr} וזה שלך! 🍦`;$('cpFlv').innerHTML='';popT=setTimeout(closePop,3800)}
+c.classList.add('show');setTimeout(()=>confetti(200),150)}
+function pickFlavor(f){me().flavor=f;render();toast(`בחרת ${f}! 🍦`);burstAt($('icewrap'),70)}
+function checkCrunch(){const s=me();if(document.querySelector('.nav .on').dataset.r!=='student')return;s.seen=s.seen||{};
+if(s.zr>=12&&s.zr<15&&!s.seen[12]&&!s.flavor){s.seen[12]=s.seen[10]=1;setTimeout(()=>crunchPop(12),600)}
+else if(s.zr>=10&&s.zr<15&&!s.seen[10]){s.seen[10]=1;setTimeout(()=>crunchPop(10),600)}}
+// zrizin trail: winding road of 15 stops ending at the Crunch
+function renderTrail(){const svg=$('trail');if(!svg)return;const n=Math.min(me().zr,15),NS='http://www.w3.org/2000/svg';
+const d='M318,26 H40 A38,38 0 0 0 40,102 H300';
+svg.innerHTML=`<defs><linearGradient id="tg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fff6d6"/><stop offset=".45" stop-color="#e8b84e"/><stop offset="1" stop-color="#a06b14"/></linearGradient></defs>
+<path id="tpath" d="${d}" fill="none" stroke="rgba(255,255,255,.28)" stroke-width="10" stroke-linecap="round"/>
+<path class="prog" d="${d}" fill="none" stroke="url(#tg)" stroke-width="6" stroke-linecap="round" stroke-dasharray="0 9999"/>`;
+const path=$('tpath'),L=path.getTotalLength(),step=L/14;let h='';
+for(let i=1;i<=15;i++){const p=path.getPointAtLength(step*(i-1));
+if(i===15){h+=`<g class="nd"><circle cx="${p.x}" cy="${p.y}" r="24" fill="${n>=15?'url(#tg)':'#fff'}" stroke="#fff6d6" stroke-width="3" style="filter:drop-shadow(0 0 ${n>=12?10:3}px rgba(255,230,150,.9))"/><text class="goal" x="${p.x}" y="${p.y+1}" font-size="24" style="font-size:24px">🍦</text></g>`;continue}
+const done=i<=n,cur=i===n+1;
+h+=`<g class="nd"><circle ${cur?'class="cur"':''} cx="${p.x}" cy="${p.y}" r="${done?12:10}" fill="${done?'url(#tg)':cur?'#fff':'rgba(255,255,255,.22)'}" ${cur?'stroke="#e8b84e" stroke-width="3"':''}/><text x="${p.x}" y="${p.y+.5}" fill="${done?'#3a2504':cur?'#2a9fb0':'rgba(255,255,255,.85)'}">${done?'✓':i}</text></g>`;
+if(cur)h+=`<g class="tag"><rect x="${p.x-24}" y="${p.y-36}" width="48" height="18" rx="9" fill="#fff"/><text x="${p.x}" y="${p.y-27}" text-anchor="middle" dominant-baseline="central" style="font:900 10px Gush" fill="#2a9fb0">היום ☀️</text></g>`}
+svg.insertAdjacentHTML('beforeend',h);
+const prog=svg.querySelector('.prog');requestAnimationFrame(()=>requestAnimationFrame(()=>prog.setAttribute('stroke-dasharray',`${n>=1?step*(n-1):0} 9999`)))}
+const _render5=render;render=function(){_render5();renderTrail()};renderTrail();
+function renderFlv(){const s=me(),el=$('flvs');if(!el)return;el.innerHTML=Object.keys(ICE).map(f=>`<button class="${s.flavor===f?'on':''}" onclick="pickFlavor('${f}')">${iceSVG(15,f,1).replace(/<text[^>]*>✨<\/text>/,'')}<span>${f}</span></button>`).join('')}
+const _render6=render;render=function(){_render6();renderFlv()};renderFlv();
+// earned Crunch collection: every 15 zrizin = one Crunch in the chosen flavor
+state.students.forEach((s,i)=>{s.crunches=[['שוקולד נוגט','וניל עוגיות'],['אגוזי לוז'],[],['וניל נוגט','וניל נוגט','שוקולד נוגט'],['וניל עוגיות'],[],[],['אגוזי לוז'],[]][i%9]||[];s.totalZr=s.crunches.length*15+s.zr});
+function earnCrunch(i){const s=state.students[i];while(s.zr>=15){s.zr-=15;const f=s.flavor||'שוקולד נוגט';s.crunches.push(f);s.points+=4;s.wallet+=4;s.weeks[s.weeks.length-1]+=4;s.hist.unshift({p:4,t:'בונוס 15 זריזין',who:'זריזין',fresh:1});
+s.hist.unshift({p:'🍦',t:`קיבלת קראנץ' ${f}! (מס' ${s.crunches.length})`,who:'זריזין',fresh:1});
+notify(`🍦 קיבלת קראנץ' ${f}! זה הקראנץ' ה-${s.crunches.length} שלך`,`🍦 ${s.name} צבר 15 זריזין וקיבל קראנץ' ${f}!`);
+if(i===state.cur)setTimeout(()=>{$('ovMedal').innerHTML=`<div class="crs" style="justify-content:center">${iceSVG(15,f,1)}</div>`;$('ovTitle').textContent='קיבלת קראנץ\'!';$('ovText').textContent=`15 זריזין! ${f} מחכה לך אצל המחנך ינון אליה 🍦`;$('overlay').classList.add('show');confetti(240)},500)}}
+function renderCr(){const s=me(),el=$('crs');if(!el)return;const n=s.crunches.length;
+$('crN').textContent=n?`צברת ${n} 🍦`:'';
+el.innerHTML=n?s.crunches.map((f,j)=>iceSVG(15,f,1).replace(/<text[^>]*>✨<\/text>/,'').replace('<svg','<svg style="animation-delay:'+(j*.08)+'s"')).join('')+`<span class="nx">${iceSVG(s.zr,s.flavor,1).replace(/<text[^>]*>✨<\/text>/,'')}</span>`:'<span class="empty">הקראנץ\' הראשון שלך בדרך! עוד '+(15-s.zr)+' זריזין</span>'}
+const _render7=render;render=function(){_render7();renderCr()};renderCr();
+// ===== Agent X: a secret daily agent picked at random =====
+const AGENT_SVG=document.querySelector('#agentCard .agent').outerHTML;
+function pickAgent(seed){const d=new Date();let h=seed!=null?seed:(d.getFullYear()*372+d.getMonth()*31+d.getDate());h=(h*2654435761)%4294967296;return h%state.students.length}
+state.agent={idx:pickAgent(),status:'pending',revealed:['משה','דניאל','יהודה']};state.classBonus=0;
+function renderAgent(){const a=state.agent;if(!$('agTitle'))return;
+if(a.status==='pending'){$('agTitle').textContent='הסוכן היומי כבר נבחר...';$('agSub').textContent='האם זה אתה? 👀 אף אחד לא יודע. תתנהג כאילו זה אתה.';$('agQ').textContent='?'}
+else if(a.status==='yes'){$('agTitle').innerHTML='הסוכן של היום: <span class="gt">'+esc(state.students[a.idx].name)+'</span>';$('agSub').textContent='עמד במשימה! +10 לכל הכיתה 🎉';$('agQ').textContent='✓'}
+else{$('agTitle').textContent='הסוכן היום לא עמד במשימה';$('agSub').textContent='השם נשאר סודי... אולי מחר זה תהיה אתה 🕶️';$('agQ').textContent='🔒'}
+$('agRev').innerHTML=a.revealed.length?'סוכנים שנחשפו השבוע: '+a.revealed.map(n=>`<span class="tag">🕶️ ${esc(n)}</span>`).join(''):'';
+$('agName').textContent=state.students[a.idx].name;
+const done=a.status!=='pending';$('agYes').disabled=done;$('agNo').disabled=done}
+function agentPopup(ok){const a=state.agent,name=state.students[a.idx].name,ov=$('agOv'),bx=$('agBox');delete ov.dataset.ready;
+if(ok){bx.innerHTML=`${AGENT_SVG}<h3>הסוכן X נחשף!</h3><div class="nm typing" id="agType"></div><p>עמד במשימה, וכל הכיתה קיבלה <b class="gt">+10 נקודות</b> בזכותו!</p><p style="color:#9ff0f7;font-weight:700">כל מעשה שאתה עושה משכלל ומשדרג את כל הכיתה.</p><button class="btn" style="width:auto;padding:12px 36px;margin-top:6px">יישר כוח!</button>`;
+ov.classList.add('show');let i=0;const el=$('agType');const iv=setInterval(()=>{el.textContent=name.slice(0,++i);if(i>=name.length){clearInterval(iv);el.classList.remove('typing');ov.dataset.ready=1;confetti(260)}},140)}
+else{bx.innerHTML=`${AGENT_SVG}<div class="lock">🔒</div><h3>הסוכן היום לא עמד במשימה</h3><p>השם שלו נשאר סודי.</p><p style="color:#f4cf6b;font-weight:700;font-size:20px">אולי מחר זה תהיה אתה? 🕶️</p><button class="btn" style="width:auto;padding:12px 36px;margin-top:6px">מחר ננצח!</button>`;ov.classList.add('show');ov.dataset.ready=1}}
+$('agYes').onclick=()=>{const a=state.agent;a.status='yes';state.classBonus+=10;a.revealed.unshift(state.students[a.idx].name);
+notify(`🕶️ הסוכן X נחשף: ${state.students[a.idx].name}! עמד במשימה, +10 לכל הכיתה`,`🕶️ הסוכן של היום (${state.students[a.idx].name}) עמד במשימה: +10 לכל הכיתה`);render();
+document.querySelector('.nav [data-r=student]').click();setTimeout(()=>agentPopup(true),350)};
+$('agNo').onclick=()=>{state.agent.status='no';notify('🕶️ הסוכן היום לא עמד במשימה... אולי מחר זה תהיה אתה','🕶️ הסוכן היום לא עמד במשימה');render();document.querySelector('.nav [data-r=student]').click();setTimeout(()=>agentPopup(false),350)};
+$('agNew').onclick=()=>{const a=state.agent;let n;do{n=Math.floor(Math.random()*state.students.length)}while(n===a.idx);a.idx=n;a.status='pending';$('agSecret').classList.remove('show');render();
+notify('🕶️ בוקר טוב! הסוכן היומי כבר נבחר. האם זה אתה?','🕶️ הסוכן היומי נבחר. אולי זה הבן שלכם?');toast('🎲 נבחר סוכן חדש')};
+const _render8=render;render=function(){_render8();renderAgent()};renderAgent();
+setTimeout(()=>notify('🕶️ בוקר טוב! הסוכן היומי כבר נבחר. האם זה אתה?','🕶️ הסוכן היומי נבחר. אולי זה הבן שלכם?'),1200);
+// ===== wallet, weekly history, donating =====
+state.students.forEach((s,i)=>{s.wallet=s.points;s.goalPts=Math.round(s.points*.28);let sd=i*7+3;const r=()=>(sd=(sd*9301+49297)%233280)/233280;s.weeks=Array.from({length:8},(_,k)=>Math.round(14+r()*30+k*2));s.donated=0});
+function renderWeeks(){const s=me(),w=s.weeks,svg=$('wkChart');if(!svg)return;const mx=Math.max(...w,10),n=w.length,bw=30,gap=(340-n*bw)/(n+1);
+let h='<defs><linearGradient id="wkg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f7dc8a"/><stop offset="1" stop-color="#c8932a"/></linearGradient></defs>';
+w.forEach((v,i)=>{const x=340-gap-(i+1)*(bw+gap)+gap,bh=v/mx*130,y=160-bh,last=i===n-1;
+h+=`<rect class="bar" x="${x}" y="${y}" width="${bw}" height="${bh}" rx="9" fill="${last?'url(#wkg)':'#7fbf9a'}" opacity="${last?1:.75}"/>`+
+`<text x="${x+bw/2}" y="${y-6}" text-anchor="middle" style="font:900 12px Gush" fill="#12361f">${v}</text>`+
+`<text x="${x+bw/2}" y="180" text-anchor="middle" style="font:400 11px Gush" fill="#12361f">${last?'השבוע':'ש׳'+(i+1)}</text>`});
+svg.innerHTML=h;const now=w[n-1],prev=w[n-2],d=now-prev;
+$('wkHead').innerHTML=`<div class="now">${now}<small>נקודות השבוע</small></div><div class="trend ${d>=0?'up':'down'}">${d>=0?'▲ '+d+' יותר':'▼ '+(-d)+' פחות'} מהשבוע שעבר</div>`;
+const best=Math.max(...w),avg=Math.round(w.reduce((a,b)=>a+b,0)/n);
+$('wkFoot').innerHTML=`<span>🏆 שיא: ${best}</span><span>📊 ממוצע: ${avg}</span><span>💛 תרמת לכיתה: ${s.donated}</span>`}
+function renderDonate(){const s=me();if(!$('donBtns'))return;$('donBtns').innerHTML=[10,25,50].map(v=>`<button ${s.wallet<v?'disabled style="opacity:.4"':''} onclick="donate(${v})">${v}</button>`).join('');
+$('donSum').textContent=s.donated?`תרמת עד היום ${s.donated} נקודות לכיתה. יישר כוח! 💛`:''}
+function donate(v){const s=me();if(s.wallet<v)return;s.wallet-=v;s.donated+=v;state.classBonus=(state.classBonus||0)+v;s.hist.unshift({p:'💛',t:`תרמת ${v} נקודות לכיתה`,who:'תרומה',fresh:1});
+notify(`💛 תרמת ${v} נקודות ליעד של הכיתה`,`💛 ${s.name} תרם ${v} נקודות מהנקודות שלו לכל הכיתה`);render();burstAt($('donBtns'),80);toast(`💛 תרמת ${v} לכיתה. מה שאתה מחזק בך מחזק את כולם!`)}
+const _render9=render;render=function(){_render9();renderWeeks();renderDonate()};render();
+// ===== prayer arrival times =====
+function pad2(n){return String(n).padStart(2,'0')}function fmtT(m){return pad2(Math.floor(m/60))+':'+pad2(m%60)}function dkey(d){return d.getFullYear()+'-'+pad2(d.getMonth()+1)+'-'+pad2(d.getDate())}
+var TODAY=dkey(new Date());
+state.students.forEach((s,i)=>{let sd=i*13+5;const r=()=>(sd=(sd*9301+49297)%233280)/233280;const base=438+r()*22,trend=(r()-.6)*0.35;s.arr=[];
+const d=new Date();d.setDate(d.getDate()-1);let n=0;while(n<24){if(d.getDay()!==6){s.arr.unshift({d:dkey(d),t:Math.round(base+(24-n)*trend+(r()-.5)*14)});n++}d.setDate(d.getDate()-1)}});
+function todayArr(s){return s.arr?s.arr.find(a=>a.d===TODAY):null}
+$('ciBtn').onclick=()=>{const s=me();if(todayArr(s))return;const now=new Date(),t=now.getHours()*60+now.getMinutes();s.arr.push({d:TODAY,t});
+const ok=t<=450;notify(ok?`☀️ נרשמת בתפילה ב-${fmtT(t)}. יא זריז!`:`נרשמת בתפילה ב-${fmtT(t)}`,`${s.name} הגיע לתפילה ב-${fmtT(t)}`);render();if(ok)burstAt($('ciBtn'),60);toast(`נרשם: ${fmtT(t)} ${ok?'· יא זריז! ☀️':''}`)};
+function renderCheckin(){const s=me(),a=todayArr(s),b=$('ciBtn');if(!b)return;b.disabled=!!a;b.textContent=a?`✓ נרשמת היום ב-${fmtT(a.t)}`:'✋ הגעתי לתפילה';
+$('ciMsg').textContent=a?(a.t<=450?'יא זריז! הגעת לפני 7:30 ☀️':'נרשם. מחר מקדימים 💪'):'לוחצים כשנכנסים לתפילה, והמחנך רואה את השעה.'}
+const per={p:'week',t:'week'};
+function arrSlice(s,period,offset=0){const n=period==='week'?6:24;const all=s.arr;const end=all.length-offset*n;return all.slice(Math.max(0,end-n),end)}
+function repHTML(s,period){const a=arrSlice(s,period),prev=arrSlice(s,period,1);if(!a.length)return '<div class="sub">אין עדיין נתונים</div>';
+const W=340,H=170,top=10,bot=140,y=m=>top+(Math.min(Math.max(m,415),490)-415)/75*(bot-top);const n=a.length,x=i=>W-20-(i*(W-40)/Math.max(1,n-1));
+let g=`<line x1="10" x2="${W-10}" y1="${y(450)}" y2="${y(450)}" stroke="#e8b84e" stroke-width="2" stroke-dasharray="5 5"/><text x="12" y="${y(450)-6}" style="font:700 11px Gush" fill="#a06b14">7:30</text>`;
+g+=`<polyline fill="none" stroke="#43c1cc" stroke-width="3" stroke-linejoin="round" points="${a.map((v,i)=>x(i)+','+y(v.t)).join(' ')}"/>`;
+a.forEach((v,i)=>{const ok=v.t<=450;g+=`<circle cx="${x(i)}" cy="${y(v.t)}" r="${n>8?4:6}" fill="${ok?'#43a36a':'#e08a3c'}" stroke="#fff" stroke-width="2"/>`;
+if(n<=8)g+=`<text x="${x(i)}" y="${y(v.t)-10}" text-anchor="middle" style="font:700 10px Gush" fill="#0b3d4a">${fmtT(v.t)}</text>`;
+if(n<=8||i%4===0){const dd=new Date(v.d);g+=`<text x="${x(i)}" y="${H-8}" text-anchor="middle" style="font:400 10px Gush" fill="#0b3d4a">${['א׳','ב׳','ג׳','ד׳','ה׳','ו׳','ש׳'][dd.getDay()]} ${dd.getDate()}/${dd.getMonth()+1}</text>`}});
+const avg=Math.round(a.reduce((q,v)=>q+v.t,0)/n),on=a.filter(v=>v.t<=450).length;let tr='';
+if(prev.length){const pavg=Math.round(prev.reduce((q,v)=>q+v.t,0)/prev.length),d=pavg-avg;tr=`<div class="rtrend ${d>=0?'up':'down'}">${d>=0?'▲ הגיע בממוצע '+d+' דקות מוקדם יותר':'▼ הגיע בממוצע '+(-d)+' דקות מאוחר יותר'} מה${period==='week'?'שבוע':'חודש'} הקודם</div>`}
+return `<svg viewBox="0 0 ${W} ${H}" style="width:100%;display:block">${g}</svg><div class="rstats"><div><b>${fmtT(avg)}</b>ממוצע הגעה</div><div><b>${on}/${n}</b>לפני 7:30</div><div><b>${fmtT(Math.min(...a.map(v=>v.t)))}</b>הכי מוקדם</div></div>${tr}`}
+function renderReports(){const s=me();if($('pRep'))$('pRep').innerHTML=repHTML(s,per.p);if($('tRep'))$('tRep').innerHTML=repHTML(s,per.t);
+if($('clsRep')){const rows=state.students.map(x=>{const a=arrSlice(x,'month');const avg=Math.round(a.reduce((q,v)=>q+v.t,0)/a.length),on=a.filter(v=>v.t<=450).length/a.length;return {n:x.name,avg,on}}).sort((a,b)=>a.avg-b.avg);
+$('clsRep').innerHTML=rows.map(r=>`<div class="clsrow"><span class="nm">${esc(r.n)}</span><b>${fmtT(r.avg)}</b><span class="bar"><i style="width:${Math.round(r.on*100)}%"></i></span><span style="width:36px;text-align:left">${Math.round(r.on*100)}%</span></div>`).join('')}}
+document.querySelectorAll('.seg').forEach(sg=>sg.onclick=e=>{const b=e.target.closest('button');if(!b)return;per[sg.dataset.tgt]=b.dataset.per;sg.querySelectorAll('button').forEach(x=>x.classList.toggle('on',x===b));renderReports()});
+$('repCopy').onclick=()=>{const s=me(),a=arrSlice(s,per.t),avg=Math.round(a.reduce((q,v)=>q+v.t,0)/a.length),on=a.filter(v=>v.t<=450).length;
+const txt=`שלום, סיכום ההגעה לתפילה של ${s.name} ב${per.t==='week'?'שבוע':'חודש'} האחרון:\nממוצע הגעה: ${fmtT(avg)}\nהגיע לפני 7:30: ${on} מתוך ${a.length} ימים\n${a.map(v=>v.d.slice(8)+'/'+v.d.slice(5,7)+' - '+fmtT(v.t)).join('\n')}\n\nבברכה,\nהמחנך ינון אליה`;
+(navigator.clipboard?navigator.clipboard.writeText(txt):Promise.reject()).then(()=>toast('📋 הסיכום הועתק, אפשר להדביק בוואטסאפ'),()=>toast('לא הצלחתי להעתיק במכשיר הזה'))};
+// ===== Aramaic word of the day =====
+let ARAM=[['תָּא שְׁמַע','בוא ושמע'],['מַאי טַעְמָא','מה הסיבה?'],['אִיבַּעְיָא לְהוּ','נשאלה להם שאלה'],['תְּיוּבְתָּא','הפרכה, קושיה שאין עליה תשובה'],['פְּשִׁיטָא','פשוט! ברור!'],['הָכִי נַמִי','כך גם'],['מְנָא הָנֵי מִילֵּי','מניין הדברים האלה?'],['אִי נַמִי','או גם, אפשרות אחרת'],['לָא צְרִיכָא','לא נצרך, אין צורך לומר'],['שְׁמַע מִינַּהּ','למד מכאן'],['קַשְׁיָא','קושיה'],['תַּנְיָא','שנינו בברייתא'],['מַתְקִיף לַהּ','הקשה על כך'],['תֵּיקוּ','השאלה נשארת פתוחה']];
+const dayNo=Math.floor(Date.now()/864e5);ARAM=ARAM.slice(0,10);
+function aramList(){return ARAM.map((w,i)=>`<div class="awrow"><span class="aww">${esc(w[0])}</span><span class="awm">${esc(w[1])}</span></div>`).join('')}
+function renderAram(){const s=me();$('awWord').innerHTML=aramList();$('pAwWord').innerHTML=aramList();$('awMean').textContent='';$('pAwMean').textContent='';
+if($('aramEd'))$('aramEd').innerHTML=ARAM.map((w,i)=>`<div class="aerow"><input value="${esc(w[0])}" oninput="ARAM[${i}][0]=this.value"><input value="${esc(w[1])}" oninput="ARAM[${i}][1]=this.value"><button onclick="ARAM.splice(${i},1);renderAram()">✕</button></div>`).join('');
+const done=s.aramDay===dayNo;$('pAwBtn').disabled=done;$('pAwBtn').textContent=done?'✓ סומן היום':'✓ אמר לי את המילים בעל פה (+2)';$('awNote').innerHTML=done?'אמרת היום להורים! <b>+2</b> ✓':'תגיד אותן להורים בעל פה, והם יסמנו לך <b>+2</b>.'}
+$('aramAdd').onclick=()=>{if(ARAM.length>=10){toast('עד 10 מילים');return}ARAM.push(['','']);renderAram();const ins=document.querySelectorAll('#aramEd input');ins[ins.length-2].focus()};
+document.addEventListener('change',e=>{if(e.target.closest&&e.target.closest('#aramEd'))renderAram()});
+$('pAwBtn').onclick=()=>{const s=me();if(s.aramDay===dayNo)return;s.aramDay=dayNo;award(state.cur,2,'אמר בעל פה את המילים בארמית','ההורים');toast(`יפה! ${s.name} קיבל +2 📜`)};
+// ===== blessed initiative =====
+const VALUES=[['חברות','#ff9fb2'],['למידה','#7fc8ff'],['חסד','#ffd36e'],['אחריות','#9fe0b0'],['יראת שמיים','#c9b6ff']];let selVal=null;
+$('valChips').innerHTML=VALUES.map(v=>`<button data-v="${v[0]}" style="background:${v[1]}">${v[0]}</button>`).join('');
+$('valChips').onclick=e=>{const b=e.target.closest('button');if(!b)return;selVal=b.dataset.v;document.querySelectorAll('#valChips button').forEach(x=>x.classList.toggle('on',x===b));chkInit()};
+function chkInit(){$('initBtn').disabled=!(selVal&&$('initDone').checked)}$('initDone').onchange=chkInit;
+$('initBtn').onclick=()=>{const s=me(),txt=$('initTxt').value.trim();s.values=s.values||{};s.values[selVal]=(s.values[selVal]||0)+1;
+award(state.cur,10,`יוזמה מבורכת (${selVal})${txt?': '+txt:''}`,'המחנך ינון אליה');const col=VALUES.find(v=>v[0]===selVal)[1];
+document.querySelector('.nav [data-r=student]').click();setTimeout(()=>{$('ovMedal').innerHTML=`<div style="font-size:84px">✨</div><span style="display:inline-block;padding:8px 18px;border-radius:99px;background:${col};color:#12202a;font-weight:900">${selVal}</span>`;$('ovTitle').textContent='יאללה, התפנקת ב-10 נקודות!';$('ovText').textContent=(txt?txt+' · ':'')+'יוזמה מבורכת לכיתה';$('overlay').classList.add('show');confetti(240)},400);
+$('initTxt').value='';$('initDone').checked=false;selVal=null;document.querySelectorAll('#valChips button').forEach(x=>x.classList.remove('on'));chkInit()};
+function renderVals(){const s=me(),v=s.values||{};$('valTags').innerHTML=Object.keys(v).length?'<span style="background:none;padding:6px 0">הערכים שחיזקתי:</span>'+VALUES.filter(x=>v[x[0]]).map(x=>`<span style="background:${x[1]}">${x[0]} ×${v[x[0]]}</span>`).join(''):''}
+state.students[0].values={'חברות':2,'למידה':1};
+// ===== group study treat =====
+const grp=new Set();let treat='🍕 מגש פיצה';
+function renderGrp(){$('grpChips').innerHTML=state.students.map((x,i)=>`<button class="chip ${grp.has(i)?'on':''}" onclick="grp.has(${i})?grp.delete(${i}):grp.add(${i});renderGrp()">${esc(x.name)}</button>`).join('');
+$('treats').innerHTML=['🍕 מגש פיצה','🍦 גלידה','🍿 חטיפים'].map(t=>`<button class="chip ${t===treat?'on':''}" onclick="treat='${t}';renderGrp()">${t}</button>`).join('')}
+$('grpBtn').onclick=()=>{if(grp.size<2){toast('חבורה = לפחות 2 תלמידים');return}const ns=[...grp].map(i=>FIRST[state.students[i].name]);
+grp.forEach(i=>{const x=state.students[i];award(i,10,'למד בחבורה למבחן','המחנך ינון אליה');x.hist.unshift({p:treat.split(' ')[0],t:`למדתם בחבורה למבחן: ${treat.slice(3)} עלינו!`,who:'המחנך ינון אליה',fresh:1});notify(`${treat.split(' ')[0]} למדתם בחבורה למבחן! ${treat.slice(3)} עלינו`,`${x.name} למד בחבורה למבחן, והחבורה זכתה ב${treat.slice(3)}`)});
+confetti(200);toast(`${treat.split(' ')[0]} פינוק לחבורה: ${ns.join(', ')}`);grp.clear();render()};
+const _render10=render;render=function(){_render10();renderCheckin();renderReports();renderAram();renderVals();renderGrp()};render();
+// pop-in on scroll + celebration bursts
+function burstAt(el,n){const r=el.getBoundingClientRect(),d=devicePixelRatio,cols=['#f7dc8a','#e8b84e','#fff6d6','#43c1cc','#9ff0f7'];for(let i=0;i<n;i++)parts.push({x:(r.left+r.width/2)*d,y:(r.top+r.height/3)*d,vx:(Math.random()-.5)*16*d,vy:(Math.random()*-14-3)*d,s:(Math.random()*5+3)*d,c:cols[i%cols.length],r:Math.random()*6,vr:(Math.random()-.5)*.4,life:0});if(!loop.on){loop.on=1;loop()}}
+$('icewrap').onclick=()=>{burstAt($('icewrap'),60);toast(me().zr>=15?'הקראנץ\' שלך מחכה! 🍦':`עוד ${15-me().zr} זריזין והקראנץ' שלך! 🍦`)};
+const io=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('in');if(e.target.dataset.burst&&!e.target._b){e.target._b=1;setTimeout(()=>burstAt(e.target.querySelector('.icewrap')||e.target,50),400)}io.unobserve(e.target)}}),{threshold:.25});
+document.querySelectorAll('.card').forEach(el=>{el.classList.add('reveal');io.observe(el)});
+</script>
+</body>
+</html>
