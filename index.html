@@ -462,6 +462,19 @@ body{padding-top:0!important}
 @keyframes lp{50%{transform:scale(1.08);opacity:.75}}
 .offl{position:fixed;bottom:14px;left:50%;transform:translate(-50%,80px);z-index:998;background:#2b2b2b;color:#fff;border-radius:99px;padding:9px 18px;font:400 14px Gush,sans-serif;transition:transform .35s;white-space:nowrap}
 .offl.show{transform:translate(-50%,0)}
+
+.badm{background:#e9efe9!important;color:#12361f}
+.admseg{display:flex;gap:6px;margin:4px 0 12px}.admseg button{flex:1;border:0;border-radius:99px;padding:9px 6px;font:700 14px Gush;background:rgba(18,54,31,.08);color:#12361f}.admseg button.on{background:#0D614A;color:#fff}
+.arow{display:grid;grid-template-columns:44px 1fr 62px 62px 30px;gap:6px;align-items:center;margin-bottom:7px}
+.arow.d{grid-template-columns:44px 1fr 62px 30px}
+.arow input,.acat input{width:100%;min-width:0;box-sizing:border-box;border:1px solid rgba(18,54,31,.12);border-radius:10px;padding:9px 7px;font:400 15px Gush;background:#fff;color:#12361f}
+.arow input.em{text-align:center;font-size:19px;padding:6px 2px}.arow input.num{text-align:center}
+.arow button,.acat button{border:0;background:rgba(18,54,31,.1);border-radius:9px;height:34px;font-size:14px;color:#12361f}
+.ahead{display:grid;grid-template-columns:44px 1fr 62px 62px 30px;gap:6px;font:700 12px Gush;opacity:.6;margin-bottom:5px;text-align:center}.ahead.d{grid-template-columns:44px 1fr 62px 30px}
+.acat{display:flex;gap:6px;align-items:center;margin:16px 0 8px}.acat input{font-weight:700;font-size:16px;background:rgba(255,255,255,.6)}
+.aadd{border:1px dashed rgba(18,54,31,.35);background:none;border-radius:12px;width:100%;padding:9px;font:700 14px Gush;color:#0D614A;margin-top:2px}
+.admbtns{display:flex;gap:8px;margin-top:14px}.admbtns .btn{flex:1}.admbtns .ghost{background:rgba(18,54,31,.1)!important;color:#12361f!important;flex:.5}
+.prize.out{opacity:.55}
 </style>
 </head>
 <body>
@@ -692,6 +705,11 @@ body{padding-top:0!important}
       <div id="tGoals"></div></div>
     <div class="card b5"><div class="ch"><i>🏠</i>מה ההורים סימנו</div>
       <ul class="tl" id="tFeed"></ul></div>
+    <div class="card badm"><div class="ch"><i>⚙️</i>ניהול</div>
+      <div class="seg admseg" id="admSeg"><button class="on" data-a="prizes">פרסים</button><button data-a="deeds">ניקוד מחנך</button><button data-a="home">ניקוד הורים</button></div>
+      <div id="admBody"></div>
+      <div class="admbtns"><button class="btn" id="admSave">שמור שינויים</button><button class="btn ghost" id="admUndo">בטל</button></div>
+      <div class="sub" id="admNote" style="margin-top:8px"></div></div>
   </section>
 </div>
 
@@ -706,17 +724,7 @@ const LEVELS=[
 ];
 const STUDENTS=["אברהם לוי", "אהרן אוחיון", "אלחנן זכאי", "בנימין גבאי", "דניאל אלמוג", "יהודה חדד", "יצחק פרץ", "יעקב דהן", "משה ביטון", "נחום רביבו", "שמואל עמר", "שמעון אטיאס"];
 const FIRST={"אברהם לוי": "אברהם", "אהרן אוחיון": "אהרן", "אלחנן זכאי": "אלחנן", "בנימין גבאי": "בנימין", "דניאל אלמוג": "דניאל", "יהודה חדד": "יהודה", "יצחק פרץ": "יצחק", "יעקב דהן": "יעקב", "משה ביטון": "משה", "נחום רביבו": "נחום", "שמואל עמר": "שמואל", "שמעון אטיאס": "שמעון"};
-const CATS={
-  'חברותא ועזרה לחבר':[['🤝','עזר לחבר בשיעור',5],['📖','למד עם חבר (חברותא)',10],['💡','הסביר לחבר חומר',5],['💬','ניגש לחבר שהיה לבד',5]],
-  'גמרא':[['🗣️','אמר שקלא וטריא של עמוד גמרא',20]],
-  'לימודים':[['📚','הכין שיעורי בית',3],['✋','השתתפות פעילה',3],['📜','חזר על תורה בבית',5]],
-  'כיתה':[['🧹','סידר את הכיתה',3],['🎧','שקט ומרוכז',2],['📘','הגיע בזמן (גם אחרי הפסקה) עם ספר, מחברת וכלי כתיבה בלבד',3],['⏰','הגיע בזמן',2],['🙋','התנדב לתפקיד',4]],
-  'ערכים':[['🙏','כבוד לצוות',4],['💛','מעשה חסד',6],['🕊️','השכין שלום',6],['🎯','התמדה ומאמץ',5]],
-  'מבחנים':[['📝','מעל 80 במבחן',6],['🏅','מעל 90 במבחן',10],['💯','100 במבחן',15]],
-  'הפתעה':[['⭐','שמתי לב!',5],['🌟','משהו מיוחד',8]]
-};
-const HOME=[['👶','שמר על האחים',3],['🍽️','שטף כלים',3],['🧽','עזר לנקות',3],['🛒','עזר בקניות',3],['🛏️','סידר את החדר',3],['🕯️','הכנות לשבת',3]];
-const PRIZES=[['🎟️','שובר לקיוסק 20 ש״ח',100],['🍦','גלידה',40],['🎧','שיר בהפסקה',30],['🪑','לשבת ליד חבר שבוע',60],['📝','פטור משיעורי בית',80],['🍕','פיצה אישית',120],['⚽','כדור כדורגל',150]];
+let CATS={},HOME=[],PRIZES=[];
 const BADGES=[['🤝','חבר אמיתי',s=>s.count['עזר לחבר בשיעור']>=3,'3 עזרות לחבר'],['📖','חברותא',s=>s.count['למד עם חבר (חברותא)']>=3,'3 לימודים עם חבר'],['CREST','זריז',s=>s.crunches.length*15+s.zr>=5,'5 זריזין'],['🏡','עמוד התווך',s=>s.homeCount>=5,'5 מעשים בבית'],['🔥','על הגל',s=>s.points>=150,'150 נקודות'],['🌙','ישן כמו אלוף',s=>s.sleepBadge,'5 לילות בזמן']];
 const CLASS_GOAL=1500, CLASS_PRIZE='פיצה לכל הכיתה 🍕';
 const GREETS=['יא זריז!','אשריך!','תמשיך ככה','כל הכבוד, אלוף','יישר כוח!','רואים את המאמץ'];
@@ -746,7 +754,7 @@ function pad2(n){return String(n).padStart(2,'0')}function fmtT(m){return pad2(M
 // fill in fields the screens expect (other students arrive with only a name and class points)
 function derive(){const D=KR.newStudent('','');state.students.forEach(s=>{for(const k in D)if(s[k]===undefined)s[k]=JSON.parse(JSON.stringify(D[k]));
   FIRST[s.name]=s.first||s.name.split(' ')[0];s.weeks=WK.map(k=>s.wk[k]||0);const td=s.sleep.days[TODAY]||{};s.sleep.today={bed:td.b,wake:td.w};s.gaveToday=s.gave===TODAY});
-  state.classBonus=state.cls.bonus}
+  state.classBonus=state.cls.bonus;const C=state.cls.cfg||KR.defCfg();CATS=C.cats;HOME=C.home;PRIZES=C.prizes}
 Object.assign(state,ONLINE?KR.init([{id:'_',name:' ',first:' '}]):demoSeed());derive();
 // every change goes through act(): checked by the shared rules, shown at once, then saved
 let queue=[],inflight=null;
@@ -766,7 +774,7 @@ let booted=0;
 function take(v,own){const cur=state.cur;ROLE=v.role;ME=v.me;TODAY=v.today;Object.assign(state,{n:v.n,students:v.students,cls:v.cls});
   queue.forEach(op=>{const full=Object.assign({ts:Date.now(),r:ROLE,a:ME,i:LOCAL_N++},op);try{if(!KR.check(state,full))KR.apply(state,full)}catch(e){}});
   state.cur=ROLE==='teacher'?Math.min(cur,state.students.length-1):ME;derive();
-  if(!booted){booted=1;setupRole()}render();afterSync(own);$('offl').classList.remove('show')}
+  if(!booted){booted=1;setupRole()}render();renderCats();afterSync(own);$('offl').classList.remove('show')}
 async function pull(){if(!ONLINE||inflight||queue.length||document.hidden)return;try{take(await api('GET'))}catch(e){offline(e)}}
 function offline(e){if(e.code===401){try{localStorage.removeItem('kr_k')}catch(x){}$('ldTxt').innerHTML='הקישור הזה לא תקין.<br>בקשו מהמחנך ינון אליה את הקישור האישי.';$('loader').classList.add('show');return}
   if(e.code===503){$('ldTxt').textContent='האפליקציה בהקמה, נסו שוב בעוד כמה דקות 🙏';$('loader').classList.add('show');return}
@@ -877,7 +885,8 @@ function render(){
   const SEEN=render._seen||(render._seen=new Set());const first=!render._seenInit;render._seenInit=1;
   $('hist').innerHTML=s.hist.slice(0,7).map(h=>`<li class="${!first&&!SEEN.has(h.id)?'new':''}"><div class="dot">${typeof h.p==='number'?'+'+h.p:h.p}</div><div><div class="${h.q?'q':''}">${h.q?'"'+esc(h.t)+'"':esc(h.t)}</div><div class="who">${esc(h.who)}</div></div></li>`).join('');
   s.hist.forEach(h=>SEEN.add(h.id));
-  $('prizes').innerHTML=PRIZES.map((p,i)=>`<div class="prize"><div class="img">${p[0]}</div><b>${p[1]}</b><div class="cost">${p[2]} נקודות</div><button class="btn" ${s.wallet<p[2]?'disabled':''} onclick="redeem(${i})">${s.wallet<p[2]?'עוד '+(p[2]-s.wallet):'אני רוצה!'}</button></div>`).join('');
+  $('prizes').innerHTML=PRIZES.map((p,i)=>{const out=p.stock===0,lack=s.wallet<p.cost;return `<div class="prize ${out?'out':''}"><div class="img">${esc(p.e)}</div><b>${esc(p.name)}</b><div class="cost">${p.cost} נקודות${p.stock!=null&&!out?` · נשארו ${p.stock}`:''}</div><button class="btn" ${lack||out?'disabled':''} onclick="redeem(${i})">${out?'אזל':lack?'עוד '+(p.cost-s.wallet):'אני רוצה!'}</button></div>`}).join('');
+  if($('homeDeeds'))$('homeDeeds').innerHTML=HOME.map((d,i)=>`<button class="deed" data-h="${i}" data-p="${d[2]}"><span class="e">${esc(d[0])}</span>${esc(d[1])}<span class="p">+${d[2]}</span></button>`).join('');
   $('pPts').textContent=s.wallet+' (סה״כ '+s.points+')';$('pLvl').textContent=L.name;$('pZr').textContent=Math.min(s.zr,15)+' / 15';
   $('stuChips').innerHTML=state.students.map((x,i)=>`<button class="chip ${i===state.cur?'on':''}" onclick="pick(${i})">${x.name}</button>`).join('');
   $('zGrid').innerHTML=state.students.map((x,i)=>`<button class="zs ${state.zToday.has(i)?'on':''}" onclick="zt(${i})"><div class="av">${x.name[0]}</div>${x.name}<small>${todayArr(x)?'🕒 '+fmtT(todayArr(x).t)+' · ':''}${x.zr}/15 · רצף ${x.streak}${x.crunches&&x.crunches.length?' · 🍦'+x.crunches.length:''}${x.flavor?' · '+x.flavor:''}</small></button>`).join('');
@@ -886,11 +895,10 @@ function render(){
 
 function pick(i){state.cur=i;render()}
 let cat='חברותא ועזרה לחבר';
-function renderCats(){$('catChips').innerHTML=Object.keys(CATS).map(c=>`<button class="chip ${c===cat?'on':''}" data-c="${c}">${c}</button>`).join('');
+function renderCats(){if(!CATS[cat])cat=Object.keys(CATS)[0]||'';if(!cat){$('catChips').innerHTML='';$('tDeeds').innerHTML='';return}$('catChips').innerHTML=Object.keys(CATS).map(c=>`<button class="chip ${c===cat?'on':''}" data-c="${c}">${c}</button>`).join('');
   $('tDeeds').innerHTML=CATS[cat].map(d=>`<button class="deed" data-t="${d[1]}" data-p="${d[2]}"><span class="e">${d[0]}</span>${d[1]}<span class="p">+${d[2]}</span></button>`).join('')}
 $('catChips').onclick=e=>{const c=e.target.closest('[data-c]');if(c){cat=c.dataset.c;renderCats()}};
 $('tDeeds').onclick=e=>{const d=e.target.closest('.deed');if(!d)return;const p=+d.dataset.p;if(act({t:'award',s:state.cur,p,tx:d.dataset.t})){confetti(p>=6?160:90);toast(`+${p} ל${me().name} · ${d.dataset.t}`)}};
-$('homeDeeds').innerHTML=HOME.map((d,i)=>`<button class="deed" data-h="${i}" data-t="${d[1]}" data-p="${d[2]}"><span class="e">${d[0]}</span>${d[1]}<span class="p">+${d[2]}</span></button>`).join('');
 $('homeDeeds').onclick=e=>{const d=e.target.closest('.deed');if(!d)return;const s=me();if(act({t:'home',s:state.cur,h:+d.dataset.h})){confetti(90);toast(`תודה! ${FIRST[s.name]} קיבל +${d.dataset.p}`)}};
 $('otherRange').oninput=e=>$('otherVal').textContent=e.target.value;
 $('otherBtn').onclick=()=>{const t=$('otherTxt').value.trim();if(!t){toast('כתבו מה הוא עשה ✍️');return}const s=me();if(act({t:'other',s:state.cur,tx:t})){$('otherTxt').value='';confetti(90);toast(`נשלח! +3 ל${FIRST[s.name]}`)}};
@@ -898,8 +906,8 @@ function zt(i){state.zToday.has(i)?state.zToday.delete(i):state.zToday.add(i);re
 $('zSave').onclick=()=>{if(!state.zToday.size){toast('סמן מי הגיע לפני 7:30');return}const n=state.zToday.size;
   if(act({t:'zr',list:[...state.zToday]})){state.zToday.clear();render();confetti(140);toast(`☀️ זריזין ל-${n} תלמידים`)}};
 $('tMsgBtn').onclick=()=>{const t=$('tMsg').value.trim();if(!t)return;if(act({t:'msg',s:state.cur,tx:t})){$('tMsg').value='';toast(`ההודעה נשלחה ל${me().name}`)}};
-function redeem(i){const s=me(),p=PRIZES[i];if(s.wallet<p[2])return;if(!act({t:'redeem',s:state.cur,pz:i}))return;
-  $('ovMedal').innerHTML=`<div style="font-size:96px">${p[0]}</div>`;$('ovTitle').textContent='הבקשה נשלחה!';$('ovText').textContent=`המחנך ינון אליה יקבל הודעה על ה${p[1]} שלך`;$('overlay').classList.add('show');confetti(200)}
+function redeem(i){const s=me(),p=PRIZES[i];if(!p||s.wallet<p.cost||p.stock===0)return;if(!act({t:'redeem',s:state.cur,pz:p.id}))return;
+  $('ovMedal').innerHTML=`<div style="font-size:96px">${esc(p.e)}</div>`;$('ovTitle').textContent='הבקשה נשלחה!';$('ovText').textContent=`המחנך ינון אליה יקבל הודעה על ה${p.name} שלך`;$('overlay').classList.add('show');confetti(200)}
 document.querySelector('.nav').onclick=e=>{const b=e.target.closest('button');if(!b)return;document.querySelectorAll('.nav button').forEach(x=>x.classList.toggle('on',x===b));['student','parent','teacher'].forEach(r=>$('v-'+r).classList.toggle('hide',r!==b.dataset.r));renderNotes();scrollTo({top:0,behavior:'smooth'})};
 renderCats();render();greet();
 
@@ -1109,6 +1117,36 @@ const io=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){e.targ
 document.querySelectorAll('.card').forEach(el=>{el.classList.add('reveal');io.observe(el)});
 
 
+
+// ===== teacher: manage prizes and points =====
+let admTab='prizes',draft=null,dirty=0;
+function admLoad(){const C=state.cls.cfg||KR.defCfg();draft=JSON.parse(JSON.stringify(C));dirty=0}
+function admMark(){dirty=1;$('admNote').textContent='יש שינויים שלא נשמרו'}
+function admRender(){if(!$('admBody')||ROLE!=='teacher')return;if(!draft||!dirty)admLoad();const B=$('admBody');
+  const del='<button title="מחק">✕</button>';
+  if(admTab==='prizes'){B.innerHTML=`<div class="ahead"><span></span><span>פרס</span><span>מחיר</span><span>מלאי</span><span></span></div>`+draft.prizes.map((p,i)=>`<div class="arow" data-i="${i}"><input class="em" data-f="e" value="${esc(p.e)}"><input data-f="name" value="${esc(p.name)}" placeholder="שם הפרס"><input class="num" data-f="cost" type="number" inputmode="numeric" value="${p.cost}"><input class="num" data-f="stock" type="number" inputmode="numeric" value="${p.stock==null?'':p.stock}" placeholder="∞">${del}</div>`).join('')+`<button class="aadd" data-add="1">+ פרס חדש</button><div class="sub" style="margin-top:8px">מלאי ריק = בלי הגבלה. כשהמלאי מגיע ל-0 הפרס מופיע כ"אזל".</div>`}
+  else if(admTab==='home'){B.innerHTML=`<div class="ahead d"><span></span><span>מה ההורים מסמנים</span><span>נקודות</span><span></span></div>`+draft.home.map((d,i)=>`<div class="arow d" data-i="${i}"><input class="em" data-f="0" value="${esc(d[0])}"><input data-f="1" value="${esc(d[1])}"><input class="num" data-f="2" type="number" inputmode="numeric" value="${d[2]}">${del}</div>`).join('')+`<button class="aadd" data-add="1">+ פעולה חדשה</button>`}
+  else{B.innerHTML=Object.keys(draft.cats).map((c,ci)=>`<div class="acat" data-c="${ci}"><input data-cat="1" value="${esc(c)}"><button data-delcat="1" title="מחק קטגוריה">🗑</button></div>`+draft.cats[c].map((d,i)=>`<div class="arow d" data-c="${ci}" data-i="${i}"><input class="em" data-f="0" value="${esc(d[0])}"><input data-f="1" value="${esc(d[1])}"><input class="num" data-f="2" type="number" inputmode="numeric" value="${d[2]}">${del}</div>`).join('')+`<button class="aadd" data-c="${ci}" data-add="1">+ פעולה ב${esc(c)}</button>`).join('')+`<button class="aadd" data-newcat="1" style="margin-top:14px">+ קטגוריה חדשה</button>`}}
+function catAt(ci){return Object.keys(draft.cats)[ci]}
+$('admSeg').onclick=e=>{const b=e.target.closest('button');if(!b)return;if(dirty&&!confirm('יש שינויים שלא נשמרו. לעבור בלי לשמור?'))return;dirty=0;admTab=b.dataset.a;$('admSeg').querySelectorAll('button').forEach(x=>x.classList.toggle('on',x===b));$('admNote').textContent='';admRender()};
+$('admBody').addEventListener('input',e=>{const t=e.target,row=t.closest('.arow');admMark();
+  if(t.dataset.cat){const ci=+t.closest('.acat').dataset.c,old=catAt(ci),keys=Object.keys(draft.cats),o={};keys.forEach(k=>o[k===old?t.value:k]=draft.cats[k]);draft.cats=o;t.closest('.acat').nextElementSibling;return}
+  if(!row)return;const i=+row.dataset.i,f=t.dataset.f;
+  if(admTab==='prizes'){const p=draft.prizes[i];p[f]=f==='cost'?t.value:f==='stock'?t.value:t.value}
+  else{const L=admTab==='home'?draft.home:draft.cats[catAt(+row.dataset.c)];L[i][+f]=t.value}});
+$('admBody').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;
+  if(b.dataset.add){if(admTab==='prizes')draft.prizes.push({id:'',e:'🎁',name:'',cost:50,stock:''});else if(admTab==='home')draft.home.push(['🏡','',3]);else draft.cats[catAt(+b.dataset.c)].push(['⭐','',5]);admMark();admRender();const ins=$('admBody').querySelectorAll('.arow input:not(.em):not(.num)');if(ins.length)ins[ins.length-1].focus();return}
+  if(b.dataset.newcat){let n='קטגוריה חדשה',k=2;while(draft.cats[n])n='קטגוריה חדשה '+k++;draft.cats[n]=[['⭐','',5]];admMark();admRender();return}
+  if(b.dataset.delcat){const c=catAt(+b.closest('.acat').dataset.c);if(!confirm(`למחוק את הקטגוריה "${c}" עם כל הפעולות שבה?`))return;delete draft.cats[c];admMark();admRender();return}
+  const row=b.closest('.arow');if(!row)return;const i=+row.dataset.i;
+  if(admTab==='prizes')draft.prizes.splice(i,1);else if(admTab==='home')draft.home.splice(i,1);else draft.cats[catAt(+row.dataset.c)].splice(i,1);admMark();admRender()});
+$('admSave').onclick=()=>{if(!dirty){toast('אין שינויים');return}let op;
+  if(admTab==='prizes')op={t:'cfgPrizes',list:draft.prizes.map(p=>({id:p.id,e:p.e,name:p.name,cost:+p.cost,stock:p.stock===''||p.stock==null?null:+p.stock}))};
+  else if(admTab==='home')op={t:'cfgHome',list:draft.home.map(d=>[d[0],d[1],+d[2]])};
+  else{const c={};Object.keys(draft.cats).forEach(k=>c[k]=draft.cats[k].map(d=>[d[0],d[1],+d[2]]));op={t:'cfgDeeds',cats:c}}
+  dirty=0;if(act(op)){$('admNote').textContent='';toast('✓ נשמר. התלמידים וההורים יראו את השינוי');renderCats();admRender()}else{dirty=1}};
+$('admUndo').onclick=()=>{dirty=0;$('admNote').textContent='';admRender();toast('השינויים בוטלו')};
+const _render11=render;render=function(){_render11();if(!dirty&&!($('admBody')&&$('admBody').contains(document.activeElement)))admRender()};
 // ===== start =====
 if(ONLINE){$('loader').classList.add('show');api('GET').then(v=>take(v)).catch(offline);
   setInterval(pull,30000);document.addEventListener('visibilitychange',()=>{if(!document.hidden)pull()});addEventListener('online',()=>{flush();pull()})}

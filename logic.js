@@ -11,6 +11,16 @@
   const TREATS = ['🍕 מגש פיצה','🍦 גלידה','🍿 חטיפים'];
   const TEACHER = 'המחנך ינון אליה';
   const ARAM0 = [['תָּא שְׁמַע','בוא ושמע'],['מַאי טַעְמָא','מה הסיבה?'],['אִיבַּעְיָא לְהוּ','נשאלה להם שאלה'],['תְּיוּבְתָּא','הפרכה, קושיה שאין עליה תשובה'],['פְּשִׁיטָא','פשוט! ברור!'],['הָכִי נַמִי','כך גם'],['מְנָא הָנֵי מִילֵּי','מניין הדברים האלה?'],['אִי נַמִי','או גם, אפשרות אחרת'],['לָא צְרִיכָא','לא נצרך, אין צורך לומר'],['שְׁמַע מִינַּהּ','למד מכאן']];
+  const CATS = {
+    'חברותא ועזרה לחבר':[['🤝','עזר לחבר בשיעור',5],['📖','למד עם חבר (חברותא)',10],['💡','הסביר לחבר חומר',5],['💬','ניגש לחבר שהיה לבד',5]],
+    'גמרא':[['🗣️','אמר שקלא וטריא של עמוד גמרא',20]],
+    'לימודים':[['📚','הכין שיעורי בית',3],['✋','השתתפות פעילה',3],['📜','חזר על תורה בבית',5]],
+    'כיתה':[['🧹','סידר את הכיתה',3],['🎧','שקט ומרוכז',2],['📘','הגיע בזמן (גם אחרי הפסקה) עם ספר, מחברת וכלי כתיבה בלבד',3],['⏰','הגיע בזמן',2],['🙋','התנדב לתפקיד',4]],
+    'ערכים':[['🙏','כבוד לצוות',4],['💛','מעשה חסד',6],['🕊️','השכין שלום',6],['🎯','התמדה ומאמץ',5]],
+    'מבחנים':[['📝','מעל 80 במבחן',6],['🏅','מעל 90 במבחן',10],['💯','100 במבחן',15]],
+    'הפתעה':[['⭐','שמתי לב!',5],['🌟','משהו מיוחד',8]] };
+  const defCfg = () => ({ prizes: PRIZES.map((p, i) => ({ id: 'p' + i, e: p[0], name: p[1], cost: p[2], stock: null })),
+    cats: JSON.parse(JSON.stringify(CATS)), home: HOME.map(h => h.slice()) });
   const HIST_MAX = 120, FEED_MAX = 60;
 
   // ---- Israel time ----
@@ -27,11 +37,12 @@
       sleep: { bed: '23:30', wake: '06:45', nights: 0, days: {} }, msg: '', gave: '', aramDay: '', zrDay: '', wk: {}, sleepBadge: 0 };
   }
   function init(roster) {
-    return { n: 0, students: roster.map(r => Object.assign(newStudent(r.id, r.name), { first: r.first || r.name.split(' ')[0] })), cls: { bonus: 0, feed: [], agent: null, revealed: [], aram: ARAM0.map(x => x.slice()) } };
+    return { n: 0, students: roster.map(r => Object.assign(newStudent(r.id, r.name), { first: r.first || r.name.split(' ')[0] })), cls: { bonus: 0, feed: [], agent: null, revealed: [], aram: ARAM0.map(x => x.slice()), cfg: defCfg() } };
   }
   // keep the state in step with the roster (new students, renamed students)
   function syncRoster(st, roster) {
     const by = {}; st.students.forEach(s => by[s.id] = s);
+    if (!st.cls.cfg) st.cls.cfg = defCfg();
     st.students = roster.map(r => { const s = by[r.id] || newStudent(r.id, r.name); s.name = r.name; s.first = r.first || r.name.split(' ')[0]; return s; });
     return st;
   }
@@ -42,7 +53,7 @@
   function apply(st, op) {
     const T = il(op.ts), r = op.r, a = op.a; // r = role of who sent it, a = his student index (student/parent)
     const S = i => { const s = st.students[i]; need(s, 'תלמיד לא קיים'); return s; };
-    const isT = r === 'teacher';
+    const isT = r === 'teacher'; const C = st.cls.cfg || (st.cls.cfg = defCfg());
     const own = i => isT || (+i === +a);
     const hid = k => `${op.i}.${k}`;
     let hk = 0;
@@ -55,7 +66,7 @@
     switch (op.t) {
       case 'award': { need(isT); const s = S(op.s), p = Math.round(+op.p); need(p > 0 && p <= 50, 'ניקוד לא תקין');
         const t = String(op.tx || '').slice(0, 140); need(t); s.count[t] = (s.count[t] || 0) + 1; add(s, p, t, TEACHER); break; }
-      case 'home': { need(r === 'parent' || isT); need(own(op.s)); const s = S(op.s), h = HOME[op.h]; need(h);
+      case 'home': { need(r === 'parent' || isT); need(own(op.s)); const s = S(op.s), h = C.home[op.h]; need(h);
         s.homeCount++; feed({ s: s.name, p: h[2], t: h[1], who: 'הורים' }); s.count[h[1]] = (s.count[h[1]] || 0) + 1; add(s, h[2], h[1], 'ההורים'); break; }
       case 'other': { need(r === 'parent' || isT); need(own(op.s)); const s = S(op.s), t = String(op.tx || '').trim().slice(0, 140); need(t, 'כתבו מה הוא עשה');
         s.homeCount++; feed({ s: s.name, p: 3, t, who: 'הורים' }); add(s, 3, t, 'ההורים', 1); break; }
@@ -64,8 +75,18 @@
           else { s.zr += 1; hist(s, { p: '☀️', t: 'זריזין, הגעת לפני 7:30', who: TEACHER }); }
           crunch(s); }); break; }
       case 'msg': { need(isT); S(op.s).msg = String(op.tx || '').slice(0, 500); break; }
-      case 'redeem': { need(r !== 'parent' && own(op.s)); const s = S(op.s), p = PRIZES[op.pz]; need(p); need(s.wallet >= p[2], 'אין מספיק נקודות');
-        s.wallet -= p[2]; hist(s, { p: '🎁', t: 'בחרת פרס: ' + p[1], who: 'בנק הפרסים' }); feed({ s: s.name, p: '🎁', t: 'ביקש פרס: ' + p[1], who: 'בנק הפרסים' }); break; }
+      case 'redeem': { need(r !== 'parent' && own(op.s)); const s = S(op.s), p = C.prizes.find(x => x.id === op.pz); need(p, 'הפרס לא קיים'); need(p.stock == null || p.stock > 0, 'הפרס אזל'); need(s.wallet >= p.cost, 'אין מספיק נקודות');
+        s.wallet -= p.cost; if (p.stock != null) p.stock--; hist(s, { p: '🎁', t: 'בחרת פרס: ' + p.name, who: 'בנק הפרסים' }); feed({ s: s.name, p: '🎁', t: 'ביקש פרס: ' + p.name, who: 'בנק הפרסים' }); break; }
+      case 'cfgPrizes': { need(isT); need(Array.isArray(op.list) && op.list.length <= 40); const seen = new Set();
+        C.prizes = op.list.map((x, k) => { const c = Math.round(+x.cost), st0 = x.stock === '' || x.stock == null ? null : Math.round(+x.stock); need(String(x.name || '').trim(), 'לכל פרס צריך שם'); need(c > 0 && c <= 5000, 'מחיר לא תקין');
+          need(st0 == null || (st0 >= 0 && st0 <= 999), 'מלאי לא תקין'); let id = String(x.id || '').slice(0, 20) || hid('p' + k); if (seen.has(id)) id = hid('p' + k); seen.add(id);
+          return { id, e: String(x.e || '🎁').slice(0, 8), name: String(x.name).trim().slice(0, 60), cost: c, stock: st0 }; }); break; }
+      case 'cfgDeeds': { need(isT); const cats = op.cats; need(cats && typeof cats === 'object'); const out = {}; const ks = Object.keys(cats).slice(0, 15);
+        ks.forEach(k => { const name = String(k).trim().slice(0, 40); need(name, 'לכל קטגוריה צריך שם'); need(Array.isArray(cats[k]));
+          out[name] = cats[k].slice(0, 30).map(d => { const pp = Math.round(+d[2]); need(String(d[1] || '').trim(), 'לכל פעולה צריך שם'); need(pp > 0 && pp <= 50, 'ניקוד בין 1 ל-50'); return [String(d[0] || '⭐').slice(0, 8), String(d[1]).trim().slice(0, 140), pp]; }); });
+        C.cats = out; break; }
+      case 'cfgHome': { need(isT); need(Array.isArray(op.list) && op.list.length <= 20);
+        C.home = op.list.map(d => { const pp = Math.round(+d[2]); need(String(d[1] || '').trim(), 'לכל פעולה צריך שם'); need(pp > 0 && pp <= 20, 'ניקוד בין 1 ל-20'); return [String(d[0] || '🏡').slice(0, 8), String(d[1]).trim().slice(0, 140), pp]; }); break; }
       case 'peer': { need(r !== 'parent' && own(op.s)); const s = S(op.s), f = S(op.to); need(+op.to !== +op.s); need(s.gave !== T.date, 'כבר נתת היום');
         const why = WHY.includes(op.why) ? op.why : WHY[0]; s.gave = T.date; add(f, 5, why, 'מחבר: ' + s.name); break; }
       case 'goal': { need(r !== 'parent' && own(op.s)); const s = S(op.s), tg = Math.round(+op.tg); need(SUBJ.includes(op.sub)); need(tg >= 65 && tg <= 100);
@@ -111,6 +132,6 @@
     return { date, idx: h % st.students.length, status: 'pending' };
   }
 
-  const KR = { newStudent, HOME, PRIZES, FLAVORS, VALUES, WHY, SUBJ, TREATS, TEACHER, il, init, syncRoster, apply, replay, check, agentFor, Bad };
+  const KR = { newStudent, defCfg, CATS, HOME, PRIZES, FLAVORS, VALUES, WHY, SUBJ, TREATS, TEACHER, il, init, syncRoster, apply, replay, check, agentFor, Bad };
   G.KR = KR;
 })(typeof window !== 'undefined' ? window : globalThis);
