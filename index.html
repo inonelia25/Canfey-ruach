@@ -171,7 +171,7 @@ input[type=range]{width:100%;accent-color:#e8b84e}
 .nav button.on{background:var(--gold);color:var(--ink);opacity:1;font-weight:700}
 
 #toast{position:fixed;left:50%;top:calc(14px + env(safe-area-inset-top));transform:translate(-50%,-150%);background:rgba(8,26,50,.95);color:#fff;font-size:15.5px;padding:12px 22px;border-radius:99px;box-shadow:0 10px 30px rgba(0,0,0,.35),inset 0 0 0 1.5px rgba(244,207,107,.6);transition:transform .45s cubic-bezier(.3,1.5,.5,1);z-index:30;max-width:92vw;text-align:center}
-#toast.show{transform:translate(-50%,0)}
+#toast{opacity:0;pointer-events:none;max-width:calc(100vw - 30px)}#toast.show{transform:translate(-50%,0);opacity:1;pointer-events:auto}
 #overlay{position:fixed;inset:0;background:radial-gradient(circle,rgba(20,60,100,.92),rgba(4,16,32,.96));display:none;place-items:center;z-index:25;text-align:center;padding:24px}
 #overlay.show{display:grid;animation:pop .5s}
 #overlay h3{font-size:32px;font-weight:700;margin:14px 0 6px}
@@ -489,6 +489,9 @@ body[data-role=teacher] .dhandle{display:block}
 .drawer .dlist button .av{width:34px;height:34px;border-radius:50%;background:#dfe9e4;display:grid;place-items:center;font:900 15px Gush;flex:none}
 .drawer .dlist button small{margin-inline-start:auto;font:400 12px Gush;opacity:.6}
 .drawer .dlist button.on{background:#0D614A;color:#fff}.drawer .dlist button.on .av{background:#f4cf6b;color:#3a2504}
+
+#fpop{position:fixed;left:12px;right:12px;top:calc(12px + env(safe-area-inset-top));z-index:200;background:#fff;color:#12361f;border-radius:20px;padding:14px 18px;box-shadow:0 14px 40px rgba(0,0,0,.35);font:400 15px Gush;transform:translateY(-140%);opacity:0;transition:transform .35s cubic-bezier(.2,.8,.2,1),opacity .35s;border-right:6px solid #e8b84e}
+#fpop.show{transform:none;opacity:1}#fpop>b{display:block;font:900 16px Gush;margin-bottom:4px;color:#0D614A}#fpop div{margin-top:3px}
 </style>
 </head>
 <body>
@@ -543,7 +546,7 @@ body[data-role=teacher] .dhandle{display:block}
         </div>
       </div>
       <div class="checkin"><button class="btn" id="ciBtn">✋ הגעתי לתפילה</button><div class="sub" id="ciMsg" style="margin:8px 0 0;font-weight:700"></div></div>
-      <div class="flvrow"><div class="sub" style="margin:0 0 8px;font-weight:700">איזה קראנץ' אתה רוצה? 🍦</div><div class="flvs" id="flvs"></div></div>
+      <div class="flvrow" id="flvRow"><div class="sub" style="margin:0 0 8px;font-weight:700">איזה קראנץ' אתה רוצה? 🍦</div><div class="flvs" id="flvs"></div></div>
       <div class="steps" id="streak"></div>
       <div class="pro">5 ימים ברצף = <b>זריזין פרו ⚡</b> שווה 8</div>
       <div class="crrow"><div class="row" style="justify-content:space-between;margin-bottom:8px"><b style="font-size:16px">הקראנצ'ים שלי</b><span class="sub" style="margin:0;font-weight:700" id="crN"></span></div><div class="crs" id="crs"></div></div>
@@ -801,7 +804,7 @@ function setupRole(){const nav=document.querySelector('.nav');document.body.data
   const s=state.students[ME];document.querySelector('.demo').textContent=ROLE==='teacher'?'מחובר כמחנך':ROLE==='parent'?'הורי '+(s.first||s.name):'';
   $('loader').classList.remove('show')}
 // new things from others (teacher, parents, friends) show up in the bell
-function afterSync(own){if(ROLE==='teacher')return;const s=state.students[ME],K='kr_seen_'+ROLE+ME;let seen=0;try{seen=+localStorage.getItem(K)||0}catch(e){}
+function afterSync(own){if(ROLE==='teacher'){teacherSync(own);return}setTimeout(day14,1200);const s=state.students[ME],K='kr_seen_'+ROLE+ME;let seen=0;try{seen=+localStorage.getItem(K)||0}catch(e){}
   const top=Math.max(0,...s.hist.map(h=>h.ts||0));
   if(!own&&seen)s.hist.filter(h=>h.ts>seen).slice(0,6).reverse().forEach(h=>{const t=(typeof h.p==='number'?'+'+h.p+' · ':h.p+' ')+h.t+(h.who?' · '+h.who:'');notify(t,(s.first||s.name)+': '+t)});
   try{localStorage.setItem(K,Math.max(seen,top))}catch(e){}
@@ -855,7 +858,7 @@ ${f>=1?'<text x="50" y="9" text-anchor="middle" font-size="13">✨</text>':''}</
 function ringSVG(v,goal){const r=50,c=2*Math.PI*r,f=Math.min(v/goal,1);return `<svg viewBox="0 0 118 118" width="118" height="118"><defs><linearGradient id="rg" x1="0" x2="1"><stop offset="0" stop-color="#0D614A"/><stop offset="1" stop-color="#55A38B"/></linearGradient></defs>
 <circle cx="59" cy="59" r="${r}" stroke="rgba(255,255,255,.12)"/><circle cx="59" cy="59" r="${r}" stroke="url(#rg)" stroke-dasharray="${c}" stroke-dashoffset="${c*(1-f)}" style="transition:stroke-dashoffset 1.4s"/></svg>
 <div class="rv"><div><b>${Math.round(f*100)}%</b><small>${v} / ${goal}</small></div></div>`}
-function toast(t){const e=$('toast');e.textContent=t;e.classList.add('show');clearTimeout(e._t);e._t=setTimeout(()=>e.classList.remove('show'),2400)}
+function toast(t){const e=$('toast');e.textContent=t;e.classList.add('show');clearTimeout(e._t);e._t=setTimeout(()=>e.classList.remove('show'),2800);e.onclick=()=>{clearTimeout(e._t);e.classList.remove('show')}}
 
 // confetti
 const cv=$('cf'),cx=cv.getContext('2d');let parts=[];
@@ -999,7 +1002,7 @@ function crunchPop(kind){const s=me(),c=$('cpop');clearTimeout(popT);$('cpIce').
     $('cpFlv').innerHTML=FLAVORS.map(f=>`<button class="fbtn" onclick="pickFlavor('${f}')">${iceSVG(15,f,1).replace('<text x="50" y="9" text-anchor="middle" font-size="13">✨</text>','')}<span>${f}</span></button>`).join('');c.classList.add('pick')}
   else{$('cpTitle').textContent='עוד קצת והקראנץ\' שלך!';$('cpText').textContent=`הגעת ל-${Math.min(s.zr,15)} זריזין, עוד ${15-s.zr} וזה שלך! 🍦`;$('cpFlv').innerHTML='';popT=setTimeout(closePop,3800)}
   c.classList.add('show');setTimeout(()=>confetti(200),150)}
-function pickFlavor(f){if(!act({t:'flavor',s:state.cur,f}))return;toast(`בחרת ${f}! 🍦`);burstAt($('icewrap'),70)}
+function pickFlavor(f){if(!act({t:'flavor',s:state.cur,f}))return;if($('cpop').classList.contains('show'))setTimeout(closePop,700);toast(`בחרת ${f}! 🍦`);burstAt($('icewrap'),70)}
 function checkCrunch(){const s=me();if(document.querySelector('.nav .on').dataset.r!=='student')return;s.seen=s.seen||{};
   if(s.zr>=12&&s.zr<15&&!s.seen[12]&&!s.flavor){s.seen[12]=s.seen[10]=1;setTimeout(()=>crunchPop(12),600)}
   else if(s.zr>=10&&s.zr<15&&!s.seen[10]){s.seen[10]=1;setTimeout(()=>crunchPop(10),600)}}
@@ -1024,7 +1027,7 @@ function renderTrail(){const svg=$('trail');if(!svg)return;const n=Math.min(me()
 const _render5=render;render=function(){_render5();renderTrail()};renderTrail();
 
 
-function renderFlv(){const s=me(),el=$('flvs');if(!el)return;el.innerHTML=Object.keys(ICE).map(f=>`<button class="${s.flavor===f?'on':''}" onclick="pickFlavor('${f}')">${iceSVG(15,f,1).replace(/<text[^>]*>✨<\/text>/,'')}<span>${f}</span></button>`).join('')}
+function renderFlv(){const s=me(),el=$('flvs');if(!el)return;$('flvRow').style.display=s.zr>=14||document.body.dataset.role==='teacher'&&document.querySelector('.nav .on').dataset.r==='teacher'?'':'none';el.innerHTML=Object.keys(ICE).map(f=>`<button class="${s.flavor===f?'on':''}" onclick="pickFlavor('${f}')">${iceSVG(15,f,1).replace(/<text[^>]*>✨<\/text>/,'')}<span>${f}</span></button>`).join('')}
 const _render6=render;render=function(){_render6();renderFlv()};renderFlv();
 
 
@@ -1198,6 +1201,20 @@ $('dList').onclick=e=>{const b=e.target.closest('[data-i]');if(!b)return;pick(+b
     const w=dr.offsetWidth;dr.classList.add('drag');if(mode==='open'){if(!dr.classList.contains('on')){dRender()}dr.style.transform=`translateX(${Math.max(0,w+dx)}px)`}else dr.style.transform=`translateX(${Math.max(0,dx)}px)`},{passive:true});
   addEventListener('touchend',()=>{if(sx==null)return;dr.classList.remove('drag');dr.style.transform='';if(mode==='open'&&dx<-50)dOpen();else if(mode==='close'&&dx>60)dClose();sx=null;dx=0})})();
 const _render12=render;render=function(){_render12();if(ROLE==='teacher'&&$('dCur'))$('dCur').textContent=FIRST[me().name]||me().name};
+
+// ===== teacher: pop-up when parents report a good deed / Aramaic words =====
+function popFeed(items){let box=$('fpop');if(!box){box=document.createElement('div');box.id='fpop';document.body.appendChild(box);box.onclick=()=>box.classList.remove('show')}
+  box.innerHTML='<b>חדש מההורים</b>'+items.slice(0,4).map(f=>`<div>${typeof f.p==='number'?'+'+f.p:f.p} · <b>${esc(f.s)}</b>: ${esc(f.t)}</div>`).join('')+(items.length>4?`<div>ועוד ${items.length-4}...</div>`:'');
+  box.classList.add('show');clearTimeout(box._t);box._t=setTimeout(()=>box.classList.remove('show'),6000)}
+function teacherSync(own){const K='kr_feed_seen';let seen=0;try{seen=+localStorage.getItem(K)||0}catch(e){}const F=state.cls.feed||[];const top=Math.max(0,...F.map(f=>f.ts||0));
+  const fresh=F.filter(f=>f.ts>seen&&f.who==='הורים');if(seen&&!own&&fresh.length){popFeed(fresh);fresh.slice(0,5).reverse().forEach(f=>notify('',`${f.s}: ${f.t} (+${f.p})`))}
+  try{localStorage.setItem(K,Math.max(seen,top)||Date.now())}catch(e){}}
+// ===== the morning of zariz #14: choose your Crunch flavour =====
+function day14(){if(ROLE!=='student')return;const s=me();if(s.zr!==14||todayArr(s))return;let d='';try{d=localStorage.getItem('kr_f14')}catch(e){}if(d===TODAY)return;try{localStorage.setItem('kr_f14',TODAY)}catch(e){}
+  const c=$('cpop');$('cpIce').innerHTML=iceSVG(14,s.flavor,1);$('cpTitle').textContent='היום זה יכול לקרות! 🍦';
+  $('cpText').textContent='יש לך 14 זריזין. אם תגיע היום לתפילה לפני 7:30 תקבל קראנץ\'! בחר עכשיו את הטעם:';
+  $('cpFlv').innerHTML=FLAVORS.map(f=>`<button class="fbtn" onclick="pickFlavor('${f}')">${iceSVG(15,f,1).replace(/<text[^>]*>✨<\/text>/,'')}<span>${f}</span></button>`).join('');
+  c.classList.add('pick','show');setTimeout(()=>confetti(160),200);notify('🍦 יש לך 14 זריזין! הגעה בזמן היום = קראנץ\'. בחר טעם','')}
 // ===== start =====
 if(ONLINE){$('loader').classList.add('show');api('GET').then(v=>take(v)).catch(offline);
   setInterval(pull,30000);document.addEventListener('visibilitychange',()=>{if(!document.hidden)pull()});addEventListener('online',()=>{flush();pull()})}

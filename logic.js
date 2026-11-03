@@ -122,7 +122,7 @@
         need(ag.status === 'pending', 'הסוכן של היום כבר סומן');
         ag.status = op.ok ? 'yes' : 'no'; if (op.ok) { st.cls.bonus += 10; st.cls.revealed.unshift(S(ag.idx).name); st.cls.revealed.length = Math.min(st.cls.revealed.length, 20); } break; }
       case 'aramSet': { need(isT); need(Array.isArray(op.list)); st.cls.aram = op.list.slice(0, 10).map(w => [String(w[0] || '').slice(0, 60), String(w[1] || '').slice(0, 120)]); break; }
-      case 'aramMark': { need(r === 'parent' || isT); need(own(op.s)); const s = S(op.s); need(s.aramDay !== T.date, 'כבר סומן היום'); s.aramDay = T.date; add(s, 2, 'אמר בעל פה את המילים בארמית', 'ההורים'); break; }
+      case 'aramMark': { need(r === 'parent' || isT); need(own(op.s)); const s = S(op.s); need(s.aramDay !== T.date, 'כבר סומן היום'); s.aramDay = T.date; feed({ s: s.name, p: 2, t: 'אמר את המילים בארמית בעל פה', who: 'הורים' }); add(s, 2, 'אמר בעל פה את המילים בארמית', 'ההורים'); break; }
       case 'init': { need(isT); const s = S(op.s); need(VALUES.includes(op.val)); const tx = String(op.tx || '').trim().slice(0, 140);
         s.values[op.val] = (s.values[op.val] || 0) + 1; add(s, 10, `יוזמה מבורכת (${op.val})${tx ? ': ' + tx : ''}`, TEACHER); break; }
       case 'grp': { need(isT); const tr = TREATS.includes(op.treat) ? op.treat : TREATS[0]; const L = [...new Set(op.list || [])]; need(L.length >= 2, 'חבורה = לפחות 2 תלמידים');
