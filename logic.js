@@ -47,6 +47,8 @@
     return st;
   }
 
+  function dist(a, b, c, d) { const R = 6371000, t = x => x * Math.PI / 180, dLa = t(c - a), dLo = t(d - b);
+    const h = Math.sin(dLa / 2) ** 2 + Math.cos(t(a)) * Math.cos(t(c)) * Math.sin(dLo / 2) ** 2; return 2 * R * Math.asin(Math.sqrt(h)); }
   class Bad extends Error {}
   const need = (c, m) => { if (!c) throw new Bad(m || 'לא מורשה'); };
 
@@ -74,6 +76,14 @@
           if (s.streak >= 5) { s.zr += 4; s.streak = 0; hist(s, { p: '⚡', t: 'זריזין פרו! 5 ימים ברצף, שווה 8', who: TEACHER }); }
           else { s.zr += 1; hist(s, { p: '☀️', t: 'זריזין, הגעת לפני 7:30', who: TEACHER }); }
           crunch(s); }); break; }
+      case 'zrAdd': { need(isT); need(Array.isArray(op.list) && op.list.length <= 60);
+        op.list.forEach(x => { const s = S(x.s), k = Math.round(+x.n); need(k >= -100 && k <= 300, 'מספר זריזין לא תקין'); if (!k) return;
+          const tot = s.crunches.length * 15 + s.zr; need(tot + k >= 0, 'אי אפשר לרדת מתחת ל-0');
+          if (k < 0) { s.zr += k; while (s.zr < 0 && s.crunches.length) { s.crunches.pop(); s.zr += 15; } }
+          else s.zr += k;
+          hist(s, { p: '☀️', t: k > 0 ? `${k} זריזין מלפני האפליקציה` : `תיקון זריזין: ${k}`, who: TEACHER }); crunch(s); }); break; }
+      case 'cfgLoc': { need(isT); if (op.off) { C.loc = null; break; } const la = +op.lat, ln = +op.lng, rr = Math.round(+op.rad);
+        need(Math.abs(la) <= 90 && Math.abs(ln) <= 180, 'מיקום לא תקין'); need(rr >= 50 && rr <= 2000, 'טווח לא תקין'); C.loc = { lat: la, lng: ln, r: rr }; break; }
       case 'msg': { need(isT); S(op.s).msg = String(op.tx || '').slice(0, 500); break; }
       case 'redeem': { need(r !== 'parent' && own(op.s)); const s = S(op.s), p = C.prizes.find(x => x.id === op.pz); need(p, 'הפרס לא קיים'); need(p.stock == null || p.stock > 0, 'הפרס אזל'); need(s.wallet >= p.cost, 'אין מספיק נקודות');
         s.wallet -= p.cost; if (p.stock != null) p.stock--; hist(s, { p: '🎁', t: 'בחרת פרס: ' + p.name, who: 'בנק הפרסים' }); feed({ s: s.name, p: '🎁', t: 'ביקש פרס: ' + p.name, who: 'בנק הפרסים' }); break; }
@@ -103,6 +113,8 @@
       case 'donate': { need(r !== 'parent' && own(op.s)); const s = S(op.s), v = +op.v; need([10, 25, 50].includes(v)); need(s.wallet >= v, 'אין מספיק נקודות');
         s.wallet -= v; s.donated += v; st.cls.bonus += v; hist(s, { p: '💛', t: `תרמת ${v} נקודות לכיתה`, who: 'תרומה' }); break; }
       case 'checkin': { need(r !== 'parent' && own(op.s)); const s = S(op.s); need(!s.arr.some(x => x.d === T.date), 'כבר נרשמת היום');
+        if (C.loc && !isT) { need(isFinite(+op.lat) && isFinite(+op.lng), 'צריך לאשר גישה למיקום כדי להירשם');
+          need(dist(+op.lat, +op.lng, C.loc.lat, C.loc.lng) <= C.loc.r, 'אפשר להירשם רק כשנמצאים בישיבה'); }
         s.arr.push({ d: T.date, t: T.min }); break; }
       case 'agentSet': { need(isT); S(op.idx); st.cls.agent = { date: T.date, idx: +op.idx, status: 'pending' }; break; }
       case 'agentRes': { need(isT); let ag = st.cls.agent;
@@ -132,6 +144,6 @@
     return { date, idx: h % st.students.length, status: 'pending' };
   }
 
-  const KR = { newStudent, defCfg, CATS, HOME, PRIZES, FLAVORS, VALUES, WHY, SUBJ, TREATS, TEACHER, il, init, syncRoster, apply, replay, check, agentFor, Bad };
+  const KR = { dist, newStudent, defCfg, CATS, HOME, PRIZES, FLAVORS, VALUES, WHY, SUBJ, TREATS, TEACHER, il, init, syncRoster, apply, replay, check, agentFor, Bad };
   G.KR = KR;
 })(typeof window !== 'undefined' ? window : globalThis);
