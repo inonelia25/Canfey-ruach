@@ -356,7 +356,7 @@ select{width:100%;font:700 16px Gush;padding:12px 16px;border-radius:99px;border
 .agsecret.show .nm{display:block}.agsecret.show .hid{display:none}
 .agno{background:rgba(255,255,255,.14)!important;color:#fff!important;box-shadow:none!important}
 .agnew{margin-top:12px;width:100%;border:0;background:none;color:#9ff0f7;font:700 14px Gush;text-decoration:underline}
-#agOv{position:fixed;inset:0;z-index:36;display:none;place-items:center;padding:22px;background:radial-gradient(circle,rgba(13,60,70,.92),rgba(3,15,22,.97))}
+#agOv{position:fixed;inset:0;z-index:36;display:none;place-items:center;padding:22px;background:radial-gradient(circle,rgba(13,60,70,.97),rgba(3,15,22,.99))}
 #agOv.show{display:grid}
 #agOv .box{text-align:center;max-width:360px;animation:cpin .6s cubic-bezier(.3,1.6,.5,1)}
 #agOv .agent{width:180px;margin:0 auto}
@@ -503,6 +503,8 @@ body[data-role=teacher] .dhandle{display:block}
 #zpop .zn{font:900 40px Gush;color:#fff6d6}
 #zpop .zs{font:900 25px/1.3 Gush;color:#fff;margin-top:8px;max-width:320px}
 #zpop .zh{font:400 17px Gush;color:#bff4f8;margin-top:10px}
+
+.zs.done{opacity:.45}
 </style>
 </head>
 <body>
@@ -707,7 +709,7 @@ body[data-role=teacher] .dhandle{display:block}
       <div class="row" style="gap:10px;margin-top:14px"><button class="btn" id="agYes">✓ עמד במשימה</button><button class="btn agno" id="agNo">✗ לא עמד</button></div>
       <button class="agnew" id="agNew">🎲 הגרלת סוכן חדש (למחר)</button></div>
     <div class="card b2"><div class="ch"><i>☀️</i>זריזין היום · לפני 7:30</div>
-      <div class="zgrid" id="zGrid"></div>
+      <div class="sub" id="zAutoN" style="margin:-4px 0 10px;font-weight:700"></div><div class="zgrid" id="zGrid"></div>
       <button class="btn" style="margin-top:18px" id="zSave">אישור זריזין להיום</button></div>
     <div class="card binit"><div class="ch"><i>✨</i>יוזמה מבורכת · <span class="sname"></span></div>
       <div class="sub" style="margin:-6px 0 10px">באה ממנו · נוגעת באחרים · מבטאת ערך · יצאה לפועל</div>
@@ -816,7 +818,7 @@ function setupRole(){const nav=document.querySelector('.nav');document.body.data
   const s=state.students[ME];document.querySelector('.demo').textContent=ROLE==='teacher'?'מחובר כמחנך':ROLE==='parent'?'הורי '+(s.first||s.name):'';
   $('loader').classList.remove('show')}
 // new things from others (teacher, parents, friends) show up in the bell
-function afterSync(own){if(ROLE==='teacher'){teacherSync(own);return}setTimeout(day14,1200);const s=state.students[ME],K='kr_seen_'+ROLE+ME;let seen=0;try{seen=+localStorage.getItem(K)||0}catch(e){}
+function afterSync(own){if(ROLE==='teacher'){teacherSync(own);return}setTimeout(()=>{const shown=agentMorning();setTimeout(day14,shown?7000:0)},1000);const s=state.students[ME],K='kr_seen_'+ROLE+ME;let seen=0;try{seen=+localStorage.getItem(K)||0}catch(e){}
   const top=Math.max(0,...s.hist.map(h=>h.ts||0));
   if(!own&&seen)s.hist.filter(h=>h.ts>seen).slice(0,6).reverse().forEach(h=>{const t=(typeof h.p==='number'?'+'+h.p+' · ':h.p+' ')+h.t+(h.who?' · '+h.who:'');notify(t,(s.first||s.name)+': '+t)});
   try{localStorage.setItem(K,Math.max(seen,top))}catch(e){}
@@ -920,7 +922,9 @@ function render(){
   if($('homeDeeds'))$('homeDeeds').innerHTML=HOME.map((d,i)=>`<button class="deed" data-h="${i}" data-p="${d[2]}"><span class="e">${esc(d[0])}</span>${esc(d[1])}<span class="p">+${d[2]}</span></button>`).join('');
   $('pPts').textContent=s.wallet+' (סה״כ '+s.points+')';$('pLvl').textContent=L.name;$('pZr').textContent=Math.min(s.zr,15)+' / 15';
   $('stuChips').innerHTML=state.students.map((x,i)=>`<button class="chip ${i===state.cur?'on':''}" onclick="pick(${i})">${x.name}</button>`).join('');
-  $('zGrid').innerHTML=state.students.map((x,i)=>`<button class="zs ${state.zToday.has(i)?'on':''}" onclick="zt(${i})"><div class="av">${x.name[0]}</div>${x.name}<small>${todayArr(x)?'🕒 '+fmtT(todayArr(x).t)+' · ':''}${x.zr}/15 · רצף ${x.streak}${x.crunches&&x.crunches.length?' · 🍦'+x.crunches.length:''}${x.flavor?' · '+x.flavor:''}</small></button>`).join('');
+  state.zAuto=state.zAuto||new Set();state.students.forEach((x,i)=>{const a=todayArr(x);const k=x.id+'|'+TODAY;if(a&&a.t<=450&&x.zrDay!==TODAY&&!state.zAuto.has(k)){state.zAuto.add(k);state.zToday.add(i)}if(x.zrDay===TODAY)state.zToday.delete(i)});
+  if($('zAutoN')){const n=state.students.filter(x=>{const a=todayArr(x);return a&&a.t<=450}).length;$('zAutoN').textContent=n?`${n} נרשמו עד 7:30 וכבר מסומנים. בודקים ולוחצים אישור.`:'עדיין אף אחד לא נרשם עד 7:30 היום.'}
+  $('zGrid').innerHTML=state.students.map((x,i)=>x.zrDay===TODAY?`<button class="zs done" disabled><div class="av">✓</div>${x.name}<small>קיבל זריז היום ✓</small></button>`:`<button class="zs ${state.zToday.has(i)?'on':''}" onclick="zt(${i})"><div class="av">${x.name[0]}</div>${x.name}<small>${todayArr(x)?'🕒 '+fmtT(todayArr(x).t)+' · ':''}${x.zr}/15 · רצף ${x.streak}${x.crunches&&x.crunches.length?' · 🍦'+x.crunches.length:''}${x.flavor?' · '+x.flavor:''}</small></button>`).join('');
   $('tFeed').innerHTML=state.cls.feed.slice(0,6).map(f=>`<li><div class="dot">${typeof f.p==='number'?'+'+f.p:f.p}</div><div><div>${esc(f.s)}: ${esc(f.t)}</div><div class="who">${esc(f.who)}</div></div></li>`).join('');
 }
 
@@ -1251,6 +1255,12 @@ function day14(){if(ROLE!=='student')return;const s=me();if(s.zr!==14||todayArr(
   $('cpText').textContent='יש לך 14 זריזין. אם תגיע היום לתפילה לפני 7:30 תקבל קראנץ\'! בחר עכשיו את הטעם:';
   $('cpFlv').innerHTML=FLAVORS.map(f=>`<button class="fbtn" onclick="pickFlavor('${f}')">${iceSVG(15,f,1).replace(/<text[^>]*>✨<\/text>/,'')}<span>${f}</span></button>`).join('');
   c.classList.add('pick','show');setTimeout(()=>confetti(160),200);notify('🍦 יש לך 14 זריזין! הגעה בזמן היום = קראנץ\'. בחר טעם','')}
+
+// ===== the daily agent: morning pop-up for every student =====
+function agentMorning(){if(ROLE!=='student')return false;const a=state.cls.agent;if(!a||a.status!=='pending')return false;let d='';try{d=localStorage.getItem('kr_agm')}catch(e){}if(d===TODAY)return false;
+  try{localStorage.setItem('kr_agm',TODAY)}catch(e){}const ov=$('agOv');
+  $('agBox').innerHTML=`${AGENT_SVG}<h3>הסוכן X של היום נבחר!</h3><p style="font-size:19px">אף אחד לא יודע מי זה...</p><p style="color:#f4cf6b;font:900 26px/1.3 Gush">אולי זה אתה? 🕶️</p><p>אם הסוכן יעמוד במשימה, כל הכיתה מקבלת <b class="gt">+10</b>. תתנהג כאילו זה אתה!</p><button class="btn" style="width:auto;padding:12px 36px;margin-top:6px">אני על זה!</button>`;
+  ov.dataset.ready=1;ov.classList.add('show');setTimeout(()=>confetti(240),250);return true}
 // ===== start =====
 if(ONLINE){$('loader').classList.add('show');api('GET').then(v=>take(v)).catch(offline);
   setInterval(pull,30000);document.addEventListener('visibilitychange',()=>{if(!document.hidden)pull()});addEventListener('online',()=>{flush();pull()})}
