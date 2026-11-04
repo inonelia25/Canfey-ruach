@@ -510,7 +510,7 @@ body[data-role=teacher] .dhandle{display:block}
 <body>
 <div class="sky"></div><canvas id="cf"></canvas>
 <div id="toast"></div>
-<div id="zpop" onclick="this.classList.remove('show')"><div class="zb"><div class="zt">יא זריז!</div><div class="zi" id="zpIce"></div><div class="zn" id="zpN"></div><div class="zs" id="zpSub"></div><div class="zh">הגעת לפני 7:30 ☀️</div></div></div>
+<div id="zpop" onclick="this.classList.remove('show')"><div class="zb"><div class="zt">יא זריז!</div><div class="zi" id="zpIce"></div><div class="zn" id="zpN"></div><div class="zs" id="zpSub"></div><div class="zh">הגעת לפני 7:30 ☀️ · +2 נקודות</div></div></div>
 <div id="agOv" onclick="if(this.dataset.ready)this.classList.remove('show')"><div class="box" id="agBox"></div></div>
 <div id="cpop" onclick="if(!this.classList.contains('pick'))closePop()"><div class="cbox"><div class="cice" id="cpIce"></div><h3 id="cpTitle"></h3><div id="cpText"></div><div class="flv" id="cpFlv"></div></div></div>
 <div id="overlay" onclick="this.classList.remove('show')"><div><div id="ovMedal"></div><h3 id="ovTitle" class="gold-t"></h3><div id="ovText" style="font-size:17px;opacity:.85"></div><br><button class="btn" style="width:auto;padding:12px 40px">יאללה!</button></div></div>
@@ -632,6 +632,19 @@ body[data-role=teacher] .dhandle{display:block}
       <button class="btn" id="peerBtn" style="margin-top:6px">שלח לחבר</button>
     </div>
 
+    <div class="card bgrp">
+      <div class="ch"><i>👥</i>לומדים בחבורה למבחן</div>
+      <div class="sub" style="margin:-8px 0 12px">קבעתם ללמוד ביחד? בחרו את החברים בחבורה ושלחו למחנך. אחרי שהוא מאשר, כל אחד מקבל <b>10 נקודות</b> והחבורה מקבלת פינוק!</div>
+      <div class="sub" style="margin:0 0 6px;font-weight:700">מי לומד איתך?</div>
+      <div class="chips wrap" id="sgChips"></div>
+      <div class="sub" style="margin:10px 0 6px;font-weight:700">למבחן ב:</div>
+      <div class="chips wrap" id="sgSub"></div>
+      <div class="sub" style="margin:10px 0 6px;font-weight:700">איזה פינוק?</div>
+      <div class="chips" id="sgTreat"></div>
+      <button class="btn" id="sgBtn" style="margin-top:10px">שלחו למחנך לאישור</button>
+      <div id="sgMine" style="margin-top:10px"></div>
+    </div>
+
     <div class="card b2">
       <div class="ch"><i>🏆</i>היעד של כל הכיתה</div>
       <div class="ringrow">
@@ -721,7 +734,8 @@ body[data-role=teacher] .dhandle{display:block}
       <div class="sub" style="margin:-6px 0 10px">קבעתם ללמוד ביחד? כל אחד מקבל <b>10 נקודות</b>, והחבורה מקבלת פינוק ללימוד עלינו!</div>
       <div class="chips wrap" id="grpChips"></div>
       <div class="row" style="gap:8px;margin:10px 0" id="treats"></div>
-      <button class="btn" id="grpBtn">אשר פינוק לחבורה</button></div>
+      <button class="btn" id="grpBtn">אשר פינוק לחבורה</button>
+      <div id="grpReqs" style="margin-top:14px"></div></div>
     <div class="card brep"><div class="ch"><i>⏰</i>דוח הגעה לתפילה</div>
       <div class="seg" data-tgt="t"><button class="on" data-per="week">שבוע</button><button data-per="month">חודש</button></div>
       <div id="tRep"></div>
@@ -1104,7 +1118,7 @@ $('ciBtn').onclick=()=>{const s=me();if(todayArr(s))return;const L=(state.cls.cf
       e=>{b.disabled=false;renderCheckin();toast(e.code===1?'צריך לאשר גישה למיקום כדי להירשם':'לא הצלחתי לאתר מיקום, נסה שוב')},{enableHighAccuracy:true,timeout:15000,maximumAge:0});return}
   ciDo({})};
 function ciFx(){const s=me();const a=todayArr(s)||s.arr[s.arr.length-1];if(!a)return;const t=a.t;const ok=t<=450;
-  if(!ok){if(s.deal&&t<=s.deal.until){burstAt($('ciBtn'),70);toast(`🎯 עמדת ביעד! +${s.deal.pts} נקודות`)}else toast(`נרשם: ${fmtT(t)} · מחר מקדימים 💪`);return}
+  if(!ok){if(s.deal&&t<=s.deal.until){burstAt($('ciBtn'),70);toast(`🎯 עמדת ביעד! +${s.deal.pts+(t<=480?2:0)} נקודות`)}else toast(t<=480?`נרשם: ${fmtT(t)} · +2 נקודות. מחר מקדימים 💪`:`נרשם: ${fmtT(t)} · מחר מקדימים 💪`);return}
   if(s.deal)setTimeout(()=>toast(`🎯 ועוד +${s.deal.pts} על היעד האישי שלך`),5200);
   const n=Math.min(s.zr+1,15),left=15-n;const z=$('zpop');
   $('zpIce').innerHTML=iceSVG(n,s.flavor,1);$('zpN').textContent=`${n}/15`;
@@ -1252,10 +1266,10 @@ const _render12=render;render=function(){_render12();if(ROLE==='teacher'&&$('dCu
 
 // ===== teacher: pop-up when parents report a good deed / Aramaic words =====
 function popFeed(items){let box=$('fpop');if(!box){box=document.createElement('div');box.id='fpop';document.body.appendChild(box);box.onclick=()=>box.classList.remove('show')}
-  box.innerHTML='<b>חדש מההורים</b>'+items.slice(0,4).map(f=>`<div>${typeof f.p==='number'?'+'+f.p:f.p} · <b>${esc(f.s)}</b>: ${esc(f.t)}</div>`).join('')+(items.length>4?`<div>ועוד ${items.length-4}...</div>`:'');
+  box.innerHTML='<b>חדש מהכיתה</b>'+items.slice(0,4).map(f=>`<div>${typeof f.p==='number'?'+'+f.p:f.p} · <b>${esc(f.s)}</b>: ${esc(f.t)}</div>`).join('')+(items.length>4?`<div>ועוד ${items.length-4}...</div>`:'');
   box.classList.add('show');clearTimeout(box._t);box._t=setTimeout(()=>box.classList.remove('show'),6000)}
-function teacherSync(own){const K='kr_feed_seen';let seen=0;try{seen=+localStorage.getItem(K)||0}catch(e){}const F=state.cls.feed||[];const top=Math.max(0,...F.map(f=>f.ts||0));
-  const fresh=F.filter(f=>f.ts>seen&&f.who==='הורים');if(seen&&!own&&fresh.length){popFeed(fresh);fresh.slice(0,5).reverse().forEach(f=>notify('',`${f.s}: ${f.t} (+${f.p})`))}
+function teacherSync(own){const K='kr_feed_seen';let seen=0;try{seen=+localStorage.getItem(K)||0}catch(e){}const F=state.cls.feed||[];const top=Math.max(0,...F.map(f=>f.ts||0),...(state.cls.reqs||[]).map(q=>q.ts||0));
+  const fresh=F.filter(f=>f.ts>seen&&f.who==='הורים').concat((state.cls.reqs||[]).filter(q=>q.st==='pending'&&q.ts>seen).map(q=>({s:state.students[q.by]?state.students[q.by].name:'',p:'👥',t:'מבקש אישור ללימוד בחבורה',ts:q.ts})));if(seen&&!own&&fresh.length){popFeed(fresh);fresh.slice(0,5).reverse().forEach(f=>notify('',`${f.s}: ${f.t} (+${f.p})`))}
   try{localStorage.setItem(K,Math.max(seen,top)||Date.now())}catch(e){}}
 // ===== the morning of zariz #14: choose your Crunch flavour =====
 function day14(){if(ROLE!=='student')return;const s=me();if(s.zr!==14||todayArr(s))return;let d='';try{d=localStorage.getItem('kr_f14')}catch(e){}if(d===TODAY)return;try{localStorage.setItem('kr_f14',TODAY)}catch(e){}
@@ -1269,6 +1283,21 @@ function agentMorning(){if(ROLE!=='student')return false;const a=state.cls.agent
   try{localStorage.setItem('kr_agm',TODAY)}catch(e){}const ov=$('agOv');
   $('agBox').innerHTML=`${AGENT_SVG}<h3>הסוכן X של היום נבחר!</h3><p style="font-size:19px">אף אחד לא יודע מי זה...</p><p style="color:#f4cf6b;font:900 26px/1.3 Gush">אולי זה אתה? 🕶️</p><p>אם הסוכן יעמוד במשימה, כל הכיתה מקבלת <b class="gt">+10</b>. תתנהג כאילו זה אתה!</p><button class="btn" style="width:auto;padding:12px 36px;margin-top:6px">אני על זה!</button>`;
   ov.dataset.ready=1;ov.classList.add('show');setTimeout(()=>confetti(240),250);return true}
+
+// ===== students ask for a study-group treat, the teacher approves =====
+const sg=new Set();let sgTreat=KR.TREATS[0],sgSub='';
+function renderSG(){if(!$('sgChips'))return;const s=me(),cur=state.cur;
+  $('sgChips').innerHTML=state.students.map((x,i)=>i===cur?'':`<button class="chip ${sg.has(i)?'on':''}" onclick="sg.has(${i})?sg.delete(${i}):sg.add(${i});renderSG()">${esc(x.name)}</button>`).join('');
+  $('sgSub').innerHTML=KR.SUBJ.map(x=>`<button class="chip ${x===sgSub?'on':''}" onclick="sgSub=sgSub==='${x}'?'':'${x}';renderSG()">${x}</button>`).join('');
+  $('sgTreat').innerHTML=KR.TREATS.map(t=>`<button class="chip ${t===sgTreat?'on':''}" onclick="sgTreat='${t}';renderSG()">${t}</button>`).join('');
+  const mine=(state.cls.reqs||[]).filter(q=>q.list.includes(cur)).slice(0,3);
+  const nm=i=>state.students[i]?FIRST[state.students[i].name]||state.students[i].name:'';
+  $('sgMine').innerHTML=mine.map(q=>`<div class="sub" style="margin:4px 0;font-weight:700">${q.st==='pending'?'⏳ מחכה לאישור':q.st==='ok'?'✅ אושר! '+esc(q.treat):'✖️ לא אושר'} · ${q.list.map(nm).map(esc).join(', ')}${q.sub?' · '+esc(q.sub):''}</div>`).join('');
+  const pend=mine.some(q=>q.st==='pending'&&q.by===cur);$('sgBtn').disabled=pend;$('sgBtn').textContent=pend?'הבקשה שלכם אצל המחנך ⏳':'שלחו למחנך לאישור'}
+$('sgBtn').onclick=()=>{if(!sg.size){toast('בחרו לפחות חבר אחד');return}if(act({t:'grpReq',s:state.cur,list:[...sg],treat:sgTreat,sub:sgSub})){sg.clear();renderSG();burstAt($('sgBtn'),60);toast('נשלח למחנך! ברגע שיאשר תקבלו הודעה 👥')}};
+function renderReqs(){if(!$('grpReqs'))return;const P=(state.cls.reqs||[]).filter(q=>q.st==='pending');const nm=i=>state.students[i]?state.students[i].name:'';
+  $('grpReqs').innerHTML=P.length?'<div style="font:900 16px Gush;margin-bottom:6px">בקשות מהתלמידים</div>'+P.map(q=>`<div class="arow" style="grid-template-columns:1fr 58px 58px;background:rgba(255,255,255,.55);border-radius:14px;padding:8px;margin-bottom:8px"><span style="font:400 14px Gush"><b>${q.list.map(nm).map(esc).join(', ')}</b><small style="display:block;opacity:.7">${q.sub?'מבחן ב'+esc(q.sub)+' · ':''}${esc(q.treat)}</small></span><button class="btn" style="padding:8px 0;font-size:14px" onclick="if(act({t:'grpOk',id:'${q.id}'})){confetti(160);toast('✅ אושר! כל אחד קיבל +10')}">אשר</button><button class="btn ghost" style="padding:8px 0;font-size:14px;background:rgba(18,54,31,.12)!important;color:#12361f!important" onclick="act({t:'grpNo',id:'${q.id}'})">דחה</button></div>`).join(''):''}
+const _render13=render;render=function(){_render13();renderSG();renderReqs()};
 // ===== start =====
 if(ONLINE){$('loader').classList.add('show');api('GET').then(v=>take(v)).catch(offline);
   setInterval(pull,30000);document.addEventListener('visibilitychange',()=>{if(!document.hidden)pull()});addEventListener('online',()=>{flush();pull()})}

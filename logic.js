@@ -84,6 +84,14 @@
           hist(s, { p: '☀️', t: k > 0 ? `${k} זריזין מלפני האפליקציה` : `תיקון זריזין: ${k}`, who: TEACHER, z: k }); crunch(s); }); break; }
       case 'cfgLoc': { need(isT); if (op.off) { C.loc = null; break; } const la = +op.lat, ln = +op.lng, rr = Math.round(+op.rad);
         need(Math.abs(la) <= 90 && Math.abs(ln) <= 180, 'מיקום לא תקין'); need(rr >= 50 && rr <= 2000, 'טווח לא תקין'); C.loc = { lat: la, lng: ln, r: rr }; break; }
+      case 'grpReq': { need(r !== 'parent' && own(op.s)); const s = S(op.s); const R0 = st.cls.reqs || (st.cls.reqs = []);
+        const L = [...new Set([+op.s, ...(op.list || []).map(Number)])]; L.forEach(i => S(i)); need(L.length >= 2, 'בחרו לפחות חבר אחד');
+        need(!R0.some(q => q.st === 'pending' && q.by === +op.s), 'כבר שלחת בקשה שמחכה לאישור');
+        R0.unshift({ id: hid('r'), ts: op.ts, by: +op.s, list: L, treat: TREATS.includes(op.treat) ? op.treat : TREATS[0], sub: SUBJ.includes(op.sub) ? op.sub : '', st: 'pending' });
+        if (R0.length > 60) R0.length = 60; break; }
+      case 'grpOk': case 'grpNo': { need(isT); const q = (st.cls.reqs || []).find(x => x.id === op.id); need(q && q.st === 'pending', 'הבקשה כבר טופלה');
+        q.st = op.t === 'grpOk' ? 'ok' : 'no';
+        if (q.st === 'ok') q.list.forEach(i => { const s = S(i); add(s, 10, 'למד בחבורה למבחן' + (q.sub ? ' ב' + q.sub : ''), TEACHER); hist(s, { p: q.treat.split(' ')[0], t: `למדתם בחבורה למבחן: ${q.treat.slice(3)} עלינו!`, who: TEACHER }); }); break; }
       case 'msg': { need(isT); S(op.s).msg = String(op.tx || '').slice(0, 500); break; }
       case 'redeem': { need(r !== 'parent' && own(op.s)); const s = S(op.s), p = C.prizes.find(x => x.id === op.pz); need(p, 'הפרס לא קיים'); need(p.stock == null || p.stock > 0, 'הפרס אזל'); need(s.wallet >= p.cost, 'אין מספיק נקודות');
         s.wallet -= p.cost; if (p.stock != null) p.stock--; hist(s, { p: '🎁', t: 'בחרת פרס: ' + p.name, who: 'בנק הפרסים', w: -p.cost, pz: p.id }); feed({ s: s.name, p: '🎁', t: 'ביקש פרס: ' + p.name, who: 'בנק הפרסים' }); break; }
@@ -117,6 +125,7 @@
           need(dist(+op.lat, +op.lng, C.loc.lat, C.loc.lng) <= C.loc.r, 'אפשר להירשם רק כשנמצאים בישיבה'); }
         if (!isT) need(T.min >= 420 && T.min <= 660, 'אפשר ללחוץ "הגעתי" רק בין 7:00 ל-11:00');
         s.arr.push({ d: T.date, t: T.min });
+        if (T.min <= 480) add(s, 2, 'נרשם לתפילה עד 8:00', 'תפילה');
         if (s.deal && T.min <= s.deal.until) add(s, s.deal.pts, 'הגעה בזמן לתפילה 🎯', TEACHER); break; }
       case 'deal': { need(isT); const s = S(op.s); s.dealSet = 1; if (op.off) { s.deal = null; break; }
         const u = Math.round(+op.until), p = Math.round(+op.pts); need(u >= 400 && u <= 660, 'שעה לא תקינה'); need(p > 0 && p <= 50, 'ניקוד לא תקין'); s.deal = { until: u, pts: p }; break; }
