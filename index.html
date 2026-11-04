@@ -493,11 +493,22 @@ body[data-role=teacher] .dhandle{display:block}
 #fpop{position:fixed;left:12px;right:12px;top:calc(12px + env(safe-area-inset-top));z-index:200;background:#fff;color:#12361f;border-radius:20px;padding:14px 18px;box-shadow:0 14px 40px rgba(0,0,0,.35);font:400 15px Gush;transform:translateY(-140%);opacity:0;transition:transform .35s cubic-bezier(.2,.8,.2,1),opacity .35s;border-right:6px solid #e8b84e}
 #admBody .arow input#fxT{text-align:right}.admseg{background:none!important;padding:0!important;box-shadow:none!important;border-radius:0!important}
 #fpop.show{transform:none;opacity:1}#fpop>b{display:block;font:900 16px Gush;margin-bottom:4px;color:#0D614A}#fpop div{margin-top:3px}
+
+#zpop{position:fixed;inset:0;z-index:300;display:grid;place-items:center;background:rgba(4,24,36,.82);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);opacity:0;pointer-events:none;transition:opacity .3s}
+#zpop.show{opacity:1;pointer-events:auto}
+#zpop .zb{text-align:center;padding:30px 26px;margin:0 22px;border-radius:34px;background:linear-gradient(170deg,#1a7f8f,#0b3d4a);box-shadow:0 30px 70px rgba(0,0,0,.5),inset 0 0 0 2px rgba(244,207,107,.5);transform:scale(.6);transition:transform .55s cubic-bezier(.2,1.6,.4,1)}#zpop.show .zb{transform:none}
+#zpop .zt{font:900 76px/1 Gush;background:linear-gradient(135deg,#9a6510,#d9a238 22%,#ffe39a 44%,#fff6d6 52%,#f0c25a 62%,#b07a18 84%,#e6b44c);-webkit-background-clip:text;background-clip:text;color:transparent;filter:drop-shadow(0 6px 12px rgba(0,0,0,.35));letter-spacing:-1px}
+#zpop .zi{width:120px;margin:14px auto 4px;animation:zbob 1.6s ease-in-out infinite}#zpop .zi svg{width:100%;height:auto}
+@keyframes zbob{50%{transform:translateY(-8px) rotate(-4deg)}}
+#zpop .zn{font:900 40px Gush;color:#fff6d6}
+#zpop .zs{font:900 25px/1.3 Gush;color:#fff;margin-top:8px;max-width:320px}
+#zpop .zh{font:400 17px Gush;color:#bff4f8;margin-top:10px}
 </style>
 </head>
 <body>
 <div class="sky"></div><canvas id="cf"></canvas>
 <div id="toast"></div>
+<div id="zpop" onclick="this.classList.remove('show')"><div class="zb"><div class="zt">יא זריז!</div><div class="zi" id="zpIce"></div><div class="zn" id="zpN"></div><div class="zs" id="zpSub"></div><div class="zh">הגעת לפני 7:30 ☀️</div></div></div>
 <div id="agOv" onclick="if(this.dataset.ready)this.classList.remove('show')"><div class="box" id="agBox"></div></div>
 <div id="cpop" onclick="if(!this.classList.contains('pick'))closePop()"><div class="cbox"><div class="cice" id="cpIce"></div><h3 id="cpTitle"></h3><div id="cpText"></div><div class="flv" id="cpFlv"></div></div></div>
 <div id="overlay" onclick="this.classList.remove('show')"><div><div id="ovMedal"></div><h3 id="ovTitle" class="gold-t"></h3><div id="ovText" style="font-size:17px;opacity:.85"></div><br><button class="btn" style="width:auto;padding:12px 40px">יאללה!</button></div></div>
@@ -1088,11 +1099,15 @@ $('ciBtn').onclick=()=>{const s=me();if(todayArr(s))return;const L=(state.cls.cf
         ciDo({lat:L.lat+(p.coords.latitude-L.lat)*Math.min(1,L.r/Math.max(d,1)),lng:L.lng+(p.coords.longitude-L.lng)*Math.min(1,L.r/Math.max(d,1))})},
       e=>{b.disabled=false;renderCheckin();toast(e.code===1?'צריך לאשר גישה למיקום כדי להירשם':'לא הצלחתי לאתר מיקום, נסה שוב')},{enableHighAccuracy:true,timeout:15000,maximumAge:0});return}
   ciDo({})};
-function ciFx(){const s=me();const t=todayArr(s).t;
-  const ok=t<=450;if(ok)burstAt($('ciBtn'),60);toast(`נרשם: ${fmtT(t)} ${ok?'· יא זריז! ☀️':''}`)};
-function renderCheckin(){const s=me(),a=todayArr(s),b=$('ciBtn');if(!b)return;const m=KR.il(Date.now()).min,closed=!a&&ROLE!=='teacher'&&(m<420||m>450);
-  b.disabled=!!a||closed;b.textContent=a?`✓ נרשמת היום ב-${fmtT(a.t)}`:closed?'✋ הגעתי לתפילה · 7:00–7:30':'✋ הגעתי לתפילה';
-  $('ciMsg').textContent=a?(a.t<=450?'יא זריז! הגעת לפני 7:30 ☀️':'נרשם. מחר מקדימים 💪'):closed?(m<420?'הכפתור נפתח ב-7:00 בבוקר ☀️':'אפשר להירשם רק בין 7:00 ל-7:30. מחר מקדימים 💪'):'לוחצים כשנכנסים לתפילה, והמחנך רואה את השעה.'}
+function ciFx(){const s=me();const a=todayArr(s)||s.arr[s.arr.length-1];if(!a)return;const t=a.t;const ok=t<=450;
+  if(!ok){toast(`נרשם: ${fmtT(t)} · מחר מקדימים 💪`);return}
+  const n=Math.min(s.zr+1,15),left=15-n;const z=$('zpop');
+  $('zpIce').innerHTML=iceSVG(n,s.flavor,1);$('zpN').textContent=`${n}/15`;
+  $('zpSub').textContent=left?`אתה מתקרב לקראנץ' שלך! עוד ${left} ${left===1?'בוקר':'בקרים'} 🍦`:'זהו! הקראנץ\' שלך מחכה לך 🍦';
+  z.classList.remove('show');void z.offsetWidth;z.classList.add('show');confetti(220);clearTimeout(z._t);z._t=setTimeout(()=>z.classList.remove('show'),5000)}
+function renderCheckin(){const s=me(),a=todayArr(s),b=$('ciBtn');if(!b)return;const m=KR.il(Date.now()).min,closed=!a&&ROLE!=='teacher'&&(m<420||m>660);
+  b.disabled=!!a||closed;b.textContent=a?`✓ נרשמת היום ב-${fmtT(a.t)}`:closed?'✋ הגעתי לתפילה · 7:00–11:00':'✋ הגעתי לתפילה';
+  $('ciMsg').textContent=a?(a.t<=450?'יא זריז! הגעת לפני 7:30 ☀️':'נרשם. מחר מקדימים 💪'):closed?(m<420?'הכפתור נפתח ב-7:00 בבוקר ☀️':'ההרשמה להיום נסגרה ב-11:00. מחר מקדימים 💪'):'לוחצים כשנכנסים לתפילה, והמחנך רואה את השעה.'}
 setInterval(()=>{try{renderCheckin()}catch(e){}},30000);
 const per={p:'week',t:'week'};
 function arrSlice(s,period,offset=0){const n=period==='week'?6:24;const all=s.arr;const end=all.length-offset*n;return all.slice(Math.max(0,end-n),end)}

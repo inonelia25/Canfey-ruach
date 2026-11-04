@@ -115,7 +115,7 @@
       case 'checkin': { need(r !== 'parent' && own(op.s)); const s = S(op.s); need(!s.arr.some(x => x.d === T.date), 'כבר נרשמת היום');
         if (C.loc && !isT) { need(isFinite(+op.lat) && isFinite(+op.lng), 'צריך לאשר גישה למיקום כדי להירשם');
           need(dist(+op.lat, +op.lng, C.loc.lat, C.loc.lng) <= C.loc.r, 'אפשר להירשם רק כשנמצאים בישיבה'); }
-        if (!isT) need(T.min >= 420 && T.min <= 450, 'אפשר ללחוץ "הגעתי" רק בין 7:00 ל-7:30');
+        if (!isT) need(T.min >= 420 && T.min <= 660, 'אפשר ללחוץ "הגעתי" רק בין 7:00 ל-11:00');
         s.arr.push({ d: T.date, t: T.min }); break; }
       case 'adj': { need(isT); const s = S(op.s), p = Math.round(+op.p); need(p && Math.abs(p) <= 1000, 'מספר לא תקין');
         const t = String(op.tx || '').trim().slice(0, 140) || (p > 0 ? 'תוספת נקודות' : 'הורדת נקודות');
