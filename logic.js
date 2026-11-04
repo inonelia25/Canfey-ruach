@@ -43,7 +43,7 @@
   function syncRoster(st, roster) {
     const by = {}; st.students.forEach(s => by[s.id] = s);
     if (!st.cls.cfg) st.cls.cfg = defCfg();
-    st.students = roster.map(r => { const s = by[r.id] || newStudent(r.id, r.name); s.name = r.name; s.first = r.first || r.name.split(' ')[0]; return s; });
+    st.students = roster.map(r => { const s = by[r.id] || newStudent(r.id, r.name); s.name = r.name; s.first = r.first || r.name.split(' ')[0]; if (r.deal && !s.dealSet) { s.deal = r.deal; s.dealSet = 1; } return s; });
     return st;
   }
 
@@ -116,7 +116,10 @@
         if (C.loc && !isT) { need(isFinite(+op.lat) && isFinite(+op.lng), 'צריך לאשר גישה למיקום כדי להירשם');
           need(dist(+op.lat, +op.lng, C.loc.lat, C.loc.lng) <= C.loc.r, 'אפשר להירשם רק כשנמצאים בישיבה'); }
         if (!isT) need(T.min >= 420 && T.min <= 660, 'אפשר ללחוץ "הגעתי" רק בין 7:00 ל-11:00');
-        s.arr.push({ d: T.date, t: T.min }); break; }
+        s.arr.push({ d: T.date, t: T.min });
+        if (s.deal && T.min <= s.deal.until) add(s, s.deal.pts, 'הגעה בזמן לתפילה 🎯', TEACHER); break; }
+      case 'deal': { need(isT); const s = S(op.s); s.dealSet = 1; if (op.off) { s.deal = null; break; }
+        const u = Math.round(+op.until), p = Math.round(+op.pts); need(u >= 400 && u <= 660, 'שעה לא תקינה'); need(p > 0 && p <= 50, 'ניקוד לא תקין'); s.deal = { until: u, pts: p }; break; }
       case 'adj': { need(isT); const s = S(op.s), p = Math.round(+op.p); need(p && Math.abs(p) <= 1000, 'מספר לא תקין');
         const t = String(op.tx || '').trim().slice(0, 140) || (p > 0 ? 'תוספת נקודות' : 'הורדת נקודות');
         need(s.wallet + p >= 0 || p > 0, 'אין לו מספיק נקודות לשימוש להוריד'); s.points = Math.max(0, s.points + p); s.wallet = Math.max(0, s.wallet + p); s.goalPts = Math.max(0, s.goalPts + p);

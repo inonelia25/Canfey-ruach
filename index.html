@@ -1104,14 +1104,16 @@ $('ciBtn').onclick=()=>{const s=me();if(todayArr(s))return;const L=(state.cls.cf
       e=>{b.disabled=false;renderCheckin();toast(e.code===1?'צריך לאשר גישה למיקום כדי להירשם':'לא הצלחתי לאתר מיקום, נסה שוב')},{enableHighAccuracy:true,timeout:15000,maximumAge:0});return}
   ciDo({})};
 function ciFx(){const s=me();const a=todayArr(s)||s.arr[s.arr.length-1];if(!a)return;const t=a.t;const ok=t<=450;
-  if(!ok){toast(`נרשם: ${fmtT(t)} · מחר מקדימים 💪`);return}
+  if(!ok){if(s.deal&&t<=s.deal.until){burstAt($('ciBtn'),70);toast(`🎯 עמדת ביעד! +${s.deal.pts} נקודות`)}else toast(`נרשם: ${fmtT(t)} · מחר מקדימים 💪`);return}
+  if(s.deal)setTimeout(()=>toast(`🎯 ועוד +${s.deal.pts} על היעד האישי שלך`),5200);
   const n=Math.min(s.zr+1,15),left=15-n;const z=$('zpop');
   $('zpIce').innerHTML=iceSVG(n,s.flavor,1);$('zpN').textContent=`${n}/15`;
   $('zpSub').textContent=left?`אתה מתקרב לקראנץ' שלך! עוד ${left} ${left===1?'בוקר':'בקרים'} 🍦`:'זהו! הקראנץ\' שלך מחכה לך 🍦';
   z.classList.remove('show');void z.offsetWidth;z.classList.add('show');confetti(220);clearTimeout(z._t);z._t=setTimeout(()=>z.classList.remove('show'),5000)}
 function renderCheckin(){const s=me(),a=todayArr(s),b=$('ciBtn');if(!b)return;const m=KR.il(Date.now()).min,closed=!a&&ROLE!=='teacher'&&(m<420||m>660);
   b.disabled=!!a||closed;b.textContent=a?`✓ נרשמת היום ב-${fmtT(a.t)}`:closed?'✋ הגעתי לתפילה · 7:00–11:00':'✋ הגעתי לתפילה';
-  $('ciMsg').textContent=a?(a.t<=450?'יא זריז! הגעת לפני 7:30 ☀️':'נרשם. מחר מקדימים 💪'):closed?(m<420?'הכפתור נפתח ב-7:00 בבוקר ☀️':'ההרשמה להיום נסגרה ב-11:00. מחר מקדימים 💪'):'לוחצים כשנכנסים לתפילה, והמחנך רואה את השעה.'}
+  $('ciMsg').textContent=a?(a.t<=450?'יא זריז! הגעת לפני 7:30 ☀️':'נרשם. מחר מקדימים 💪'):closed?(m<420?'הכפתור נפתח ב-7:00 בבוקר ☀️':'ההרשמה להיום נסגרה ב-11:00. מחר מקדימים 💪'):'לוחצים כשנכנסים לתפילה, והמחנך רואה את השעה.';
+  if(s.deal&&!a)$('ciMsg').textContent+=` 🎯 היעד האישי שלך: עד ${fmtT(s.deal.until)} = +${s.deal.pts}`}
 setInterval(()=>{try{renderCheckin()}catch(e){}},30000);
 const per={p:'week',t:'week'};
 function arrSlice(s,period,offset=0){const n=period==='week'?6:24;const all=s.arr;const end=all.length-offset*n;return all.slice(Math.max(0,end-n),end)}
@@ -1190,12 +1192,18 @@ function admRender(){if(!$('admBody')||ROLE!=='teacher')return;document.querySel
     <div style="font:700 15px Gush;margin-bottom:6px">הוספה או הורדה של נקודות</div>
     <div class="arow" style="grid-template-columns:80px 1fr"><input class="num" id="fxP" type="number" inputmode="numeric" placeholder="+5 / -5"><input id="fxT" placeholder="סיבה (לא חובה)"></div>
     <button class="btn" id="fxGo" style="margin-bottom:16px">עדכן נקודות</button>
+    <div style="font:700 15px Gush;margin-bottom:6px">🎯 יעד הגעה אישי לתפילה</div>
+    <div class="sub" style="margin:0 0 6px">${x.deal?`פעיל: מגיע עד ${fmtT(x.deal.until)} ומסמן "הגעתי" = +${x.deal.pts} אוטומטית`:'אין יעד אישי. אפשר לקבוע לתלמיד שעה ובונוס משלו.'}</div>
+    <div class="arow" style="grid-template-columns:1fr 1fr"><input id="dlU" type="time" value="${x.deal?fmtT(x.deal.until):'07:50'}"><input class="num" id="dlP" type="number" inputmode="numeric" value="${x.deal?x.deal.pts:10}" placeholder="נקודות"></div>
+    <div style="display:flex;gap:8px;margin-bottom:16px"><button class="btn" id="dlGo" style="flex:1">${x.deal?'עדכן יעד':'קבע יעד'}</button>${x.deal?'<button class="btn ghost" id="dlOff" style="flex:.6;background:rgba(18,54,31,.1)!important;color:#12361f!important">בטל יעד</button>':''}</div>
     <div style="font:700 15px Gush;margin-bottom:6px">פעולות אחרונות · אפשר לבטל ולהחזיר</div>
     ${H.map(h=>{const can=typeof h.p==='number'||h.w||h.z||h.b;return `<div class="arow" style="grid-template-columns:1fr 64px;${h.u?'opacity:.5':''}"><span style="font:400 14px Gush;${h.u?'text-decoration:line-through':''}"><b>${typeof h.p==='number'?(h.p>0?'+':'')+h.p:esc(h.p)}</b> ${esc(h.t)}<small style="display:block;opacity:.6">${esc(h.who||'')}</small></span>${can?`<button data-undo="${esc(h.id)}" style="height:34px;font:700 13px Gush">${h.u?'החזר':'בטל'}</button>`:'<span></span>'}</div>`}).join('')||'<div class="sub">אין עדיין פעולות</div>'}
     <div style="font:700 15px Gush;margin:16px 0 6px">איפוס התלמיד</div>
     <button class="btn ghost" id="fxReset" style="background:rgba(160,30,30,.12)!important;color:#7a1414!important">איפוס כל הנתונים של ${esc(x.first||x.name)}</button>
     ${x.bak?`<button class="btn" id="fxRestore" style="margin-top:8px">↩︎ החזר את הנתונים מלפני האיפוס</button>`:''}`;
     $('fxGo').onclick=()=>{const p=+$('fxP').value;if(!p){toast('כתוב מספר, למשל 10 או -10');return}if(act({t:'adj',s:state.cur,p,tx:$('fxT').value})){toast(`${p>0?'+':''}${p} ל${x.name}`);admRender()}};
+    $('dlGo').onclick=()=>{const [h,m]=($('dlU').value||'07:50').split(':').map(Number);if(act({t:'deal',s:state.cur,until:h*60+m,pts:+$('dlP').value})){toast('🎯 היעד האישי נשמר');admRender()}};
+    if($('dlOff'))$('dlOff').onclick=()=>{if(act({t:'deal',s:state.cur,off:1})){toast('היעד האישי בוטל');admRender()}};
     B.querySelectorAll('[data-undo]').forEach(b=>b.onclick=()=>{if(act({t:'undo',s:state.cur,h:b.dataset.undo}))admRender()});
     $('fxReset').onclick=()=>{if(!confirm(`לאפס את כל הנקודות, הזריזין והיסטוריה של ${x.name}? אפשר יהיה להחזיר.`))return;if(act({t:'reset',s:state.cur})){toast('התלמיד אופס');admRender()}};
     if($('fxRestore'))$('fxRestore').onclick=()=>{if(act({t:'restore',s:state.cur})){toast('↩︎ הנתונים הוחזרו');admRender()}}}
