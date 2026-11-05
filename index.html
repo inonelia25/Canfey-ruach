@@ -539,6 +539,14 @@ body[data-role=teacher] .dhandle{display:block}
 .jump::-webkit-scrollbar{display:none}
 .jump button{flex:none;border:0;border-radius:12px;padding:8px 13px;font:700 14px Gush;background:rgba(255,255,255,.12);color:#fff;white-space:nowrap}
 .jump button.on{background:#d2a24a;color:#2e1d04}
+
+.binit{background:#DDE6C7!important;color:#12361f!important}.binit .ch{text-shadow:none}.binit .sub{color:#3d5a45!important}
+.binit textarea,.binit input[type=text],.binit #initTxt{background:rgba(255,255,255,.75)!important;color:#12361f!important}
+.binit .btn:disabled{opacity:.5!important;background:#c9a55c!important;color:#2e1d04!important}.binit #initTxt::placeholder{color:#6b7f6f!important;opacity:1}.binit #valChips button{opacity:1!important;color:#12202a!important}
+#v-teacher #catChips{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;overflow:visible;margin:12px 0 4px}
+#v-teacher #catChips .chip{margin:0;border-radius:14px;padding:11px 4px;text-align:center;font:700 14px/1.15 Gush;white-space:normal;background:rgba(255,255,255,.22);color:#fff;box-shadow:none}
+#v-teacher #catChips .chip.on{background:#fff;color:#0b3d4a}
+#v-teacher #catChips .chip small{display:block;font:400 11px Gush;opacity:.75;margin-top:2px}
 </style>
 </head>
 <body>
@@ -991,7 +999,7 @@ function render(){
 
 function pick(i){state.cur=i;render()}
 let cat='חברותא ועזרה לחבר';
-function renderCats(){if(!CATS[cat])cat=Object.keys(CATS)[0]||'';if(!cat){$('catChips').innerHTML='';$('tDeeds').innerHTML='';return}$('catChips').innerHTML=Object.keys(CATS).map(c=>`<button class="chip ${c===cat?'on':''}" data-c="${c}">${c}</button>`).join('');
+function renderCats(){if(!CATS[cat])cat=Object.keys(CATS)[0]||'';if(!cat){$('catChips').innerHTML='';$('tDeeds').innerHTML='';return}$('catChips').innerHTML=Object.keys(CATS).map(c=>`<button class="chip ${c===cat?'on':''}" data-c="${c}">${esc(c)}<small>${CATS[c].length} פעולות</small></button>`).join('');
   $('tDeeds').innerHTML=CATS[cat].map(d=>`<button class="deed" data-t="${d[1]}" data-p="${d[2]}"><span class="e">${d[0]}</span>${d[1]}<span class="p">+${d[2]}</span></button>`).join('')}
 $('catChips').onclick=e=>{const c=e.target.closest('[data-c]');if(c){cat=c.dataset.c;renderCats()}};
 $('tDeeds').onclick=e=>{const d=e.target.closest('.deed');if(!d)return;const p=+d.dataset.p;if(act({t:'award',s:state.cur,p,tx:d.dataset.t})){confetti(p>=6?160:90);toast(`+${p} ל${me().name} · ${d.dataset.t}`)}};
