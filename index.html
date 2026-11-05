@@ -25,7 +25,7 @@
 @keyframes bump{0%{transform:scale(1)}40%{transform:scale(1.25)}100%{transform:scale(1)}}
 :root{
   --navy:#0c2747;--teal:#43c1cc;--teal2:#1c8ea2;
-  --gold:linear-gradient(135deg,#7a4e0e 0%,#c8932a 20%,#f7dc8a 42%,#fff6d6 50%,#e8b84e 60%,#a06b14 82%,#e0ad45 100%);
+  --gold:linear-gradient(135deg,#b8862f 0%,#d2a24a 45%,#c9963c 100%);
   --goldTxt:#f4cf6b;--ink:#3a2504;
   --soft:rgba(255,255,255,.07);--line:rgba(255,255,255,.14);
 }
@@ -526,6 +526,14 @@ body[data-role=teacher] .dhandle{display:block}
 .tq{display:grid;grid-template-columns:1fr 70px 70px;gap:6px;margin-top:12px}
 .tq input{min-width:0;border:0;border-radius:12px;padding:10px;font:400 15px Gush;background:rgba(255,255,255,.75);color:#12361f}.tq input.num{text-align:center}
 .tq button{border:0;border-radius:12px;background:var(--gold);color:#3a2504;font:900 15px Gush}
+
+.btn{box-shadow:0 2px 6px rgba(120,80,20,.18)!important;color:#2e1d04}
+.gold-t{background:none!important;-webkit-text-fill-color:currentColor!important;color:#b8862f!important;filter:none!important}
+/* square icons without frames */
+.deed .e,.card .deed .e,.b2 .deed .e,.b3 .deed .e{box-shadow:none!important}
+.badge .ic:before{display:none!important}
+.tl .dot{box-shadow:none!important}
+.zs .av,.card .zs .av{box-shadow:none!important}
 </style>
 </head>
 <body>
@@ -733,7 +741,7 @@ body[data-role=teacher] .dhandle{display:block}
 
   <!-- TEACHER -->
   <section id="v-teacher" class="hide">
-    <div class="lead"><span class="todT">בוקר טוב</span>, <span class="gold-t">המחנך ינון אליה</span></div>
+    <div class="lead"><span class="todT">בוקר טוב</span>, <span>ינון אליה</span></div>
     <div class="card b1"><div class="ch"><i>⚡</i>נקודות מהירות</div>
       <div class="chips" id="stuChips"></div>
       <div class="chips" id="catChips"></div>
@@ -1013,7 +1021,7 @@ function fmtUntil(u){const d=new Date(u);return `${['א׳','ב׳','ג׳','ד׳',
 let gTest=null;
 function renderGoals(){const s=me();
   const stT={pending:'⏳ מחכה לאישור המחנך',ok:'✅ אושר. בהצלחה במבחן! 💪',no:'היעד לא אושר. אפשר לדבר עם המחנך'};
-  $('goalList').innerHTML=s.goals.slice(0,8).map(g=>{const hit=g.res==='hit'||(g.grade!=null&&g.grade>=g.target);const txt=g.res==='hit'?'אלוף! עמדת ביעד, +5 בונוס 🏆':g.res==='miss'?'לא הפעם. במבחן הבא! 💪':g.grade!=null?(hit?'עמדת ביעד! 🎉':'כמעט! בפעם הבאה 💪'):(stT[g.st]||'');
+  $('goalList').innerHTML=s.goals.slice(0,8).map(g=>{const hit=g.res==='hit'||(g.grade!=null&&g.grade>=g.target);const txt=g.res==='hit'?'אלוף! עמדת ביעד, +5 בונוס 🏆':g.res==='miss'?'לא הפעם. במבחן הבא! 💪':g.grade!=null?(hit?'עמדת ביעד! 🎉':'כמעט! בפעם הבאה 💪'):(stT[g.st||'pending']||'');
     return `<div class="goal ${hit?'hit':''}"><div class="tg">${g.target}</div><div><b>${esc(g.sub)}</b><small>${txt}</small></div></div>`}).join('');
   const open=testOpenNow().filter(t=>{const g=s.goals.find(x=>x.test===t.id);return !g||g.st==='pending'});
   if(!open.length){$('gOpen').innerHTML='<div class="sub" style="margin:0">כרגע אין מבחן פתוח להצבת יעד. כשהמחנך יפתח, זה יופיע כאן 🎯</div>';$('gForm').querySelectorAll('.row,#gRange,.sub+.sub,#gAdd').forEach(e=>e.style.display='none');$('gRange').nextElementSibling.style.display='none';return}
@@ -1024,7 +1032,7 @@ function renderGoals(){const s=me();
 function renderTGoals(){if(!$('tGoals')||ROLE!=='teacher')return;
   if(!$('tsSub').options.length){$('tsSub').innerHTML=KR.SUBJ.map(x=>`<option>${x}</option>`).join('');const d=new Date();d.setDate(d.getDate()+1);$('tsD').value=d.getFullYear()+'-'+pad2(d.getMonth()+1)+'-'+pad2(d.getDate())}
   const T=state.cls.tests||[];$('tsList').innerHTML=T.slice(0,6).map(t=>`<div class="sub" style="margin:3px 0;display:flex;gap:8px;align-items:center"><span style="flex:1">${t.until>Date.now()?'🟢':'⚪️'} <b>${esc(t.sub)}</b> · עד ${fmtUntil(t.until)}</span><button onclick="act({t:'testDel',id:'${t.id}'})" style="border:0;border-radius:9px;background:rgba(0,0,0,.12);padding:4px 10px;font:400 13px Gush">מחק</button></div>`).join('');
-  const P=[],A=[];state.students.forEach((x,i)=>x.goals.forEach(g=>{if(g.st==='pending')P.push([x,i,g]);else if(g.st==='ok'&&!g.res)A.push([x,i,g])}));
+  const P=[],A=[];state.students.forEach((x,i)=>x.goals.forEach(g=>{const st=g.st||(g.grade==null?'pending':'');if(st==='pending')P.push([x,i,g]);else if(st==='ok'&&!g.res)A.push([x,i,g])}));
   const row=(x,i,g,btns)=>`<div class="arow" style="grid-template-columns:1fr auto;background:rgba(255,255,255,.18);border-radius:14px;padding:8px 10px;margin-bottom:7px"><span style="font:400 15px Gush"><b>${esc(x.name)}</b> · ${esc(g.sub)} · יעד <b>${g.target}</b></span><span style="display:flex;gap:6px">${btns}</span></div>`;
   const b=(lbl,js,gold)=>`<button onclick="${js}" style="border:0;border-radius:10px;padding:8px 12px;font:900 14px Gush;${gold?'background:var(--gold);color:#3a2504':'background:rgba(0,0,0,.15);color:inherit'}">${lbl}</button>`;
   $('tGoals').innerHTML=(P.length?`<div style="font:900 16px Gush;margin-bottom:6px">ממתינים לאישור (${P.length})</div>`+P.map(([x,i,g])=>row(x,i,g,b('אשר',`act({t:'goalOk',s:${i},g:'${g.id}'})`,1)+b('דחה',`act({t:'goalNo',s:${i},g:'${g.id}'})`))).join(''):'<div class="sub">אין יעדים שמחכים לאישור</div>')

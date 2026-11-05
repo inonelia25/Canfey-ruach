@@ -123,7 +123,7 @@
       case 'testOpen': { need(isT); const sub = String(op.sub || '').trim().slice(0, 40), u = +op.until; need(sub, 'בחר מקצוע'); need(u > op.ts, 'השעה שבחרת כבר עברה');
         const T0 = st.cls.tests || (st.cls.tests = []); T0.unshift({ id: hid('t'), sub, until: u, ts: op.ts }); if (T0.length > 30) T0.length = 30; break; }
       case 'testDel': { need(isT); st.cls.tests = (st.cls.tests || []).filter(x => x.id !== op.id); break; }
-      case 'goalOk': case 'goalNo': { need(isT); const s = S(op.s), g = s.goals.find(x => x.id === op.g); need(g && g.st === 'pending', 'היעד כבר טופל');
+      case 'goalOk': case 'goalNo': { need(isT); const s = S(op.s), g = s.goals.find(x => x.id === op.g); need(g && (g.st || (g.grade == null ? 'pending' : '')) === 'pending', 'היעד כבר טופל');
         g.st = op.t === 'goalOk' ? 'ok' : 'no'; break; }
       case 'goalRes': { need(isT); const s = S(op.s), g = s.goals.find(x => x.id === op.g); need(g && g.st === 'ok' && !g.res, 'היעד כבר סומן');
         g.res = op.hit ? 'hit' : 'miss'; if (op.hit) add(s, 5, `בונוס: עמד ביעד במבחן ב${g.sub} (${g.target})`, TEACHER); break; }
