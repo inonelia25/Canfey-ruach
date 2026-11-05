@@ -97,6 +97,8 @@
       case 'grpOk': case 'grpNo': { need(isT); const q = (st.cls.reqs || []).find(x => x.id === op.id); need(q && q.st === 'pending', 'הבקשה כבר טופלה');
         q.st = op.t === 'grpOk' ? 'ok' : 'no';
         if (q.st === 'ok') q.list.forEach(i => { const s = S(i); add(s, 10, 'למד בחבורה למבחן' + (q.sub ? ' ב' + q.sub : ''), TEACHER); hist(s, { p: q.treat.split(' ')[0], t: `למדתם בחבורה למבחן: ${q.treat.slice(3)} עלינו!`, who: TEACHER }); }); break; }
+      case 'talk': { need(r !== 'parent' && own(op.s)); const s = S(op.s); s.tk = s.tk || {};
+        if (op.done) { s.tk.d = T.date; s.tk.at = ''; } else { need(/^\d\d:\d\d$/.test(op.at || ''), 'שעה לא תקינה'); s.tk.at = op.at; s.tk.ad = T.date; } break; }
       case 'msg': { need(isT); S(op.s).msg = String(op.tx || '').slice(0, 500); break; }
       case 'redeem': { need(r !== 'parent' && own(op.s)); const s = S(op.s), p = C.prizes.find(x => x.id === op.pz); need(p, 'הפרס לא קיים'); need(p.stock == null || p.stock > 0, 'הפרס אזל'); need(s.wallet >= p.cost, 'אין מספיק נקודות');
         s.wallet -= p.cost; if (p.stock != null) p.stock--; hist(s, { p: '🎁', t: 'בחרת פרס: ' + p.name, who: 'בנק הפרסים', w: -p.cost, pz: p.id }); feed({ s: s.name, p: '🎁', t: 'ביקש פרס: ' + p.name, who: 'בנק הפרסים' }); break; }

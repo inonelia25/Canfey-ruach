@@ -505,6 +505,27 @@ body[data-role=teacher] .dhandle{display:block}
 #zpop .zh{font:400 17px Gush;color:#bff4f8;margin-top:10px}
 
 .zs.done{opacity:.45}
+
+.badge .ic,.badge .ic:before{border-radius:18px!important}
+.tl .dot{border-radius:13px!important}
+.prize .img{border-radius:28px!important}
+.deed .e{border-radius:18px!important}
+.zs .av,.drawer .dlist button .av{border-radius:14px!important}
+.goal .tg{border-radius:14px!important}
+/* talk with Hashem */
+#tkpop{position:fixed;inset:0;z-index:310;display:grid;place-items:center;background:rgba(4,24,36,.82);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);opacity:0;pointer-events:none;transition:opacity .3s}
+#tkpop.show{opacity:1;pointer-events:auto}
+#tkpop .tb{margin:0 22px;padding:30px 24px 24px;border-radius:30px;text-align:center;background:linear-gradient(170deg,#24406b,#0d1d36);box-shadow:0 30px 70px rgba(0,0,0,.5),inset 0 0 0 2px rgba(244,207,107,.45);transform:scale(.7);transition:transform .5s cubic-bezier(.2,1.5,.4,1);max-width:360px}
+#tkpop.show .tb{transform:none}
+#tkpop .tt{font:900 40px/1.15 Gush;background:var(--gold);-webkit-background-clip:text;background-clip:text;color:transparent;filter:drop-shadow(0 4px 8px rgba(0,0,0,.35))}
+#tkpop .ts{font:400 17px/1.5 Gush;color:#d9e6ff;margin:12px 0 18px}
+#tkpop .tbtn{display:block;width:100%;border:0;border-radius:16px;padding:14px;font:900 18px Gush;margin-top:10px}
+#tkpop .ty{background:var(--gold);color:#3a2504}#tkpop .tn{background:rgba(255,255,255,.12);color:#fff}
+#tkpop input{width:100%;box-sizing:border-box;border:0;border-radius:14px;padding:12px;font:700 22px Gush;text-align:center;margin-top:6px}
+.tkline{font:700 14px Gush;margin-top:8px;color:#fff6d6}
+.tq{display:grid;grid-template-columns:1fr 70px 70px;gap:6px;margin-top:12px}
+.tq input{min-width:0;border:0;border-radius:12px;padding:10px;font:400 15px Gush;background:rgba(255,255,255,.75);color:#12361f}.tq input.num{text-align:center}
+.tq button{border:0;border-radius:12px;background:var(--gold);color:#3a2504;font:900 15px Gush}
 </style>
 </head>
 <body>
@@ -686,7 +707,7 @@ body[data-role=teacher] .dhandle{display:block}
 
   <!-- PARENT -->
   <section id="v-parent" class="hide">
-    <div class="lead">שלום להורים של <span class="sname gold-t"></span></div>
+    <div class="lead"><span class="todT">שלום</span> להורים של <span class="sname gold-t"></span></div>
     <div class="leadsub">ראיתם משהו טוב בבית? סמנו, והנקודות נכנסות מיד.</div>
     <div class="card b1"><div class="ch"><i>🏡</i>מה הוא עשה?</div><div class="sub" id="homeLeft" style="margin:-6px 0 10px;font-weight:700"></div><div class="deeds" id="homeDeeds"></div></div>
     <div class="card b2"><div class="ch"><i>✍️</i>משהו אחר שהוא עשה</div>
@@ -712,11 +733,14 @@ body[data-role=teacher] .dhandle{display:block}
 
   <!-- TEACHER -->
   <section id="v-teacher" class="hide">
-    <div class="lead">בוקר טוב, <span class="gold-t">המחנך ינון אליה</span></div>
+    <div class="lead"><span class="todT">בוקר טוב</span>, <span class="gold-t">המחנך ינון אליה</span></div>
     <div class="card b1"><div class="ch"><i>⚡</i>נקודות מהירות</div>
       <div class="chips" id="stuChips"></div>
       <div class="chips" id="catChips"></div>
-      <div class="deeds" id="tDeeds"></div></div>
+      <div class="deeds" id="tDeeds"></div>
+      <div class="sub" style="margin:14px 0 0;font-weight:700">משהו אחר? כותבים ונותנים:</div>
+      <div class="tq"><input id="mqT" placeholder="על מה? למשל: עזר לסדר את האולם"><input class="num" id="mqP" type="number" inputmode="numeric" value="5"><button id="mqGo">תן</button></div>
+      <div class="sub" style="margin:6px 0 0;font-size:12.5px;opacity:.75">רוצה שזה יופיע תמיד ככפתור? מוסיפים במסך הניהול, בלשונית "ניקוד מחנך".</div></div>
     <div class="card bx"><div class="ch"><i>🕶️</i>הסוכן X של היום</div>
       <div class="agsecret" id="agSecret" onclick="this.classList.toggle('show')"><span class="hid">🔒 לחץ כדי לראות מי הסוכן (רק אתה רואה)</span><span class="nm" id="agName"></span></div>
       <div class="row" style="gap:10px;margin-top:14px"><button class="btn" id="agYes">✓ עמד במשימה</button><button class="btn agno" id="agNo">✗ לא עמד</button></div>
@@ -832,7 +856,7 @@ function setupRole(){const nav=document.querySelector('.nav');document.body.data
   const s=state.students[ME];document.querySelector('.demo').textContent=ROLE==='teacher'?'מחובר כמחנך':ROLE==='parent'?'הורי '+(s.first||s.name):'';
   $('loader').classList.remove('show')}
 // new things from others (teacher, parents, friends) show up in the bell
-function afterSync(own){if(ROLE==='teacher'){teacherSync(own);return}setTimeout(()=>{const shown=agentMorning();setTimeout(day14,shown?7000:0)},1000);const s=state.students[ME],K='kr_seen_'+ROLE+ME;let seen=0;try{seen=+localStorage.getItem(K)||0}catch(e){}
+function afterSync(own){if(ROLE==='teacher'){teacherSync(own);return}setTimeout(()=>{const shown=agentMorning();setTimeout(day14,shown?7000:0);setTimeout(tkDue,shown?14000:2500)},1000);const s=state.students[ME],K='kr_seen_'+ROLE+ME;let seen=0;try{seen=+localStorage.getItem(K)||0}catch(e){}
   const top=Math.max(0,...s.hist.map(h=>h.ts||0));
   if(!own&&seen)s.hist.filter(h=>h.ts>seen).slice(0,6).reverse().forEach(h=>{const t=(typeof h.p==='number'?'+'+h.p+' · ':h.p+' ')+h.t+(h.who?' · '+h.who:'');notify(t,(s.first||s.name)+': '+t)});
   try{localStorage.setItem(K,Math.max(seen,top))}catch(e){}
@@ -1301,6 +1325,28 @@ $('sgBtn').onclick=()=>{if(!sg.size){toast('בחרו לפחות חבר אחד');
 function renderReqs(){if(!$('grpReqs'))return;const P=(state.cls.reqs||[]).filter(q=>q.st==='pending');const nm=i=>state.students[i]?state.students[i].name:'';
   $('grpReqs').innerHTML=P.length?'<div style="font:900 16px Gush;margin-bottom:6px">בקשות מהתלמידים</div>'+P.map(q=>`<div class="arow" style="grid-template-columns:1fr 58px 58px;background:rgba(255,255,255,.55);border-radius:14px;padding:8px;margin-bottom:8px"><span style="font:400 14px Gush"><b>${q.list.map(nm).map(esc).join(', ')}</b><small style="display:block;opacity:.7">${q.sub?'מבחן ב'+esc(q.sub)+' · ':''}${esc(q.treat)}</small></span><button class="btn" style="padding:8px 0;font-size:14px" onclick="if(act({t:'grpOk',id:'${q.id}'})){confetti(160);toast('✅ אושר! כל אחד קיבל +10')}">אשר</button><button class="btn ghost" style="padding:8px 0;font-size:14px;background:rgba(18,54,31,.12)!important;color:#12361f!important" onclick="act({t:'grpNo',id:'${q.id}'})">דחה</button></div>`).join(''):''}
 const _render13=render;render=function(){_render13();renderSG();renderReqs()};
+
+// ===== manual points from the teacher =====
+$('mqGo').onclick=()=>{const t=$('mqT').value.trim(),p=+$('mqP').value;if(!t){toast('כתוב על מה הנקודות');return}if(!(p>0&&p<=50)){toast('ניקוד בין 1 ל-50');return}
+  if(act({t:'award',s:state.cur,p,tx:t})){confetti(p>=6?160:90);toast(`+${p} ל${me().name} · ${t}`);$('mqT').value=''}};
+// ===== greeting by time of day =====
+function todAll(){const t=tod();document.querySelectorAll('.todT').forEach(e=>e.textContent=t)}todAll();setInterval(todAll,60000);
+// ===== 19:00 and later: "did you talk with Hashem today?" =====
+function tkShow(kind){const s=me(),P=$('tkpop');if(!P)return;const at=(s.tk&&s.tk.at)||'21:30';
+  $('tkBox').innerHTML=kind==='remind'?`<div style="font-size:54px">🙏</div><div class="tt">הגיע הזמן שקבעת</div><div class="ts">קבעת לדבר עם ה׳ ב-${esc(at)}. כמה דקות רק אתה והוא.</div><button class="tbtn ty" data-a="done">דיברתי ✓</button><button class="tbtn tn" data-a="later">עוד מעט</button>`
+   :`<div style="font-size:54px">🌙</div><div class="tt">אחי, דיברת<br>עם ה׳ היום?</div><div class="ts">כמה דקות של שיחה אישית, במילים שלך. זה הכי חזק שיש.</div><button class="tbtn ty" data-a="done">כן, דיברתי ✓</button><button class="tbtn tn" data-a="pick">עוד לא, אקבע שעה</button><div id="tkPick" style="display:none;margin-top:12px"><input type="time" id="tkAt" value="${esc(at)}"><button class="tbtn ty" data-a="set">קבע לי תזכורת</button></div><button class="tbtn tn" data-a="close" style="background:none;opacity:.7;font-weight:400">לא עכשיו</button>`;
+  P.classList.add('show')}
+function tkDue(){if(ROLE!=='student'||!$('tkpop'))return;const s=me(),T=KR.il(Date.now()),tk=s.tk||{};if(tk.d===TODAY)return;if($('tkpop').classList.contains('show'))return;
+  let seen='';try{seen=localStorage.getItem('kr_tk')||''}catch(e){}
+  if(tk.at&&tk.ad===TODAY){const [h,m]=tk.at.split(':').map(Number);if(T.min>=h*60+m&&seen!==TODAY+'r'){try{localStorage.setItem('kr_tk',TODAY+'r')}catch(e){}tkShow('remind')}return}
+  if(T.min>=19*60&&seen!==TODAY&&seen!==TODAY+'r'){try{localStorage.setItem('kr_tk',TODAY)}catch(e){}tkShow('ask')}}
+document.body.insertAdjacentHTML('beforeend','<div id="tkpop"><div class="tb" id="tkBox"></div></div>');
+$('tkpop').onclick=e=>{const b=e.target.closest('[data-a]');if(!b){if(e.target.id==='tkpop')$('tkpop').classList.remove('show');return}const a=b.dataset.a,P=$('tkpop');
+  if(a==='done'){if(act({t:'talk',s:state.cur,done:1})){P.classList.remove('show');confetti(180);toast('אשריך! 🙏')}}
+  else if(a==='pick'){$('tkPick').style.display='';b.style.display='none'}
+  else if(a==='set'){const v=$('tkAt').value;if(act({t:'talk',s:state.cur,at:v})){P.classList.remove('show');toast(`🔔 נקבע: ${v}. כשתפתח את האפליקציה בשעה הזו אזכיר לך`)}}
+  else P.classList.remove('show')};
+setInterval(tkDue,60000);
 // ===== start =====
 if(ONLINE){$('loader').classList.add('show');api('GET').then(v=>take(v)).catch(offline);
   setInterval(pull,30000);document.addEventListener('visibilitychange',()=>{if(!document.hidden)pull()});addEventListener('online',()=>{flush();pull()})}
