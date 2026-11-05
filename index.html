@@ -635,10 +635,10 @@ body[data-role=teacher] .dhandle{display:block}
 
     <div class="card bg">
       <div class="ch"><i>🎯</i>היעדים שלי במבחנים</div>
-      <div class="sub" style="margin:-8px 0 14px">הצב לעצמך יעד לכל מבחן. עמדת ביעד? <b>+8 למדליה</b> ועוד <b>5 בונוס</b> על המבחן.</div>
+      <div class="sub" style="margin:-8px 0 14px">כשהמחנך פותח מבחן, מציבים לעצמכם יעד. עמדתם ביעד? <b>5 נקודות בונוס</b> על המבחן!</div>
       <div id="goalList"></div>
-      <div class="gform">
-        <select id="gSub"></select>
+      <div class="gform" id="gForm">
+        <div id="gOpen"></div>
         <div class="row" style="margin:12px 2px 2px"><span>היעד שלי:</span><b class="big" style="font-size:34px;margin-right:auto" id="gVal">85</b></div>
         <input type="range" min="65" max="100" step="5" value="85" id="gRange"><div class="sub" style="margin:4px 0 0;font-size:13px">היעד המינימלי הוא 65</div>
         <button class="btn" style="margin-top:12px" id="gAdd">הצב יעד</button>
@@ -772,8 +772,13 @@ body[data-role=teacher] .dhandle{display:block}
     <div class="card b3"><div class="ch"><i>💌</i>הודעת הפתעה</div>
       <textarea id="tMsg" placeholder="שמתי לב שעזרת לחבר היום, כל הכבוד!"></textarea>
       <button class="btn" style="margin-top:10px" id="tMsgBtn">שלח ל<span class="sname"></span></button></div>
-    <div class="card b4"><div class="ch"><i>🎯</i>יעדים במבחנים · הזנת ציון</div>
-      <div id="tGoals"></div></div>
+    <div class="card b4"><div class="ch"><i>🎯</i>יעדים במבחנים</div>
+      <div style="font:700 15px Gush;margin-bottom:6px">פתיחת הצבת יעדים למבחן</div>
+      <div class="tq" style="grid-template-columns:1fr 1fr;margin-top:0"><select id="tsSub" style="border:0;border-radius:12px;padding:10px;font:400 15px Gush"></select><input id="tsSubX" placeholder="או מקצוע אחר"></div>
+      <div class="sub" style="margin:8px 0 4px">התלמידים יכולים להציב יעד עד:</div>
+      <div class="tq" style="grid-template-columns:1fr 1fr 70px;margin-top:0"><input id="tsD" type="date"><input id="tsT" type="time" value="22:00"><button id="tsGo">פתח</button></div>
+      <div id="tsList" style="margin-top:8px"></div>
+      <div id="tGoals" style="margin-top:12px"></div></div>
     <div class="card b5"><div class="ch"><i>🏠</i>מה ההורים סימנו</div>
       <ul class="tl" id="tFeed"></ul></div>
     <div class="card badm"><div class="ch"><i>⚙️</i>ניהול</div>
@@ -856,7 +861,7 @@ function setupRole(){const nav=document.querySelector('.nav');document.body.data
   const s=state.students[ME];document.querySelector('.demo').textContent=ROLE==='teacher'?'מחובר כמחנך':ROLE==='parent'?'הורי '+(s.first||s.name):'';
   $('loader').classList.remove('show')}
 // new things from others (teacher, parents, friends) show up in the bell
-function afterSync(own){if(ROLE==='teacher'){teacherSync(own);return}setTimeout(()=>{const shown=agentMorning();setTimeout(day14,shown?7000:0);setTimeout(tkDue,shown?14000:2500)},1000);const s=state.students[ME],K='kr_seen_'+ROLE+ME;let seen=0;try{seen=+localStorage.getItem(K)||0}catch(e){}
+function afterSync(own){if(ROLE==='teacher'){teacherSync(own);return}setTimeout(()=>{const shown=agentMorning();setTimeout(day14,shown?7000:0);setTimeout(tkDue,shown?14000:2500);setTimeout(goalPop,shown?3000:600)},1000);const s=state.students[ME],K='kr_seen_'+ROLE+ME;let seen=0;try{seen=+localStorage.getItem(K)||0}catch(e){}
   const top=Math.max(0,...s.hist.map(h=>h.ts||0));
   if(!own&&seen)s.hist.filter(h=>h.ts>seen).slice(0,6).reverse().forEach(h=>{const t=(typeof h.p==='number'?'+'+h.p+' · ':h.p+' ')+h.t+(h.who?' · '+h.who:'');notify(t,(s.first||s.name)+': '+t)});
   try{localStorage.setItem(K,Math.max(seen,top))}catch(e){}
@@ -1001,18 +1006,38 @@ const _render=render;render=function(){_render();if($('peerChips'))renderPeer()}
 
 // test goals
 const SUBJ=['תורה','גמרא','משנה','נביא','מתמטיקה','אנגלית','לשון','מדעים','היסטוריה','גיאוגרפיה'];
-$('gSub').innerHTML=SUBJ.map(x=>`<option>${x}</option>`).join('');
 $('gRange').oninput=e=>$('gVal').textContent=e.target.value;
 function gradePts(g){return g>=100?15:g>=90?10:g>=80?6:0}
+function testOpenNow(){return (state.cls.tests||[]).filter(t=>t.until>Date.now())}
+function fmtUntil(u){const d=new Date(u);return `${['א׳','ב׳','ג׳','ד׳','ה׳','ו׳','ש׳'][d.getDay()]} ${d.getDate()}/${d.getMonth()+1} ב-${pad2(d.getHours())}:${pad2(d.getMinutes())}`}
+let gTest=null;
 function renderGoals(){const s=me();
-  $('goalList').innerHTML=s.goals.map(g=>{const hit=g.grade!=null&&g.grade>=g.target;return `<div class="goal ${hit?'hit':''}"><div class="tg">${g.target}</div><div><b>${g.sub}</b><small>${g.grade==null?'היעד שלך: '+g.target+' · בהצלחה! 💪':hit?'קיבלת '+g.grade+', עמדת ביעד! 🎉':'קיבלת '+g.grade+', כמעט! בפעם הבאה 💪'}</small></div></div>`}).join('');
-  const rows=[];state.students.forEach((x,i)=>x.goals.forEach((g,j)=>{if(g.grade==null)rows.push(`<div class="tg-row"><div class="who"><b>${x.name}</b> · ${g.sub}<br><small style="opacity:.8">יעד: ${g.target}</small></div><input type="number" min="0" max="100" placeholder="ציון" id="gr-${i}-${j}"><button class="btn" onclick="setGrade(${i},${j})">עדכן</button></div>`)}));
-  $('tGoals').innerHTML=rows.join('')||'<div class="sub">אין יעדים פתוחים כרגע</div>'}
-$('gAdd').onclick=()=>{const s=me();if(!act({t:'goal',s:state.cur,sub:$('gSub').value,tg:+$('gRange').value}))return;burstAt($('gAdd'),50);toast(`יעד חדש: ${$('gRange').value} ב${$('gSub').value}. אתה יכול! 💪`)};
-function setGrade(i,j){const el=$(`gr-${i}-${j}`),v=+el.value;if(!el.value||v<0||v>100){toast('הזן ציון בין 0 ל-100');return}
-  const x=state.students[i],g=x.goals[j];if(!act({t:'grade',s:i,g:g.id,v}))return;
-  if(v>=g.target){confetti(160);toast(`${x.name} עמד ביעד! +8 למדליה ו-5 בונוס 🎯`)}else toast(`עודכן: ${x.name} קיבל ${v}`)}
-const _render2=render;render=function(){_render2();if($('goalList'))renderGoals()};renderGoals();
+  const stT={pending:'⏳ מחכה לאישור המחנך',ok:'✅ אושר. בהצלחה במבחן! 💪',no:'היעד לא אושר. אפשר לדבר עם המחנך'};
+  $('goalList').innerHTML=s.goals.slice(0,8).map(g=>{const hit=g.res==='hit'||(g.grade!=null&&g.grade>=g.target);const txt=g.res==='hit'?'אלוף! עמדת ביעד, +5 בונוס 🏆':g.res==='miss'?'לא הפעם. במבחן הבא! 💪':g.grade!=null?(hit?'עמדת ביעד! 🎉':'כמעט! בפעם הבאה 💪'):(stT[g.st]||'');
+    return `<div class="goal ${hit?'hit':''}"><div class="tg">${g.target}</div><div><b>${esc(g.sub)}</b><small>${txt}</small></div></div>`}).join('');
+  const open=testOpenNow().filter(t=>{const g=s.goals.find(x=>x.test===t.id);return !g||g.st==='pending'});
+  if(!open.length){$('gOpen').innerHTML='<div class="sub" style="margin:0">כרגע אין מבחן פתוח להצבת יעד. כשהמחנך יפתח, זה יופיע כאן 🎯</div>';$('gForm').querySelectorAll('.row,#gRange,.sub+.sub,#gAdd').forEach(e=>e.style.display='none');$('gRange').nextElementSibling.style.display='none';return}
+  if(!gTest||!open.some(t=>t.id===gTest))gTest=open[0].id;
+  $('gOpen').innerHTML=`<div class="chips wrap">${open.map(t=>`<button class="chip ${t.id===gTest?'on':''}" onclick="gTest='${t.id}';renderGoals()">${esc(t.sub)}</button>`).join('')}</div><div class="sub" style="margin:6px 0 0">אפשר להציב יעד עד ${fmtUntil(open.find(t=>t.id===gTest).until)}</div>`;
+  $('gForm').querySelectorAll('.row,#gRange,#gAdd').forEach(e=>e.style.display='');$('gRange').nextElementSibling.style.display='';
+  const ex=s.goals.find(x=>x.test===gTest);$('gAdd').textContent=ex?'עדכן יעד':'הצב יעד'}
+function renderTGoals(){if(!$('tGoals')||ROLE!=='teacher')return;
+  if(!$('tsSub').options.length){$('tsSub').innerHTML=KR.SUBJ.map(x=>`<option>${x}</option>`).join('');const d=new Date();d.setDate(d.getDate()+1);$('tsD').value=d.getFullYear()+'-'+pad2(d.getMonth()+1)+'-'+pad2(d.getDate())}
+  const T=state.cls.tests||[];$('tsList').innerHTML=T.slice(0,6).map(t=>`<div class="sub" style="margin:3px 0;display:flex;gap:8px;align-items:center"><span style="flex:1">${t.until>Date.now()?'🟢':'⚪️'} <b>${esc(t.sub)}</b> · עד ${fmtUntil(t.until)}</span><button onclick="act({t:'testDel',id:'${t.id}'})" style="border:0;border-radius:9px;background:rgba(0,0,0,.12);padding:4px 10px;font:400 13px Gush">מחק</button></div>`).join('');
+  const P=[],A=[];state.students.forEach((x,i)=>x.goals.forEach(g=>{if(g.st==='pending')P.push([x,i,g]);else if(g.st==='ok'&&!g.res)A.push([x,i,g])}));
+  const row=(x,i,g,btns)=>`<div class="arow" style="grid-template-columns:1fr auto;background:rgba(255,255,255,.18);border-radius:14px;padding:8px 10px;margin-bottom:7px"><span style="font:400 15px Gush"><b>${esc(x.name)}</b> · ${esc(g.sub)} · יעד <b>${g.target}</b></span><span style="display:flex;gap:6px">${btns}</span></div>`;
+  const b=(lbl,js,gold)=>`<button onclick="${js}" style="border:0;border-radius:10px;padding:8px 12px;font:900 14px Gush;${gold?'background:var(--gold);color:#3a2504':'background:rgba(0,0,0,.15);color:inherit'}">${lbl}</button>`;
+  $('tGoals').innerHTML=(P.length?`<div style="font:900 16px Gush;margin-bottom:6px">ממתינים לאישור (${P.length})</div>`+P.map(([x,i,g])=>row(x,i,g,b('אשר',`act({t:'goalOk',s:${i},g:'${g.id}'})`,1)+b('דחה',`act({t:'goalNo',s:${i},g:'${g.id}'})`))).join(''):'<div class="sub">אין יעדים שמחכים לאישור</div>')
+   +(A.length?`<details style="margin-top:12px"><summary style="font:900 16px Gush;cursor:pointer">יעדים מאושרים · אחרי המבחן מסמנים (${A.length})</summary><div style="margin-top:8px">`+A.map(([x,i,g])=>row(x,i,g,b('✓ הגיע',`goalRes(${i},'${g.id}',1)`,1)+b('✗ לא',`goalRes(${i},'${g.id}',0)`))).join('')+'</div></details>':'')}
+function goalRes(i,g,hit){if(act({t:'goalRes',s:i,g,hit}))toast(hit?`🏆 ${state.students[i].name} קיבל +5 בונוס`:'סומן: לא הגיע ליעד')}
+$('tsGo').onclick=()=>{const sub=$('tsSubX').value.trim()||$('tsSub').value,d=$('tsD').value,t=$('tsT').value||'22:00';if(!d){toast('בחר תאריך');return}
+  const u=new Date(d+'T'+t).getTime();if(act({t:'testOpen',sub,until:u})){$('tsSubX').value='';toast(`🎯 נפתח: יעדים ל${sub} עד ${fmtUntil(u)}`)}};
+$('gAdd').onclick=()=>{if(!gTest)return;const v=$('gRange').value,te=(state.cls.tests||[]).find(t=>t.id===gTest);if(!act({t:'goal',s:state.cur,test:gTest,tg:+v}))return;burstAt($('gAdd'),50);toast(`יעד: ${v} ב${te?te.sub:''}. נשלח לאישור המחנך 💪`)};
+// goal reached: pop-up for the student
+function goalPop(){if(ROLE!=='student')return;const s=me();let seen=[];try{seen=JSON.parse(localStorage.getItem('kr_gh')||'[]')}catch(e){}
+  const g=s.goals.find(x=>x.res==='hit'&&!seen.includes(x.id));if(!g)return;seen.push(g.id);try{localStorage.setItem('kr_gh',JSON.stringify(seen.slice(-50)))}catch(e){}
+  $('ovMedal').innerHTML='<div style="font-size:96px">🏆</div>';$('ovTitle').textContent='אלוף! הגעת ליעד שלך!';$('ovText').textContent=`קיבלת 5 נקודות בונוס על המבחן ב${g.sub}`;$('overlay').classList.add('show');confetti(260)}
+const _render2=render;render=function(){_render2();if($('goalList'))renderGoals();renderTGoals()};renderGoals();
 
 
 // sleep

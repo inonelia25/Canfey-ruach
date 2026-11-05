@@ -114,8 +114,19 @@
         C.home = op.list.map(d => { const pp = Math.round(+d[2]); need(String(d[1] || '').trim(), 'לכל פעולה צריך שם'); need(pp > 0 && pp <= 20, 'ניקוד בין 1 ל-20'); return [String(d[0] || '🏡').slice(0, 8), String(d[1]).trim().slice(0, 140), pp]; }); break; }
       case 'peer': { need(r !== 'parent' && own(op.s)); const s = S(op.s), f = S(op.to); need(+op.to !== +op.s); need(s.gave !== T.date, 'כבר נתת היום');
         const why = WHY.includes(op.why) ? op.why : WHY[0]; s.gave = T.date; add(f, 5, why, 'מחבר: ' + s.name); break; }
-      case 'goal': { need(r !== 'parent' && own(op.s)); const s = S(op.s), tg = Math.round(+op.tg); need(SUBJ.includes(op.sub)); need(tg >= 65 && tg <= 100);
-        need(s.goals.filter(g => g.grade == null).length < 8, 'יותר מדי יעדים פתוחים'); s.goals.unshift({ id: hid('g'), sub: op.sub, target: tg, grade: null }); break; }
+      case 'goal': { need(r !== 'parent' && own(op.s)); const s = S(op.s), tg = Math.round(+op.tg); need(tg >= 65 && tg <= 100, 'היעד צריך להיות בין 65 ל-100');
+        const te = (st.cls.tests || []).find(x => x.id === op.test); need(te, 'אין כרגע מבחן פתוח להצבת יעד'); need(isT || op.ts <= te.until, 'הזמן להצבת יעד למבחן הזה נגמר');
+        const ex = s.goals.find(g => g.test === te.id);
+        if (ex) { need(ex.st === 'pending', 'המחנך כבר אישר את היעד שלך'); ex.target = tg; }
+        else s.goals.unshift({ id: hid('g'), test: te.id, sub: te.sub, target: tg, grade: null, st: 'pending' });
+        if (s.goals.length > 40) s.goals.length = 40; break; }
+      case 'testOpen': { need(isT); const sub = String(op.sub || '').trim().slice(0, 40), u = +op.until; need(sub, 'בחר מקצוע'); need(u > op.ts, 'השעה שבחרת כבר עברה');
+        const T0 = st.cls.tests || (st.cls.tests = []); T0.unshift({ id: hid('t'), sub, until: u, ts: op.ts }); if (T0.length > 30) T0.length = 30; break; }
+      case 'testDel': { need(isT); st.cls.tests = (st.cls.tests || []).filter(x => x.id !== op.id); break; }
+      case 'goalOk': case 'goalNo': { need(isT); const s = S(op.s), g = s.goals.find(x => x.id === op.g); need(g && g.st === 'pending', 'היעד כבר טופל');
+        g.st = op.t === 'goalOk' ? 'ok' : 'no'; break; }
+      case 'goalRes': { need(isT); const s = S(op.s), g = s.goals.find(x => x.id === op.g); need(g && g.st === 'ok' && !g.res, 'היעד כבר סומן');
+        g.res = op.hit ? 'hit' : 'miss'; if (op.hit) add(s, 5, `בונוס: עמד ביעד במבחן ב${g.sub} (${g.target})`, TEACHER); break; }
       case 'grade': { need(isT); const s = S(op.s), g = s.goals.find(x => x.id === op.g); need(g && g.grade == null); const v = Math.round(+op.v); need(v >= 0 && v <= 100);
         g.grade = v; if (v >= g.target) { add(s, 8, `עמד ביעד ב${g.sub} (${v}/${g.target}), למדליה`, TEACHER); add(s, 5, `בונוס מבחן ב${g.sub}`, TEACHER); } break; }
       case 'sleepSet': { need(own(op.s)); const s = S(op.s), ok = x => /^\d\d:\d\d$/.test(x); if (ok(op.bed)) s.sleep.bed = op.bed; if (ok(op.wake)) s.sleep.wake = op.wake; break; }
