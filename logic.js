@@ -43,6 +43,7 @@
   function syncRoster(st, roster) {
     const by = {}; st.students.forEach(s => by[s.id] = s);
     if (!st.cls.cfg) st.cls.cfg = defCfg();
+    if (!st.cls.mig1) { st.students.forEach(s => { s.goals = (s.goals || []).filter(g => KEEP_SUB.test(g.sub || '')); }); st.cls.mig1 = 1; }
     st.students = roster.map(r => { const s = by[r.id] || newStudent(r.id, r.name); s.name = r.name; s.first = r.first || r.name.split(' ')[0]; if (r.deal && !s.dealSet) { s.deal = r.deal; s.dealSet = 1; } return s; });
     return st;
   }
@@ -52,6 +53,7 @@
   // parents: 2 good deeds a day, 3 on Thursday-Saturday (rule starts 5.11.2026 08:30)
   const HOME_FROM = Date.parse('2026-11-05T06:30:00Z');
   const homeLimit = dow => (dow >= 4 && dow <= 6 ? 3 : 2);
+  const LEGACY_GOALS = Date.parse('2026-11-05T23:20:00Z'), KEEP_SUB = /גמרא|תלמוד/;
   class Bad extends Error {}
   const need = (c, m) => { if (!c) throw new Bad(m || 'לא מורשה'); };
 
@@ -115,6 +117,7 @@
       case 'peer': { need(r !== 'parent' && own(op.s)); const s = S(op.s), f = S(op.to); need(+op.to !== +op.s); need(s.gave !== T.date, 'כבר נתת היום');
         const why = WHY.includes(op.why) ? op.why : WHY[0]; s.gave = T.date; add(f, 5, why, 'מחבר: ' + s.name); break; }
       case 'goal': { need(r !== 'parent' && own(op.s)); const s = S(op.s), tg = Math.round(+op.tg); need(tg >= 65 && tg <= 100, 'היעד צריך להיות בין 65 ל-100');
+        if (!op.test && op.sub && op.ts < LEGACY_GOALS) { if (KEEP_SUB.test(op.sub)) s.goals.unshift({ id: hid('g'), sub: op.sub, target: tg, grade: null, st: 'pending' }); break; }
         const te = (st.cls.tests || []).find(x => x.id === op.test); need(te, 'אין כרגע מבחן פתוח להצבת יעד'); need(isT || op.ts <= te.until, 'הזמן להצבת יעד למבחן הזה נגמר');
         const ex = s.goals.find(g => g.test === te.id);
         if (ex) { need(ex.st === 'pending', 'המחנך כבר אישר את היעד שלך'); ex.target = tg; }
