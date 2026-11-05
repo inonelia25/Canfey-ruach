@@ -20,7 +20,7 @@
     'מבחנים':[['📝','מעל 80 במבחן',6],['🏅','מעל 90 במבחן',10],['💯','100 במבחן',15]],
     'הפתעה':[['⭐','שמתי לב!',5],['🌟','משהו מיוחד',8]] };
   const defCfg = () => ({ prizes: PRIZES.map((p, i) => ({ id: 'p' + i, e: p[0], name: p[1], cost: p[2], stock: null })),
-    cats: JSON.parse(JSON.stringify(CATS)), home: HOME.map(h => h.slice()) });
+    cats: JSON.parse(JSON.stringify(CATS)), home: HOME.map(h => h.slice()), treats: TREATS.slice() });
   const HIST_MAX = 120, FEED_MAX = 150;
 
   // ---- Israel time ----
@@ -43,6 +43,7 @@
   function syncRoster(st, roster) {
     const by = {}; st.students.forEach(s => by[s.id] = s);
     if (!st.cls.cfg) st.cls.cfg = defCfg();
+    if (!st.cls.cfg.treats) st.cls.cfg.treats = TREATS.slice();
     if (!st.cls.mig2) { const k = st.cls.cfg.cats['כיתה'] || (st.cls.cfg.cats['כיתה'] = []); if (!k.some(d => d[1] === 'היה עם ציוד על השולחן')) k.unshift(['🎒', 'היה עם ציוד על השולחן', 3]); st.cls.mig2 = 1; }
     if (!st.cls.mig1) { st.students.forEach(s => { s.goals = (s.goals || []).filter(g => KEEP_SUB.test(g.sub || '')); }); st.cls.mig1 = 1; }
     st.students = roster.map(r => { const s = by[r.id] || newStudent(r.id, r.name); s.name = r.name; s.first = r.first || r.name.split(' ')[0]; if (r.deal && !s.dealSet) { s.deal = r.deal; s.dealSet = 1; } return s; });
@@ -55,6 +56,7 @@
   const HOME_FROM = Date.parse('2026-11-05T06:30:00Z');
   const homeLimit = dow => (dow >= 4 && dow <= 6 ? 3 : 2);
   const LEGACY_GOALS = Date.parse('2026-11-05T23:20:00Z'), KEEP_SUB = /גמרא|תלמוד/;
+  const tparts = t => { const m = String(t).match(/^(\p{Extended_Pictographic}\S*)\s+(.*)$/u); return m ? [m[1], m[2]] : ['🎁', String(t)]; };
   class Bad extends Error {}
   const need = (c, m) => { if (!c) throw new Bad(m || 'לא מורשה'); };
 
@@ -80,7 +82,7 @@
           s.homeCount++; feed({ s: s.name, p: 3, t, who: 'הורים' }); add(s, 3, t, 'ההורים', 1); break; }
       { need(r === 'parent' || isT); need(own(op.s)); const s = S(op.s), h = C.home[op.h]; need(h);
         s.homeCount++; feed({ s: s.name, p: h[2], t: h[1], who: 'הורים' }); s.count[h[1]] = (s.count[h[1]] || 0) + 1; add(s, h[2], h[1], 'ההורים'); break; }
-      case 'zr': { need(isT); (op.list || []).forEach(i => { const s = S(i); if (s.zrDay === T.date) return; s.zrDay = T.date; s.streak++;
+      case 'zr': { need(isT); (op.list || []).forEach(i => { const s = S(i); if (s.zrDay === T.date) return; s.zrDay = T.date; if (s.streakWk !== T.wk) { s.streak = 0; s.streakWk = T.wk; } s.streak++;
           if (s.streak >= 5) { s.zr += 4; s.streak = 0; hist(s, { p: '⚡', t: 'זריזין פרו! 5 ימים ברצף, שווה 8', who: TEACHER, z: 4 }); }
           else { s.zr += 1; hist(s, { p: '☀️', t: 'זריזין, הגעת לפני 7:30', who: TEACHER, z: 1 }); }
           crunch(s); }); break; }
@@ -95,13 +97,15 @@
       case 'grpReq': { need(r !== 'parent' && own(op.s)); const s = S(op.s); const R0 = st.cls.reqs || (st.cls.reqs = []);
         const L = [...new Set([+op.s, ...(op.list || []).map(Number)])]; L.forEach(i => S(i)); need(L.length >= 2, 'בחרו לפחות חבר אחד');
         need(!R0.some(q => q.st === 'pending' && q.by === +op.s), 'כבר שלחת בקשה שמחכה לאישור');
-        R0.unshift({ id: hid('r'), ts: op.ts, by: +op.s, list: L, treat: TREATS.includes(op.treat) ? op.treat : TREATS[0], sub: SUBJ.includes(op.sub) ? op.sub : '', st: 'pending' });
+        R0.unshift({ id: hid('r'), ts: op.ts, by: +op.s, list: L, treat: (C.treats || TREATS).includes(op.treat) ? op.treat : (C.treats || TREATS)[0], sub: SUBJ.includes(op.sub) ? op.sub : '', st: 'pending' });
         if (R0.length > 60) R0.length = 60; break; }
       case 'grpOk': case 'grpNo': { need(isT); const q = (st.cls.reqs || []).find(x => x.id === op.id); need(q && q.st === 'pending', 'הבקשה כבר טופלה');
         q.st = op.t === 'grpOk' ? 'ok' : 'no';
-        if (q.st === 'ok') q.list.forEach(i => { const s = S(i); add(s, 10, 'למד בחבורה למבחן' + (q.sub ? ' ב' + q.sub : ''), TEACHER); hist(s, { p: q.treat.split(' ')[0], t: `למדתם בחבורה למבחן: ${q.treat.slice(3)} עלינו!`, who: TEACHER }); }); break; }
+        if (q.st === 'ok') q.list.forEach(i => { const s = S(i); add(s, 10, 'למד בחבורה למבחן' + (q.sub ? ' ב' + q.sub : ''), TEACHER); hist(s, { p: tparts(q.treat)[0], t: `למדתם בחבורה למבחן: ${tparts(q.treat)[1]} עלינו!`, who: TEACHER }); }); break; }
       case 'talk': { need(r !== 'parent' && own(op.s)); const s = S(op.s); s.tk = s.tk || {};
         if (op.done) { s.tk.d = T.date; s.tk.at = ''; } else { need(/^\d\d:\d\d$/.test(op.at || ''), 'שעה לא תקינה'); s.tk.at = op.at; s.tk.ad = T.date; } break; }
+      case 'cfgTreats': { need(isT); need(Array.isArray(op.list) && op.list.length >= 1 && op.list.length <= 12, 'צריך לפחות פינוק אחד');
+        C.treats = op.list.map(x => String(x || '').trim().slice(0, 40)).filter(Boolean); need(C.treats.length, 'צריך לפחות פינוק אחד'); break; }
       case 'msg': { need(isT); S(op.s).msg = String(op.tx || '').slice(0, 500); break; }
       case 'redeem': { need(r !== 'parent' && own(op.s)); const s = S(op.s), p = C.prizes.find(x => x.id === op.pz); need(p, 'הפרס לא קיים'); need(p.stock == null || p.stock > 0, 'הפרס אזל'); need(s.wallet >= p.cost, 'אין מספיק נקודות');
         s.wallet -= p.cost; if (p.stock != null) p.stock--; hist(s, { p: '🎁', t: 'בחרת פרס: ' + p.name, who: 'בנק הפרסים', w: -p.cost, pz: p.id }); feed({ s: s.name, p: '🎁', t: 'ביקש פרס: ' + p.name, who: 'בנק הפרסים' }); break; }
@@ -194,6 +198,6 @@
     return { date, idx: h % st.students.length, status: 'pending' };
   }
 
-  const KR = { homeLimit, dist, newStudent, defCfg, CATS, HOME, PRIZES, FLAVORS, VALUES, WHY, SUBJ, TREATS, TEACHER, il, init, syncRoster, apply, replay, check, agentFor, Bad };
+  const KR = { tparts, homeLimit, dist, newStudent, defCfg, CATS, HOME, PRIZES, FLAVORS, VALUES, WHY, SUBJ, TREATS, TEACHER, il, init, syncRoster, apply, replay, check, agentFor, Bad };
   G.KR = KR;
 })(typeof window !== 'undefined' ? window : globalThis);
