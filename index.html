@@ -787,7 +787,7 @@ body[data-role=teacher] .dhandle{display:block}
       <div class="tq" style="grid-template-columns:1fr 1fr 70px;margin-top:0"><input id="tsD" type="date"><input id="tsT" type="time" value="22:00"><button id="tsGo">פתח</button></div>
       <div id="tsList" style="margin-top:8px"></div>
       <div id="tGoals" style="margin-top:12px"></div></div>
-    <div class="card b5"><div class="ch"><i>🏠</i>מה ההורים סימנו</div>
+    <div class="card b5"><div class="ch"><i>🏠</i>מה ההורים סימנו היום</div>
       <ul class="tl" id="tFeed"></ul></div>
     <div class="card badm"><div class="ch"><i>⚙️</i>ניהול</div>
       <div class="seg admseg" id="admSeg"><button class="on" data-a="prizes">פרסים</button><button data-a="deeds">ניקוד מחנך</button><button data-a="home">ניקוד הורים</button><button data-a="zr">זריזין קודמים</button><button data-a="loc">מיקום תפילה</button><button data-a="fix">תיקונים לתלמיד</button><button data-a="cls">איפוס</button></div>
@@ -979,7 +979,8 @@ function render(){
   state.zAuto=state.zAuto||new Set();state.students.forEach((x,i)=>{const a=todayArr(x);const k=x.id+'|'+TODAY;if(a&&a.t<=450&&x.zrDay!==TODAY&&!state.zAuto.has(k)){state.zAuto.add(k);state.zToday.add(i)}if(x.zrDay===TODAY)state.zToday.delete(i)});
   if($('zAutoN')){const n=state.students.filter(x=>{const a=todayArr(x);return a&&a.t<=450}).length;$('zAutoN').textContent=n?`${n} נרשמו עד 7:30 וכבר מסומנים. בודקים ולוחצים אישור.`:'עדיין אף אחד לא נרשם עד 7:30 היום.'}
   $('zGrid').innerHTML=state.students.map((x,i)=>x.zrDay===TODAY?`<button class="zs done" disabled><div class="av">✓</div>${x.name}<small>קיבל זריז היום ✓</small></button>`:`<button class="zs ${state.zToday.has(i)?'on':''}" onclick="zt(${i})"><div class="av">${x.name[0]}</div>${x.name}<small>${todayArr(x)?'🕒 '+fmtT(todayArr(x).t)+' · ':''}${x.zr}/15 · רצף ${x.streak}${x.crunches&&x.crunches.length?' · 🍦'+x.crunches.length:''}${x.flavor?' · '+x.flavor:''}</small></button>`).join('');
-  $('tFeed').innerHTML=state.cls.feed.slice(0,8).map(f=>`<li><div class="dot">${typeof f.p==='number'?'+'+f.p:f.p}</div><div><div>${esc(f.s)}: ${esc(f.t)}</div><div class="who">${esc(f.who)}</div></div></li>`).join('')||'<li style="opacity:.8;list-style:none">עדיין אין סימונים מההורים</li>';
+  {const td=state.cls.feed.filter(f=>f.ts&&KR.il(f.ts).date===TODAY);const li=f=>`<li><div class="dot">${typeof f.p==='number'?'+'+f.p:f.p}</div><div><div>${esc(f.s)}: ${esc(f.t)}</div><div class="who">${esc(f.who)} · ${fmtT(KR.il(f.ts).min)}</div></div></li>`;
+   $('tFeed').innerHTML=td.length?td.slice(0,3).map(li).join('')+(td.length>3?`<li style="list-style:none;display:block;padding:0"><details><summary style="cursor:pointer;font:700 15px Gush;padding:6px 0">הצג את כל היום (${td.length})</summary><ul class="tl" style="margin:6px 0 0;padding:0">${td.slice(3).map(li).join('')}</ul></details></li>`:''):'<li style="opacity:.8;list-style:none">היום עדיין אין סימונים מההורים</li>'}
 }
 
 function pick(i){state.cur=i;render()}

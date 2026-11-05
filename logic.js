@@ -21,7 +21,7 @@
     'הפתעה':[['⭐','שמתי לב!',5],['🌟','משהו מיוחד',8]] };
   const defCfg = () => ({ prizes: PRIZES.map((p, i) => ({ id: 'p' + i, e: p[0], name: p[1], cost: p[2], stock: null })),
     cats: JSON.parse(JSON.stringify(CATS)), home: HOME.map(h => h.slice()) });
-  const HIST_MAX = 120, FEED_MAX = 60;
+  const HIST_MAX = 120, FEED_MAX = 150;
 
   // ---- Israel time ----
   const fmt = new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Jerusalem', year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', hourCycle: 'h23', weekday: 'short' });
