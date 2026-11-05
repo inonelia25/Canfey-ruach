@@ -546,7 +546,7 @@ body[data-role=teacher] .dhandle{display:block}
 
 <div class="loader" id="loader"><div class="lc"></div><div id="ldTxt">טוען את כנפי רוח...</div></div>
 <div class="offl" id="offl">אין חיבור כרגע · הפעולות יישמרו כשהחיבור יחזור</div>
-<button class="dhandle" id="dHandle" aria-label="בחירת תלמיד">👤 <b id="dCur"></b></button>
+<button class="dhandle" id="dHandle" aria-label="בחירת תלמיד"><b>שמות</b></button>
 <div class="dback" id="dBack"></div><div class="drawer" id="drawer"><h3>בחירת תלמיד</h3><div class="dsub">אפשר גם למשוך מהקצה הימני של המסך</div><div class="dlist" id="dList"></div></div>
 <nav class="nav">
   <button data-r="student" class="on">תלמיד</button>
@@ -1313,7 +1313,7 @@ const _render11=render;render=function(){_render11();if(!dirty&&!($('admBody')&&
 // ===== teacher: student drawer, pulled from the right edge =====
 function dOpen(){dRender();$('drawer').classList.add('on');$('dBack').classList.add('on');const on=$('dList').querySelector('.on');if(on)on.scrollIntoView({block:'center'})}
 function dClose(){$('drawer').classList.remove('on');$('dBack').classList.remove('on');$('drawer').style.transform=''}
-function dRender(){$('dCur').textContent=FIRST[me().name]||me().name;$('dList').innerHTML=state.students.map((x,i)=>`<button class="${i===state.cur?'on':''}" data-i="${i}"><span class="av">${esc((x.name||' ')[0])}</span>${esc(x.name)}<small>${x.points}</small></button>`).join('')}
+function dRender(){$('dList').innerHTML=state.students.map((x,i)=>`<button class="${i===state.cur?'on':''}" data-i="${i}"><span class="av">${esc((x.name||' ')[0])}</span>${esc(x.name)}<small>${x.points}</small></button>`).join('')}
 $('dHandle').onclick=dOpen;$('dBack').onclick=dClose;
 $('dList').onclick=e=>{const b=e.target.closest('[data-i]');if(!b)return;pick(+b.dataset.i);if(!dirty)admRender();dRender();setTimeout(dClose,120);toast('👤 '+me().name)};
 (function(){let sx=null,sy=0,mode='',dx=0;const dr=$('drawer');
@@ -1322,7 +1322,7 @@ $('dList').onclick=e=>{const b=e.target.closest('[data-i]');if(!b)return;pick(+b
   addEventListener('touchmove',e=>{if(sx==null)return;const t=e.touches[0];dx=t.clientX-sx;if(Math.abs(t.clientY-sy)>Math.abs(dx)&&mode==='close'){sx=null;return}
     const w=dr.offsetWidth;dr.classList.add('drag');if(mode==='open'){if(!dr.classList.contains('on')){dRender()}dr.style.transform=`translateX(${Math.max(0,w+dx)}px)`}else dr.style.transform=`translateX(${Math.max(0,dx)}px)`},{passive:true});
   addEventListener('touchend',()=>{if(sx==null)return;dr.classList.remove('drag');dr.style.transform='';if(mode==='open'&&dx<-50)dOpen();else if(mode==='close'&&dx>60)dClose();sx=null;dx=0})})();
-const _render12=render;render=function(){_render12();if(ROLE==='teacher'&&$('dCur'))$('dCur').textContent=FIRST[me().name]||me().name};
+
 
 // ===== teacher: pop-up when parents report a good deed / Aramaic words =====
 function popFeed(items){let box=$('fpop');if(!box){box=document.createElement('div');box.id='fpop';document.body.appendChild(box);box.onclick=()=>box.classList.remove('show')}
