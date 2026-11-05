@@ -534,6 +534,11 @@ body[data-role=teacher] .dhandle{display:block}
 .badge .ic:before{display:none!important}
 .tl .dot{box-shadow:none!important}
 .zs .av,.card .zs .av{box-shadow:none!important}
+
+.jump{position:sticky;top:0;z-index:50;display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;margin:10px -20px 0;padding:10px 20px calc(10px);background:rgba(11,61,74,.82);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);padding-top:calc(10px + env(safe-area-inset-top))}
+.jump::-webkit-scrollbar{display:none}
+.jump button{flex:none;border:0;border-radius:12px;padding:8px 13px;font:700 14px Gush;background:rgba(255,255,255,.12);color:#fff;white-space:nowrap}
+.jump button.on{background:#d2a24a;color:#2e1d04}
 </style>
 </head>
 <body>
@@ -742,6 +747,7 @@ body[data-role=teacher] .dhandle{display:block}
   <!-- TEACHER -->
   <section id="v-teacher" class="hide">
     <div class="lead"><span class="todT">בוקר טוב</span>, <span>ינון אליה</span></div>
+    <div class="jump" id="tJump"></div>
     <div class="card b1"><div class="ch"><i>⚡</i>נקודות מהירות</div>
       <div class="chips" id="stuChips"></div>
       <div class="chips" id="catChips"></div>
@@ -1381,6 +1387,15 @@ $('tkpop').onclick=e=>{const b=e.target.closest('[data-a]');if(!b){if(e.target.i
   else if(a==='set'){const v=$('tkAt').value;if(act({t:'talk',s:state.cur,at:v})){P.classList.remove('show');toast(`🔔 נקבע: ${v}. כשתפתח את האפליקציה בשעה הזו אזכיר לך`)}}
   else P.classList.remove('show')};
 setInterval(tkDue,60000);
+
+// ===== teacher: jump bar to every section =====
+(function(){const bar=$('tJump');if(!bar)return;const cards=[...document.querySelectorAll('#v-teacher > .card')];
+  const name=c=>{const h=c.querySelector('.ch');if(!h)return '';const t=h.cloneNode(true);t.querySelectorAll('i,.sname').forEach(x=>x.remove());return t.textContent.replace(/[·:].*$/,'').trim()};
+  const SHORT={'נקודות מהירות':'נקודות','הסוכן X של היום':'הסוכן X','זריזין היום':'זריזין','יוזמה מבורכת':'יוזמה','לומדים בחבורה למבחן':'חבורה','דוח הגעה לתפילה':'הגעה לתפילה','מילים בארמית':'ארמית','הודעת הפתעה':'הודעה','יעדים במבחנים':'יעדים','מה ההורים סימנו היום':'הורים','ניהול':'ניהול'};
+  bar.innerHTML=cards.map((c,i)=>{const n=name(c);return n?`<button data-i="${i}">${esc(SHORT[n]||n)}</button>`:''}).join('');
+  bar.onclick=e=>{const b=e.target.closest('button');if(!b)return;const c=cards[+b.dataset.i];scrollTo({top:c.getBoundingClientRect().top+scrollY-bar.offsetHeight-6,behavior:'smooth'})};
+  addEventListener('scroll',()=>{if($('v-teacher').classList.contains('hide'))return;let cur=0;const y=bar.offsetHeight+30;cards.forEach((c,i)=>{if(c.getBoundingClientRect().top<=y)cur=i});
+    bar.querySelectorAll('button').forEach(b=>{const on=+b.dataset.i===cur;if(on&&!b.classList.contains('on'))b.scrollIntoView({inline:'center',block:'nearest'});b.classList.toggle('on',on)})},{passive:true})})();
 // ===== start =====
 if(ONLINE){$('loader').classList.add('show');api('GET').then(v=>take(v)).catch(offline);
   setInterval(pull,30000);document.addEventListener('visibilitychange',()=>{if(!document.hidden)pull()});addEventListener('online',()=>{flush();pull()})}
