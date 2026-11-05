@@ -49,6 +49,9 @@
 
   function dist(a, b, c, d) { const R = 6371000, t = x => x * Math.PI / 180, dLa = t(c - a), dLo = t(d - b);
     const h = Math.sin(dLa / 2) ** 2 + Math.cos(t(a)) * Math.cos(t(c)) * Math.sin(dLo / 2) ** 2; return 2 * R * Math.asin(Math.sqrt(h)); }
+  // parents: 2 good deeds a day, 3 on Thursday-Saturday (rule starts 5.11.2026 08:30)
+  const HOME_FROM = Date.parse('2026-11-05T06:30:00Z');
+  const homeLimit = dow => (dow >= 4 && dow <= 6 ? 3 : 2);
   class Bad extends Error {}
   const need = (c, m) => { if (!c) throw new Bad(m || 'לא מורשה'); };
 
@@ -68,10 +71,12 @@
     switch (op.t) {
       case 'award': { need(isT); const s = S(op.s), p = Math.round(+op.p); need(p > 0 && p <= 50, 'ניקוד לא תקין');
         const t = String(op.tx || '').slice(0, 140); need(t); s.count[t] = (s.count[t] || 0) + 1; add(s, p, t, TEACHER); break; }
-      case 'home': { need(r === 'parent' || isT); need(own(op.s)); const s = S(op.s), h = C.home[op.h]; need(h);
+      case 'home': case 'other': if (r === 'parent' && op.ts >= HOME_FROM) { const s0 = S(op.s), used = (s0.hd && s0.hd[T.date]) || 0, lim = homeLimit(T.dow);
+          need(used < lim, `אפשר לסמן עד ${lim} מעשים ביום. מחר אפשר שוב 🙂`); s0.hd = { [T.date]: used + 1 }; }
+        if (op.t === 'other') { need(r === 'parent' || isT); need(own(op.s)); const s = S(op.s), t = String(op.tx || '').trim().slice(0, 140); need(t, 'כתבו מה הוא עשה');
+          s.homeCount++; feed({ s: s.name, p: 3, t, who: 'הורים' }); add(s, 3, t, 'ההורים', 1); break; }
+      { need(r === 'parent' || isT); need(own(op.s)); const s = S(op.s), h = C.home[op.h]; need(h);
         s.homeCount++; feed({ s: s.name, p: h[2], t: h[1], who: 'הורים' }); s.count[h[1]] = (s.count[h[1]] || 0) + 1; add(s, h[2], h[1], 'ההורים'); break; }
-      case 'other': { need(r === 'parent' || isT); need(own(op.s)); const s = S(op.s), t = String(op.tx || '').trim().slice(0, 140); need(t, 'כתבו מה הוא עשה');
-        s.homeCount++; feed({ s: s.name, p: 3, t, who: 'הורים' }); add(s, 3, t, 'ההורים', 1); break; }
       case 'zr': { need(isT); (op.list || []).forEach(i => { const s = S(i); if (s.zrDay === T.date) return; s.zrDay = T.date; s.streak++;
           if (s.streak >= 5) { s.zr += 4; s.streak = 0; hist(s, { p: '⚡', t: 'זריזין פרו! 5 ימים ברצף, שווה 8', who: TEACHER, z: 4 }); }
           else { s.zr += 1; hist(s, { p: '☀️', t: 'זריזין, הגעת לפני 7:30', who: TEACHER, z: 1 }); }
@@ -172,6 +177,6 @@
     return { date, idx: h % st.students.length, status: 'pending' };
   }
 
-  const KR = { dist, newStudent, defCfg, CATS, HOME, PRIZES, FLAVORS, VALUES, WHY, SUBJ, TREATS, TEACHER, il, init, syncRoster, apply, replay, check, agentFor, Bad };
+  const KR = { homeLimit, dist, newStudent, defCfg, CATS, HOME, PRIZES, FLAVORS, VALUES, WHY, SUBJ, TREATS, TEACHER, il, init, syncRoster, apply, replay, check, agentFor, Bad };
   G.KR = KR;
 })(typeof window !== 'undefined' ? window : globalThis);

@@ -688,7 +688,7 @@ body[data-role=teacher] .dhandle{display:block}
   <section id="v-parent" class="hide">
     <div class="lead">שלום להורים של <span class="sname gold-t"></span></div>
     <div class="leadsub">ראיתם משהו טוב בבית? סמנו, והנקודות נכנסות מיד.</div>
-    <div class="card b1"><div class="ch"><i>🏡</i>מה הוא עשה?</div><div class="deeds" id="homeDeeds"></div></div>
+    <div class="card b1"><div class="ch"><i>🏡</i>מה הוא עשה?</div><div class="sub" id="homeLeft" style="margin:-6px 0 10px;font-weight:700"></div><div class="deeds" id="homeDeeds"></div></div>
     <div class="card b2"><div class="ch"><i>✍️</i>משהו אחר שהוא עשה</div>
       <textarea id="otherTxt" placeholder="למשל: הכין ארוחת ערב לכל המשפחה"></textarea>
       <div class="row" style="margin:14px 4px 4px"><span>כל עזרה בבית שווה</span><b class="gold-t big" style="font-size:32px;margin-right:auto" id="otherVal">3</b></div>
@@ -933,6 +933,9 @@ function render(){
   $('hist').innerHTML=s.hist.slice(0,7).map(h=>`<li class="${!first&&!SEEN.has(h.id)?'new':''}"><div class="dot">${typeof h.p==='number'?'+'+h.p:h.p}</div><div><div class="${h.q?'q':''}">${h.q?'"'+esc(h.t)+'"':esc(h.t)}</div><div class="who">${esc(h.who)}</div></div></li>`).join('');
   s.hist.forEach(h=>SEEN.add(h.id));
   $('prizes').innerHTML=PRIZES.map((p,i)=>{const out=p.stock===0,lack=s.wallet<p.cost;return `<div class="prize ${out?'out':''}"><div class="img">${esc(p.e)}</div><b>${esc(p.name)}</b><div class="cost">${p.cost} נקודות${p.stock!=null&&!out?` · נשארו ${p.stock}`:''}</div><button class="btn" ${lack||out?'disabled':''} onclick="redeem(${i})">${out?'אזל':lack?'עוד '+(p.cost-s.wallet):'אני רוצה!'}</button></div>`}).join('');
+  if($('homeLeft')){const T=KR.il(Date.now()),lim=KR.homeLimit(T.dow),used=(s.hd&&s.hd[T.date])||0,left=Math.max(0,lim-used);
+    $('homeLeft').textContent=ROLE==='parent'?(left?`אפשר לסמן היום עוד ${left} מתוך ${lim}${lim===3?' · בחמישי עד שבת אפשר 3':' · בחמישי עד שבת אפשר 3'}`:`סימנתם היום ${lim} מעשים טובים. מחר אפשר שוב 🙂`):'';
+    document.querySelectorAll('#homeDeeds .deed,#otherBtn').forEach(b=>b.style.opacity=ROLE==='parent'&&!left?.45:'')}
   if($('homeDeeds'))$('homeDeeds').innerHTML=HOME.map((d,i)=>`<button class="deed" data-h="${i}" data-p="${d[2]}"><span class="e">${esc(d[0])}</span>${esc(d[1])}<span class="p">+${d[2]}</span></button>`).join('');
   $('pPts').textContent=s.wallet+' (סה״כ '+s.points+')';$('pLvl').textContent=L.name;$('pZr').textContent=Math.min(s.zr,15)+' / 15';
   $('stuChips').innerHTML=state.students.map((x,i)=>`<button class="chip ${i===state.cur?'on':''}" onclick="pick(${i})">${x.name}</button>`).join('');
