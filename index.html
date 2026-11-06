@@ -558,6 +558,22 @@ body[data-role=teacher] .dhandle{display:block}
 #v-teacher #tDeeds .deed .e{width:40px;height:40px;margin:0;font-size:21px;border-radius:11px!important;flex:none;background:rgba(255,255,255,.2)}
 #v-teacher #tDeeds .deed .t{flex:1}
 #v-teacher #tDeeds .deed .p{flex:none;margin:0;background:#fff;color:#0b3d4a;border-radius:10px;padding:5px 10px;font:900 15px Gush;display:inline-block}
+
+#peWho{display:flex;align-items:center;gap:10px;background:rgba(255,255,255,.55);border-radius:16px;padding:10px 12px;margin:4px 0 12px}
+#peWho .av{width:40px;height:40px;border-radius:12px;background:#0D614A;color:#fff;display:grid;place-items:center;font:900 18px Gush;flex:none}
+#peWho b{font:900 19px Gush;flex:1;color:#12361f}#peWho b.empty{font-weight:400;opacity:.6}
+#peWho button{border:0;border-radius:11px;padding:8px 14px;font:700 14px Gush;background:#0D614A;color:#fff}
+#peerWhy{display:flex!important;flex-direction:column;gap:7px;overflow:visible!important}
+#peerWhy .pw{display:flex;align-items:center;gap:12px;width:100%;border:0;text-align:right;background:rgba(255,255,255,.5);border-radius:14px;padding:9px 10px;font:700 15px Gush;color:#12361f}
+#peerWhy .pw:active{transform:scale(.98)}#peerWhy .pw:disabled{opacity:.45}
+#peerWhy .pw .e{width:40px;height:40px;border-radius:11px;background:rgba(255,255,255,.7);display:grid;place-items:center;font-size:21px;flex:none}
+#peerWhy .pw .t{flex:1}#peerWhy .pw .p{background:#0D614A;color:#fff;border-radius:10px;padding:5px 10px;font:900 15px Gush}
+#peerBtn{display:none}#peNote{font:700 14px Gush;color:#0D614A;margin-top:10px;text-align:center}
+#pePick{position:fixed;inset:0;z-index:80;background:rgba(0,15,25,.45);display:none;align-items:flex-end}
+#pePick.on{display:flex}#pePick .sh{background:#f3f7f5;width:100%;max-height:72vh;border-radius:24px 24px 0 0;padding:16px 12px calc(16px + env(safe-area-inset-bottom));overflow-y:auto}
+#pePick h3{font:900 20px Gush;color:#12361f;margin:2px 8px 10px}
+#pePick .gl{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+#pePick .gl button{border:0;border-radius:12px;padding:12px 8px;font:700 15px Gush;background:#fff;color:#12361f;text-align:right}
 </style>
 </head>
 <body>
@@ -680,7 +696,8 @@ body[data-role=teacher] .dhandle{display:block}
     <div class="card b6">
       <div class="ch"><i>🤝</i>תן כוח לחבר</div>
       <div class="sub" style="margin:-8px 0 12px">ראית חבר שעשה משהו טוב? פעם ביום אתה יכול לתת לו 5 נקודות.</div>
-      <div class="chips" id="peerChips"></div>
+      <div id="peWho"><span class="av" id="peAv">?</span><b id="peName">בחר חבר</b><button onclick="peOpen()">בחר חבר</button></div>
+      <div class="chips" id="peerChips" style="display:none"></div>
       <div class="chips" id="peerWhy"></div>
       <button class="btn" id="peerBtn" style="margin-top:6px">שלח לחבר</button>
     </div>
@@ -1031,11 +1048,18 @@ renderCats();render();greet();
 
 // peer kudos
 const WHY=['עזר לי בשיעור','למד איתי','היה חבר טוב','שיתף אותי','עודד אותי'];let peerTo=null,peerWhy=WHY[0];
-function renderPeer(){const s=me();$('peerChips').innerHTML=state.students.map((x,i)=>i===state.cur?'':`<button class="chip peer ${peerTo===i?'on':''}" data-i="${i}">${x.name}</button>`).join('');
-  $('peerWhy').innerHTML=WHY.map(w=>`<button class="chip ${w===peerWhy?'on':''}" data-w="${w}">${w}</button>`).join('');
+const WHYE={'עזר לי בשיעור':'🤝','למד איתי':'📖','היה חבר טוב':'💛','שיתף אותי':'🎁','עודד אותי':'💪'};let peWant=null;
+function peOpen(){let P=$('pePick');if(!P){document.body.insertAdjacentHTML('beforeend','<div id="pePick"><div class="sh"><h3>למי לתת כוח?</h3><div class="gl" id="peGl"></div></div></div>');P=$('pePick');
+    P.onclick=e=>{const b=e.target.closest('[data-i]');if(b){peerTo=+b.dataset.i;P.classList.remove('on');renderPeer();if(peWant){const w=peWant;peWant=null;peSend(w)}}else if(e.target===P){P.classList.remove('on');peWant=null}}}
+  $('peGl').innerHTML=state.students.map((x,i)=>i===state.cur?'':`<button data-i="${i}">${esc(x.name)}</button>`).join('');P.classList.add('on')}
+function peSend(w){const s=me();if(s.gaveToday)return;if(peerTo===null){peWant=w;peOpen();return}const f=state.students[peerTo];if(!act({t:'peer',s:state.cur,to:peerTo,why:w}))return;
+  burstAt($('peerWhy'),70);toast(`יישר כוח! שלחת ל${f.name} +5 💙`);peerTo=null;renderPeer()}
+function renderPeer(){const s=me();const f=peerTo!==null?state.students[peerTo]:null;
+  $('peName').textContent=f?f.name:'בחר חבר';$('peName').className=f?'':'empty';$('peAv').textContent=f?(f.name||' ')[0]:'?';$('peWho').querySelector('button').textContent=f?'החלף':'בחר חבר';$('peWho').style.display=s.gaveToday?'none':'';
+  $('peerWhy').innerHTML=WHY.map(w=>`<button class="pw" data-w="${w}" ${s.gaveToday?'disabled':''}><span class="e">${WHYE[w]||'⭐'}</span><span class="t">${w}</span><span class="p">+5</span></button>`).join('')+(s.gaveToday?'<div id="peNote">כבר נתת היום, מחר עוד פעם 💙</div>':'');
   const b=$('peerBtn');b.disabled=!!s.gaveToday;b.textContent=s.gaveToday?'כבר נתת היום, מחר עוד פעם 💙':(peerTo===null?'בחר חבר':`שלח ל${state.students[peerTo].name} +5`)}
 $('peerChips').onclick=e=>{const c=e.target.closest('[data-i]');if(c){peerTo=+c.dataset.i;renderPeer()}};
-$('peerWhy').onclick=e=>{const c=e.target.closest('[data-w]');if(c){peerWhy=c.dataset.w;renderPeer()}};
+$('peerWhy').onclick=e=>{const c=e.target.closest('[data-w]');if(c&&!c.disabled)peSend(c.dataset.w)};
 $('peerBtn').onclick=()=>{const s=me();if(s.gaveToday||peerTo===null)return;const f=state.students[peerTo];if(!act({t:'peer',s:state.cur,to:peerTo,why:peerWhy}))return;
   burstAt($('peerBtn'),70);toast(`יישר כוח! שלחת ל${f.name} +5 💙`);peerTo=null;renderPeer()};
 const _render=render;render=function(){_render();if($('peerChips'))renderPeer()};renderPeer();
