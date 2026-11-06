@@ -1001,7 +1001,7 @@ function render(){
   $('lvlName').innerHTML=`מדליית <span style="color:${L.t}">${L.name}</span>`;
   const pn=$('ptsNum');if(+pn.textContent!==s.wallet&&pn.textContent!=='0'){pn.classList.remove('bump');void pn.offsetWidth;pn.classList.add('bump')}animNum(pn,s.wallet);$('life').innerHTML=`סה״כ צברת מתחילת השנה: <b>${s.points}</b> · המדליה לא יורדת לעולם 🏅`;
   $('lvlBar').style.width=(frac*100)+'%';
-  $('lvlNext').innerHTML=N?`הסמל מתמלא ב<span style="color:${N.t}">${N.name}</span> · עוד ${N.min-s.points} נקודות`:'הגעת לפסגה 💎';
+  $('lvlNext').innerHTML=N?`הכנפיים מתמלאות לפי כל מה שצברת: <b>${s.points}</b> מתוך ${N.min} · עוד ${N.min-s.points} ל<span style="color:${N.t}">${N.name}</span>`:'הכנפיים מלאות! הגעת לפסגה 💎';
   // zrizin
   $('zrNum').textContent=Math.min(s.zr,15);$('ice').outerHTML=iceSVG(s.zr,s.flavor);
   $('zrCheer').textContent=s.zr>=15?'הקראנץ\' שלך!':ZR_CHEER[s.zr%ZR_CHEER.length];$('zrFlavor').textContent=s.flavor?'הטעם שלך: '+s.flavor+' 🍦':'';
@@ -1372,7 +1372,7 @@ const _render11=render;render=function(){_render11();if(!dirty&&!($('admBody')&&
 // ===== teacher: student drawer, pulled from the right edge =====
 function dOpen(){dRender();$('drawer').classList.add('on');$('dBack').classList.add('on');const on=$('dList').querySelector('.on');if(on)on.scrollIntoView({block:'center'})}
 function dClose(){$('drawer').classList.remove('on');$('dBack').classList.remove('on');$('drawer').style.transform=''}
-function dRender(){$('dList').innerHTML=state.students.map((x,i)=>`<button class="${i===state.cur?'on':''}" data-i="${i}"><span class="av">${esc((x.name||' ')[0])}</span>${esc(x.name)}<small>${x.points}</small></button>`).join('')}
+function dRender(){$('dList').innerHTML=state.students.map((x,i)=>`<button class="${i===state.cur?'on':''}" data-i="${i}"><span class="av">${esc((x.name||' ')[0])}</span>${esc(x.name)}<small>${x.wallet} לשימוש · ${x.points} סה״כ</small></button>`).join('')}
 $('dHandle').onclick=dOpen;$('dBack').onclick=dClose;
 $('dList').onclick=e=>{const b=e.target.closest('[data-i]');if(!b)return;pick(+b.dataset.i);if(!dirty)admRender();dRender();setTimeout(dClose,120);toast('👤 '+me().name)};
 (function(){let sx=null,sy=0,mode='',dx=0;const dr=$('drawer');
