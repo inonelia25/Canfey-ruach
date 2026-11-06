@@ -32,7 +32,7 @@
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html,body{margin:0}
 body{font-family:Gush,system-ui,sans-serif;font-weight:400;color:#fff;
-  background:linear-gradient(180deg,rgba(67,193,204,.5) 0%,rgba(28,110,150,.18) 28%,rgba(8,28,58,.6) 100%),url(bg2.jpg) center/cover fixed,#123d66;
+  background:linear-gradient(180deg,rgba(67,193,204,.5) 0%,rgba(28,110,150,.18) 28%,rgba(8,28,58,.6) 100%),#3fb3c2;
   padding:env(safe-area-inset-top) 0 calc(110px + env(safe-area-inset-bottom));min-height:100vh}
 .wrap{max-width:520px;margin:0 auto;padding:16px 20px}
 button{font-family:inherit}
@@ -180,7 +180,7 @@ canvas#cf{position:fixed;inset:0;pointer-events:none;z-index:40}
 
 /* === v4: texture band on top, colorful blue cards === */
 html{background:#61d0df}body{background:transparent!important}
-.sky{position:absolute;top:0;left:0;right:0;height:100vh;background:url(bg2.jpg) center top/cover;-webkit-mask:linear-gradient(#000 58%,transparent);mask:linear-gradient(#000 58%,transparent);z-index:-1}
+.sky{position:absolute;top:0;left:0;right:0;height:100vh;background:url(bg5.jpg) center top/cover;-webkit-mask:linear-gradient(#000 86%,transparent);mask:linear-gradient(#000 86%,transparent);z-index:-1}
 .card{position:relative;border-radius:30px;padding:20px 18px 22px;margin-top:18px;overflow:hidden;box-shadow:0 14px 30px rgba(0,10,30,.35),inset 0 1px 0 rgba(255,255,255,.35)}
 .card:before{content:"";position:absolute;width:220px;height:220px;border-radius:50%;top:-110px;left:-70px;background:radial-gradient(circle,rgba(255,255,255,.28),transparent 70%);pointer-events:none}
 .b1{background:linear-gradient(145deg,#5cc8ff 0%,#2a9df4 55%,#1a7fd6 100%)}
@@ -1419,7 +1419,7 @@ function trDel(i){const L=TREATS().slice();if(L.length<2){toast('צריך לפח
 $('trAdd').onclick=()=>{const n=$('trN').value.trim(),e=$('trE').value.trim();if(!n){toast('כתוב שם לפינוק');return}if(act({t:'cfgTreats',list:TREATS().concat([(e?e+' ':'')+n])})){$('trN').value='';$('trE').value='';toast('✓ הפינוק נוסף');renderTreats()}};
 function renderReqs(){if(!$('grpReqs'))return;renderTreats();const P=(state.cls.reqs||[]).filter(q=>q.st==='pending');const nm=i=>state.students[i]?state.students[i].name:'';
   $('grpReqs').innerHTML=P.length?'<div style="font:900 16px Gush;margin-bottom:6px">בקשות מהתלמידים</div>'+P.map(q=>`<div class="arow" style="grid-template-columns:1fr 58px 58px;background:rgba(255,255,255,.55);border-radius:14px;padding:8px;margin-bottom:8px"><span style="font:400 14px Gush"><b>${q.list.map(nm).map(esc).join(', ')}</b><small style="display:block;opacity:.7">${q.sub?'מבחן ב'+esc(q.sub)+' · ':''}${esc(q.treat)}</small></span><button class="btn" style="padding:8px 0;font-size:14px" onclick="if(act({t:'grpOk',id:'${q.id}'})){confetti(160);toast('✅ אושר! כל אחד קיבל +10')}">אשר</button><button class="btn ghost" style="padding:8px 0;font-size:14px;background:rgba(18,54,31,.12)!important;color:#12361f!important" onclick="act({t:'grpNo',id:'${q.id}'})">דחה</button></div>`).join(''):'<div class="sub">אין כרגע בקשות מהתלמידים</div>'}
-const _render13=render;render=function(){_render13();if($('qpName')){$('qpName').textContent=me().name;$('qpAv').textContent=(me().name||' ')[0]}renderSG();renderReqs()};
+const _render13=render;render=function(){_render13();setTimeout(fitSky,60);if($('qpName')){$('qpName').textContent=me().name;$('qpAv').textContent=(me().name||' ')[0]}renderSG();renderReqs()};
 
 // ===== manual points from the teacher =====
 $('mqGo').onclick=()=>{const t=$('mqT').value.trim(),p=+$('mqP').value;if(!t){toast('כתוב על מה הנקודות');return}if(!(p>0&&p<=50)){toast('ניקוד בין 1 ל-50');return}
