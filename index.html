@@ -590,6 +590,15 @@ body[data-role=teacher] .dhandle{display:block}
 #zfix .zr b{width:78px}#zfix .zr span{flex:1;opacity:.75}
 #zfix .zr button{border:0;border-radius:10px;padding:7px 12px;font:700 13px Gush}
 #zfix .zr button.y{background:#0D614A;color:#fff}#zfix .zr button.n{background:#f0e1e1;color:#7a1414}
+
+#aq{position:fixed;inset:0;z-index:95;background:rgba(4,24,36,.86);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);display:none;place-items:center;padding:20px}
+#aq.on{display:grid}#aq .bx{width:100%;max-width:380px;background:#f5f8ee;color:#12361f;border-radius:28px;padding:22px 18px;text-align:center;box-shadow:0 30px 70px rgba(0,0,0,.5)}
+#aq .pr{font:700 14px Gush;opacity:.6}#aq .bar{height:6px;background:#e1e8d3;border-radius:6px;margin:8px 0 18px;overflow:hidden}#aq .bar i{display:block;height:100%;background:#0D614A;transition:width .3s}
+#aq .wd{font:700 40px/1.2 Moshe,Gush;margin:4px 0 18px;color:#0b3d4a}
+#aq .op{display:block;width:100%;border:0;border-radius:14px;padding:13px;margin-top:8px;font:700 16px Gush;background:#fff;color:#12361f;box-shadow:0 2px 6px rgba(0,0,0,.06)}
+#aq .op.ok{background:#2f9a63;color:#fff}#aq .op.no{background:#d9534f;color:#fff}
+#aq .x{border:0;background:none;font:400 14px Gush;color:#5a6b5d;margin-top:14px}
+#aq .big{font:900 34px Gush;margin:6px 0}
 </style>
 </head>
 <body>
@@ -932,7 +941,7 @@ function setupRole(){const nav=document.querySelector('.nav');document.body.data
   const s=state.students[ME];document.querySelector('.demo').textContent=ROLE==='teacher'?'מחובר כמחנך':ROLE==='parent'?'הורי '+(s.first||s.name):'';
   $('loader').classList.remove('show')}
 // new things from others (teacher, parents, friends) show up in the bell
-function afterSync(own){if(ROLE==='teacher'){teacherSync(own);return}setTimeout(()=>{const shown=agentMorning();setTimeout(day14,shown?7000:0);setTimeout(tkDue,shown?14000:2500);setTimeout(goalPop,shown?3000:600)},1000);const s=state.students[ME],K='kr_seen_'+ROLE+ME;let seen=0;try{seen=+localStorage.getItem(K)||0}catch(e){}
+function afterSync(own){if(ROLE==='teacher'){teacherSync(own);return}setTimeout(()=>{agentMorning();whenFree(goalPop);setTimeout(()=>whenFree(day14),400);setTimeout(()=>whenFree(tkDue),800)},1000);const s=state.students[ME],K='kr_seen_'+ROLE+ME;let seen=0;try{seen=+localStorage.getItem(K)||0}catch(e){}
   const top=Math.max(0,...s.hist.map(h=>h.ts||0));
   if(!own&&seen)s.hist.filter(h=>h.ts>seen).slice(0,6).reverse().forEach(h=>{const t=(typeof h.p==='number'?'+'+h.p+' · ':h.p+' ')+h.t+(h.who?' · '+h.who:'');notify(t,(s.first||s.name)+': '+t)});
   try{localStorage.setItem(K,Math.max(seen,top))}catch(e){}
@@ -1091,10 +1100,10 @@ function testOpenNow(){return (state.cls.tests||[]).filter(t=>t.until>Date.now()
 function fmtUntil(u){const d=new Date(u);return `${['א׳','ב׳','ג׳','ד׳','ה׳','ו׳','ש׳'][d.getDay()]} ${d.getDate()}/${d.getMonth()+1} ב-${pad2(d.getHours())}:${pad2(d.getMinutes())}`}
 let gTest=null;
 function renderGoals(){const s=me();
-  const stT={pending:'⏳ מחכה לאישור המחנך',ok:'✅ אושר. בהצלחה במבחן! 💪',no:'היעד לא אושר. אפשר לדבר עם המחנך'};
+  const stT={pending:'⏳ מחכה לאישור המחנך',ok:'✅ אושר. בהצלחה במבחן! 💪',no:'❗ היעד שהגשת לא התקבל, נא להגיש מחדש'};
   $('goalList').innerHTML=s.goals.slice(0,8).map(g=>{const hit=g.res==='hit'||(g.grade!=null&&g.grade>=g.target);const txt=g.res==='hit'?'אלוף! עמדת ביעד, +5 בונוס 🏆':g.res==='miss'?'לא הפעם. במבחן הבא! 💪':g.grade!=null?(hit?'עמדת ביעד! 🎉':'כמעט! בפעם הבאה 💪'):(stT[g.st||'pending']||'');
-    return `<div class="goal ${hit?'hit':''}"><div class="tg">${g.target}</div><div><b>${esc(g.sub)}</b><small>${txt}</small></div></div>`}).join('');
-  const open=testOpenNow().filter(t=>{const g=s.goals.find(x=>x.test===t.id);return !g||g.st==='pending'});
+    return `<div class="goal ${hit?'hit':''}"><div class="tg">${g.target}</div><div><b>${esc(g.sub)}</b><small>${txt}</small>${g.st==='no'&&g.note?`<small style="display:block;font-weight:700;color:#7a4a00">המחנך מציע: ${esc(g.note)}</small>`:''}</div></div>`}).join('');
+  const open=testOpenNow().filter(t=>{const g=s.goals.find(x=>x.test===t.id);return !g||g.st==='pending'||g.st==='no'});
   if(!open.length){$('gOpen').innerHTML='<div class="sub" style="margin:0">כרגע אין מבחן פתוח להצבת יעד. כשהמחנך יפתח, זה יופיע כאן 🎯</div>';$('gForm').querySelectorAll('.row,#gRange,.sub+.sub,#gAdd').forEach(e=>e.style.display='none');$('gRange').nextElementSibling.style.display='none';return}
   if(!gTest||!open.some(t=>t.id===gTest))gTest=open[0].id;
   $('gOpen').innerHTML=`<div class="chips wrap">${open.map(t=>`<button class="chip ${t.id===gTest?'on':''}" onclick="gTest='${t.id}';renderGoals()">${esc(t.sub)}</button>`).join('')}</div><div class="sub" style="margin:6px 0 0">אפשר להציב יעד עד ${fmtUntil(open.find(t=>t.id===gTest).until)}</div>`;
@@ -1106,14 +1115,18 @@ function renderTGoals(){if(!$('tGoals')||ROLE!=='teacher')return;
   const P=[],A=[];state.students.forEach((x,i)=>x.goals.forEach(g=>{const st=g.st||(g.grade==null?'pending':'');if(st==='pending')P.push([x,i,g]);else if(st==='ok'&&!g.res)A.push([x,i,g])}));
   const row=(x,i,g,btns)=>`<div class="arow" style="grid-template-columns:1fr auto;background:rgba(255,255,255,.18);border-radius:14px;padding:8px 10px;margin-bottom:7px"><span style="font:400 15px Gush"><b>${esc(x.name)}</b> · ${esc(g.sub)} · יעד <b>${g.target}</b></span><span style="display:flex;gap:6px">${btns}</span></div>`;
   const b=(lbl,js,gold)=>`<button onclick="${js}" style="border:0;border-radius:10px;padding:8px 12px;font:900 14px Gush;${gold?'background:var(--gold);color:#3a2504':'background:rgba(0,0,0,.15);color:inherit'}">${lbl}</button>`;
-  $('tGoals').innerHTML=(P.length?`<div style="font:900 16px Gush;margin-bottom:6px">ממתינים לאישור (${P.length})</div>`+P.map(([x,i,g])=>row(x,i,g,b('אשר',`act({t:'goalOk',s:${i},g:'${g.id}'})`,1)+b('דחה',`act({t:'goalNo',s:${i},g:'${g.id}'})`))).join(''):'<div class="sub">אין יעדים שמחכים לאישור</div>')
+  $('tGoals').innerHTML=(P.length?`<div style="font:900 16px Gush;margin-bottom:6px">ממתינים לאישור (${P.length})</div>`+P.map(([x,i,g])=>row(x,i,g,b('אשר',`act({t:'goalOk',s:${i},g:'${g.id}'})`,1)+b('דחה',`goalNo(${i},'${g.id}')`))).join(''):'<div class="sub">אין יעדים שמחכים לאישור</div>')
    +(A.length?`<details style="margin-top:12px"><summary style="font:900 16px Gush;cursor:pointer">יעדים מאושרים · אחרי המבחן מסמנים (${A.length})</summary><div style="margin-top:8px">`+A.map(([x,i,g])=>row(x,i,g,b('✓ הגיע',`goalRes(${i},'${g.id}',1)`,1)+b('✗ לא',`goalRes(${i},'${g.id}',0)`))).join('')+'</div></details>':'')}
+function goalNo(i,g){const n=prompt('מה אתה מציע לו? (לא חובה, למשל: יעד של 80)');if(n===null)return;if(act({t:'goalNo',s:i,g,note:n}))toast('היעד נדחה, התלמיד יקבל הודעה')}
 function goalRes(i,g,hit){if(act({t:'goalRes',s:i,g,hit}))toast(hit?`🏆 ${state.students[i].name} קיבל +5 בונוס`:'סומן: לא הגיע ליעד')}
 $('tsGo').onclick=()=>{const sub=$('tsSubX').value.trim()||$('tsSub').value,d=$('tsD').value,t=$('tsT').value||'22:00';if(!d){toast('בחר תאריך');return}
   const u=new Date(d+'T'+t).getTime();if(act({t:'testOpen',sub,until:u})){$('tsSubX').value='';toast(`🎯 נפתח: יעדים ל${sub} עד ${fmtUntil(u)}`)}};
 $('gAdd').onclick=()=>{if(!gTest)return;const v=$('gRange').value,te=(state.cls.tests||[]).find(t=>t.id===gTest);if(!act({t:'goal',s:state.cur,test:gTest,tg:+v}))return;burstAt($('gAdd'),50);toast(`יעד: ${v} ב${te?te.sub:''}. נשלח לאישור המחנך 💪`)};
 // goal reached: pop-up for the student
 function goalPop(){if(ROLE!=='student')return;const s=me();let seen=[];try{seen=JSON.parse(localStorage.getItem('kr_gh')||'[]')}catch(e){}
+  const rj=s.goals.find(x=>x.st==='no'&&!seen.includes('no'+x.id+(x.nts||'')));
+  if(rj){seen.push('no'+rj.id+(rj.nts||''));try{localStorage.setItem('kr_gh',JSON.stringify(seen.slice(-50)))}catch(e){}notify(`❗ היעד שהגשת ב${rj.sub} לא התקבל, נא להגיש מחדש`,'');
+    $('ovMedal').innerHTML='<div style="font-size:80px">🎯</div>';$('ovTitle').textContent='היעד שהגשת לא התקבל';$('ovText').textContent=`במבחן ב${rj.sub}. נא להגיש מחדש${rj.note?'. המחנך מציע: '+rj.note:''}`;$('overlay').classList.add('show');return}
   const g=s.goals.find(x=>x.res==='hit'&&!seen.includes(x.id));if(!g)return;seen.push(g.id);try{localStorage.setItem('kr_gh',JSON.stringify(seen.slice(-50)))}catch(e){}
   $('ovMedal').innerHTML='<div style="font-size:96px">🏆</div>';$('ovTitle').textContent='אלוף! הגעת ליעד שלך!';$('ovText').textContent=`קיבלת 5 נקודות בונוס על המבחן ב${g.sub}`;$('overlay').classList.add('show');confetti(260)}
 const _render2=render;render=function(){_render2();if($('goalList'))renderGoals();renderTGoals()};renderGoals();
@@ -1285,7 +1298,9 @@ Object.defineProperty(window,'ARAM',{get:()=>state.cls.aram,configurable:true});
 function aramList(){return ARAM.map((w,i)=>`<div class="awrow"><span class="aww">${esc(w[0])}</span><span class="awm">${esc(w[1])}</span></div>`).join('')}
 function renderAram(){const s=me();$('awWord').innerHTML=aramList();$('pAwWord').innerHTML=aramList();$('awMean').textContent='';$('pAwMean').textContent='';
   if($('aramEd'))$('aramEd').innerHTML=ARAM.map((w,i)=>`<div class="aerow"><input value="${esc(w[0])}" oninput="ARAM[${i}][0]=this.value" onchange="saveAram()"><input value="${esc(w[1])}" oninput="ARAM[${i}][1]=this.value" onchange="saveAram()"><button onclick="ARAM.splice(${i},1);saveAram()">✕</button></div>`).join('');
-  const done=s.aramDay===TODAY;$('pAwBtn').disabled=done;$('pAwBtn').textContent=done?'✓ סומן היום':'✓ אמר לי את המילים בעל פה (+2)';$('awNote').innerHTML=done?'אמרת היום להורים! <b>+2</b> ✓':'תגיד אותן להורים בעל פה, והם יסמנו לך <b>+2</b>.'}
+  const V=state.cls.aramV||1,got=s.aramV===V,done=s.aramDay===TODAY||got;$('pAwBtn').disabled=done;$('pAwBtn').textContent=got?'✓ כבר קיבל נקודות על המילים האלה':done?'✓ סומן היום':'✓ אמר לי את המילים בעל פה (+2)';
+  $('awNote').innerHTML=got?'✓ קיבלת נקודות על המילים האלה. כשיהיו מילים חדשות, אפשר שוב. אפשר להתאמן כמה שרוצים 💪':'לחץ על <b>"בחן אותי"</b>: הפירושים נעלמים, ובוחרים את הפירוש הנכון לכל מילה. כל התשובות נכונות? <b>+5 נקודות</b>!';
+  if(!$('aqBtn'))$('awNote').insertAdjacentHTML('afterend','<button class="btn" id="aqBtn" style="margin-top:12px" onclick="aqStart()">🎯 בחן אותי</button>');}
 function saveAram(){act({t:'aramSet',list:ARAM.filter(w=>w[0]||w[1]).concat(ARAM.filter(w=>!w[0]&&!w[1]).slice(0,1))})}
 $('aramAdd').onclick=()=>{if(ARAM.length>=10){toast('עד 10 מילים');return}ARAM.push(['','']);renderAram();const ins=document.querySelectorAll('#aramEd input');ins[ins.length-2].focus()};
 $('pAwBtn').onclick=()=>{const s=me();if(s.aramDay===TODAY)return;if(act({t:'aramMark',s:state.cur}))toast(`יפה! ${FIRST[s.name]} קיבל +2 📜`)};
@@ -1488,6 +1503,25 @@ function zfRender(){const x=state.students[zfS];if(!x)return;$('zfList').innerHT
 function zfSet(d,on){if(act({t:'zrFix',s:zfS,d,on})){toast(on?'☀️ סומן זריז':'הזריז בוטל');zfRender()}}
 $('zFixBtn').onclick=zfOpen;
 const _render14=render;render=function(){_render14();renderBoard()};
+
+// ===== Aramaic quiz =====
+const AQ_EXTRA=['בוא ושמע','מה הסיבה?','נשאלה להם שאלה','פשוט! ברור!','כך גם','למד מכאן','קושיה','או גם','לא נצרך','השאלה נשארת פתוחה','הוא אמר','מכאן ואילך'];
+let aq=null;
+function aqStart(){const A=ARAM.filter(w=>w[0]&&w[1]);if(!A.length){toast('אין מילים כרגע');return}
+  const order=A.map((w,i)=>i).sort(()=>Math.random()-.5);aq={A,order,k:0,ans:{},wrong:0};let P=$('aq');if(!P){document.body.insertAdjacentHTML('beforeend','<div id="aq"><div class="bx" id="aqB"></div></div>');P=$('aq')}P.classList.add('on');aqShow()}
+function aqShow(){const {A,order,k}=aq;if(k>=order.length)return aqEnd();const i=order[k],w=A[i];
+  const pool=[...new Set(A.map(x=>x[1]).concat(AQ_EXTRA))].filter(m=>m!==w[1]).sort(()=>Math.random()-.5).slice(0,3);const opts=pool.concat([w[1]]).sort(()=>Math.random()-.5);
+  $('aqB').innerHTML=`<div class="pr">מילה ${k+1} מתוך ${order.length}</div><div class="bar"><i style="width:${k/order.length*100}%"></i></div><div class="wd">${esc(w[0])}</div>${opts.map(o=>`<button class="op" data-o="${esc(o)}">${esc(o)}</button>`).join('')}<button class="x" onclick="$('aq').classList.remove('on')">יציאה</button>`;
+  $('aqB').querySelectorAll('.op').forEach(b=>b.onclick=()=>{if(aq.lock)return;aq.lock=1;const ok=b.dataset.o===w[1];b.classList.add(ok?'ok':'no');
+    if(!ok){aq.wrong++;$('aqB').querySelectorAll('.op').forEach(x=>{if(x.dataset.o===w[1])x.classList.add('ok')})}else aq.ans[ARAM.indexOf(w)]=w[1];
+    setTimeout(()=>{aq.lock=0;aq.k++;aqShow()},ok?650:1300)})}
+function aqEnd(){const s=me(),V=state.cls.aramV||1,n=aq.order.length,good=n-aq.wrong;
+  if(aq.wrong){$('aqB').innerHTML=`<div style="font-size:52px">💪</div><div class="big">${good} מתוך ${n}</div><p style="font:400 16px Gush">כמעט! כדי לקבל נקודות צריך לענות נכון על כל המילים. חזור עליהן ונסה שוב.</p><button class="btn" onclick="aqStart()">נסה שוב</button><button class="x" onclick="$('aq').classList.remove('on')">סגור</button>`;return}
+  if(s.aramV===V||ROLE!=='student'&&ROLE!=='teacher'){$('aqB').innerHTML=`<div style="font-size:52px">🏆</div><div class="big">${n} מתוך ${n}!</div><p style="font:400 16px Gush">מעולה! על המילים האלה כבר קיבלת נקודות, אז זה היה אימון.</p><button class="btn" onclick="$('aq').classList.remove('on')">סגור</button>`;return}
+  const ans={};ARAM.forEach((w,i)=>ans[i]=w[1]);
+  if(act({t:'aramQuiz',s:state.cur,ans})){$('aqB').innerHTML=`<div style="font-size:52px">🏆</div><div class="big">אלוף! ${n} מתוך ${n}</div><p style="font:700 18px Gush">קיבלת <b>+5 נקודות</b> על המילים בארמית</p><button class="btn" onclick="$('aq').classList.remove('on')">יישר כוח!</button>`;confetti(240)}else $('aq').classList.remove('on')}
+// one pop-up at a time
+function whenFree(fn,tries=0){if(document.querySelector('#agOv.show,#overlay.show,#cpop.show,#tkpop.show,#zpop.show,#aq.on')&&tries<200){setTimeout(()=>whenFree(fn,tries+1),1500);return}fn()}
 // ===== start =====
 if(ONLINE){$('loader').classList.add('show');api('GET').then(v=>take(v)).catch(offline);
   setInterval(pull,30000);document.addEventListener('visibilitychange',()=>{if(!document.hidden)pull()});addEventListener('online',()=>{flush();pull()})}

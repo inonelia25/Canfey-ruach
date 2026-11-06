@@ -63,6 +63,7 @@
   const SUNTHU_FROM = Date.parse('2026-11-06T07:00:00Z');
   // was the student a "zariz" on this date? (new records + older history)
   function zrOn(s, date) { if (s.zd && s.zd[date]) return true; return s.hist.some(h => h.z > 0 && !h.u && h.ts && il(h.ts).date === date); }
+  const ARAM_ONCE = Date.parse('2026-11-06T07:15:00Z');
   class Bad extends Error {}
   const need = (c, m) => { if (!c) throw new Bad(m || 'לא מורשה'); };
 
@@ -138,14 +139,14 @@
         if (!op.test && op.sub && op.ts < LEGACY_GOALS) { if (KEEP_SUB.test(op.sub)) s.goals.unshift({ id: hid('g'), sub: op.sub, target: tg, grade: null, st: 'pending' }); break; }
         const te = (st.cls.tests || []).find(x => x.id === op.test); need(te, 'אין כרגע מבחן פתוח להצבת יעד'); need(isT || op.ts <= te.until, 'הזמן להצבת יעד למבחן הזה נגמר');
         const ex = s.goals.find(g => g.test === te.id);
-        if (ex) { need(ex.st === 'pending', 'המחנך כבר אישר את היעד שלך'); ex.target = tg; }
+        if (ex) { need(ex.st === 'pending' || ex.st === 'no', 'המחנך כבר אישר את היעד שלך'); ex.target = tg; ex.st = 'pending'; ex.note = ''; }
         else s.goals.unshift({ id: hid('g'), test: te.id, sub: te.sub, target: tg, grade: null, st: 'pending' });
         if (s.goals.length > 40) s.goals.length = 40; break; }
       case 'testOpen': { need(isT); const sub = String(op.sub || '').trim().slice(0, 40), u = +op.until; need(sub, 'בחר מקצוע'); need(u > op.ts, 'השעה שבחרת כבר עברה');
         const T0 = st.cls.tests || (st.cls.tests = []); T0.unshift({ id: hid('t'), sub, until: u, ts: op.ts }); if (T0.length > 30) T0.length = 30; break; }
       case 'testDel': { need(isT); st.cls.tests = (st.cls.tests || []).filter(x => x.id !== op.id); break; }
       case 'goalOk': case 'goalNo': { need(isT); const s = S(op.s), g = s.goals.find(x => x.id === op.g); need(g && (g.st || (g.grade == null ? 'pending' : '')) === 'pending', 'היעד כבר טופל');
-        g.st = op.t === 'goalOk' ? 'ok' : 'no'; break; }
+        g.st = op.t === 'goalOk' ? 'ok' : 'no'; g.note = op.t === 'goalNo' ? String(op.note || '').trim().slice(0, 200) : ''; g.nts = op.ts; break; }
       case 'goalRes': { need(isT); const s = S(op.s), g = s.goals.find(x => x.id === op.g); need(g && g.st === 'ok' && !g.res, 'היעד כבר סומן');
         g.res = op.hit ? 'hit' : 'miss'; if (op.hit) add(s, 5, `בונוס: עמד ביעד במבחן ב${g.sub} (${g.target})`, TEACHER); break; }
       case 'grade': { need(isT); const s = S(op.s), g = s.goals.find(x => x.id === op.g); need(g && g.grade == null); const v = Math.round(+op.v); need(v >= 0 && v <= 100);
@@ -189,8 +190,11 @@
         if (!(ag && ag.date === T.date)) { S(op.idx); ag = st.cls.agent = { date: T.date, idx: +op.idx, status: 'pending' }; }
         need(ag.status === 'pending', 'הסוכן של היום כבר סומן');
         ag.status = op.ok ? 'yes' : 'no'; if (op.ok) { st.cls.bonus += 10; st.cls.revealed.unshift(S(ag.idx).name); st.cls.revealed.length = Math.min(st.cls.revealed.length, 20); } break; }
-      case 'aramSet': { need(isT); need(Array.isArray(op.list)); st.cls.aram = op.list.slice(0, 10).map(w => [String(w[0] || '').slice(0, 60), String(w[1] || '').slice(0, 120)]); break; }
-      case 'aramMark': { need(r === 'parent' || isT); need(own(op.s)); const s = S(op.s); need(s.aramDay !== T.date, 'כבר סומן היום'); s.aramDay = T.date; feed({ s: s.name, p: 2, t: 'אמר את המילים בארמית בעל פה', who: 'הורים' }); add(s, 2, 'אמר בעל פה את המילים בארמית', 'ההורים'); break; }
+      case 'aramSet': { need(isT); need(Array.isArray(op.list)); const nl = op.list.slice(0, 10).map(w => [String(w[0] || '').slice(0, 60), String(w[1] || '').slice(0, 120)]); if (JSON.stringify(nl) !== JSON.stringify(st.cls.aram)) st.cls.aramV = (st.cls.aramV || 1) + 1; st.cls.aram = nl; break; }
+      case 'aramMark': { need(r === 'parent' || isT); need(own(op.s)); const s = S(op.s); need(s.aramDay !== T.date, 'כבר סומן היום'); if (op.ts >= ARAM_ONCE) { need(s.aramV !== (st.cls.aramV || 1), 'כבר קיבל נקודות על המילים האלה. כשיהיו מילים חדשות אפשר שוב'); s.aramV = st.cls.aramV || 1; } s.aramDay = T.date; feed({ s: s.name, p: 2, t: 'אמר את המילים בארמית בעל פה', who: 'הורים' }); add(s, 2, 'אמר בעל פה את המילים בארמית', 'ההורים'); break; }
+      case 'aramQuiz': { need(r !== 'parent' && own(op.s)); const s = S(op.s), A = st.cls.aram || [], V = st.cls.aramV || 1; need(A.length, 'אין מילים');
+        need(s.aramV !== V, 'כבר קיבלת נקודות על המילים האלה'); const ans = op.ans || {}; need(A.every((w, i) => ans[i] === w[1]), 'לא כל התשובות נכונות');
+        s.aramV = V; s.aramDay = T.date; add(s, 5, 'ענה נכון על כל המילים בארמית 📜', 'בוחן ארמית'); break; }
       case 'init': { need(isT); const s = S(op.s); need(VALUES.includes(op.val)); const tx = String(op.tx || '').trim().slice(0, 140);
         s.values[op.val] = (s.values[op.val] || 0) + 1; add(s, 10, `יוזמה מבורכת (${op.val})${tx ? ': ' + tx : ''}`, TEACHER); break; }
       case 'grp': { need(isT); const tr = TREATS.includes(op.treat) ? op.treat : TREATS[0]; const L = [...new Set(op.list || [])]; need(L.length >= 2, 'חבורה = לפחות 2 תלמידים');
