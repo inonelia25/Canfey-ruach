@@ -2,7 +2,7 @@
 // Every change to the data is an "op". The server keeps the list of ops; the state is rebuilt
 // by replaying them here, so the phone and the server always agree.
 (function (G) {
-  const HOME = [['👶','שמר על האחים',3],['🍽️','שטף כלים',3],['🧽','עזר לנקות',3],['🛒','עזר בקניות',3],['🛏️','סידר את החדר',3],['🕯️','הכנות לשבת',3]];
+  const HOME = [['👶','שמר על האחים',2],['🍽️','שטף כלים',2],['🧽','עזר לנקות',2],['🛒','עזר בקניות',2],['🛏️','סידר את החדר',2],['🕯️','הכנות לשבת',2]];
   const PRIZES = [['🎟️','שובר לקיוסק 20 ש״ח',100],['🍦','גלידה',40],['🎧','שיר בהפסקה',30],['🪑','לשבת ליד חבר שבוע',60],['📝','פטור משיעורי בית',80],['🍕','פיצה אישית',120],['⚽','כדור כדורגל',150]];
   const FLAVORS = ['וניל עוגיות','וניל נוגט','שוקולד נוגט','אגוזי לוז'];
   const VALUES = ['חברות','למידה','חסד','אחריות','יראת שמיים'];
@@ -44,6 +44,7 @@
     const by = {}; st.students.forEach(s => by[s.id] = s);
     if (!st.cls.cfg) st.cls.cfg = defCfg();
     if (!st.cls.cfg.treats) st.cls.cfg.treats = TREATS.slice();
+    if (!st.cls.mig6) { (st.cls.cfg.home || []).forEach(h => { if (h[2] === 3) h[2] = 2; }); st.cls.mig6 = 1; }
     if (!st.cls.mig5) { (st.cls.aram || []).forEach(w => { if (/שְׁאַל לֵיהּ|שאל ליה/.test(w[0])) w[0] = 'שְׁלַח לֵיהּ'; }); st.cls.mig5 = 1; }
     if (!st.cls.mig4) { (st.cls.aram || []).forEach(w => { if (/שִׁנְצָא|שנצא/.test(w[0])) w[0] = 'פַּנְדָּא דְּמָרָא'; }); st.cls.mig4 = 1; }
     if (!st.cls.mig3) { st.cls.aram = [['לֵיהּ','לו'],['פַּנְדָּא דְּמָרָא','בית היד של המעדר'],['קוּפִינָא דְּמָרָא','הברזל של המעדר'],['קְנָסָא','קנס'],['שְׁלַח לֵיהּ','שאל אותו'],['מַאי','מה'],['קָא מַגְבֵּית','גובה (מלשון לגבות)'],['אֵימָא לִי','אמור לי'],['גּוּפָא דְּעוּבְדָּא','גוף המעשה (מקרה)'],['הֵיכִי הֲוָה','איך היה']]; st.cls.mig3 = 1; }
@@ -57,7 +58,8 @@
     const h = Math.sin(dLa / 2) ** 2 + Math.cos(t(a)) * Math.cos(t(c)) * Math.sin(dLo / 2) ** 2; return 2 * R * Math.asin(Math.sqrt(h)); }
   // parents: 2 good deeds a day, 3 on Thursday-Saturday (rule starts 5.11.2026 08:30)
   const HOME_FROM = Date.parse('2026-11-05T06:30:00Z');
-  const homeLimit = dow => (dow >= 4 && dow <= 6 ? 3 : 2);
+  const HOME2_FROM = Date.parse('2026-11-06T07:30:00Z');
+  const homeLimit = (dow, ts) => (ts == null || ts >= HOME2_FROM) ? (dow === 5 ? 3 : 2) : (dow >= 4 && dow <= 6 ? 3 : 2);
   const LEGACY_GOALS = Date.parse('2026-11-05T23:20:00Z'), KEEP_SUB = /גמרא|תלמוד/;
   const tparts = t => { const m = String(t).match(/^(\p{Extended_Pictographic}\S*)\s+(.*)$/u); return m ? [m[1], m[2]] : ['🎁', String(t)]; };
   const SUNTHU_FROM = Date.parse('2026-11-06T07:00:00Z');
@@ -83,12 +85,12 @@
     switch (op.t) {
       case 'award': { need(isT); const s = S(op.s), p = Math.round(+op.p); need(p > 0 && p <= 50, 'ניקוד לא תקין');
         const t = String(op.tx || '').slice(0, 140); need(t); s.count[t] = (s.count[t] || 0) + 1; add(s, p, t, TEACHER); break; }
-      case 'home': case 'other': if (r === 'parent' && op.ts >= HOME_FROM) { const s0 = S(op.s), used = (s0.hd && s0.hd[T.date]) || 0, lim = homeLimit(T.dow);
+      case 'home': case 'other': if (r === 'parent' && op.ts >= HOME_FROM) { const s0 = S(op.s), used = (s0.hd && s0.hd[T.date]) || 0, lim = homeLimit(T.dow, op.ts);
           need(used < lim, `אפשר לסמן עד ${lim} מעשים ביום. מחר אפשר שוב 🙂`); s0.hd = { [T.date]: used + 1 }; }
         if (op.t === 'other') { need(r === 'parent' || isT); need(own(op.s)); const s = S(op.s), t = String(op.tx || '').trim().slice(0, 140); need(t, 'כתבו מה הוא עשה');
-          s.homeCount++; feed({ s: s.name, p: 3, t, who: 'הורים' }); add(s, 3, t, 'ההורים', 1); break; }
+          const op3 = op.ts >= HOME2_FROM ? 2 : 3; s.homeCount++; feed({ s: s.name, p: op3, t, who: 'הורים' }); add(s, op3, t, 'ההורים', 1); break; }
       { need(r === 'parent' || isT); need(own(op.s)); const s = S(op.s), h = C.home[op.h]; need(h);
-        s.homeCount++; feed({ s: s.name, p: h[2], t: h[1], who: 'הורים' }); s.count[h[1]] = (s.count[h[1]] || 0) + 1; add(s, h[2], h[1], 'ההורים'); break; }
+        const hp = (op.ts < HOME2_FROM && h[2] === 2) ? 3 : h[2]; s.homeCount++; feed({ s: s.name, p: hp, t: h[1], who: 'הורים' }); s.count[h[1]] = (s.count[h[1]] || 0) + 1; add(s, hp, h[1], 'ההורים'); break; }
       case 'zr': { need(isT); need(T.dow <= 4 || op.ts < SUNTHU_FROM, 'זריזין רק מראשון עד חמישי'); (op.list || []).forEach(i => { const s = S(i); if (s.zrDay === T.date) return; s.zrDay = T.date; (s.zd || (s.zd = {}))[T.date] = 1; if (s.streakWk !== T.wk) { s.streak = 0; s.streakWk = T.wk; } s.streak++;
           if (s.streak >= 5) { s.zr += 4; s.streak = 0; hist(s, { p: '⚡', t: 'זריזין פרו! 5 ימים ברצף, שווה 8', who: TEACHER, z: 4 }); }
           else { s.zr += 1; hist(s, { p: '☀️', t: 'זריזין, הגעת לפני 7:30', who: TEACHER, z: 1 }); }
