@@ -60,6 +60,9 @@
   const homeLimit = dow => (dow >= 4 && dow <= 6 ? 3 : 2);
   const LEGACY_GOALS = Date.parse('2026-11-05T23:20:00Z'), KEEP_SUB = /גמרא|תלמוד/;
   const tparts = t => { const m = String(t).match(/^(\p{Extended_Pictographic}\S*)\s+(.*)$/u); return m ? [m[1], m[2]] : ['🎁', String(t)]; };
+  const SUNTHU_FROM = Date.parse('2026-11-06T07:00:00Z');
+  // was the student a "zariz" on this date? (new records + older history)
+  function zrOn(s, date) { if (s.zd && s.zd[date]) return true; return s.hist.some(h => h.z > 0 && !h.u && h.ts && il(h.ts).date === date); }
   class Bad extends Error {}
   const need = (c, m) => { if (!c) throw new Bad(m || 'לא מורשה'); };
 
@@ -85,7 +88,7 @@
           s.homeCount++; feed({ s: s.name, p: 3, t, who: 'הורים' }); add(s, 3, t, 'ההורים', 1); break; }
       { need(r === 'parent' || isT); need(own(op.s)); const s = S(op.s), h = C.home[op.h]; need(h);
         s.homeCount++; feed({ s: s.name, p: h[2], t: h[1], who: 'הורים' }); s.count[h[1]] = (s.count[h[1]] || 0) + 1; add(s, h[2], h[1], 'ההורים'); break; }
-      case 'zr': { need(isT); (op.list || []).forEach(i => { const s = S(i); if (s.zrDay === T.date) return; s.zrDay = T.date; if (s.streakWk !== T.wk) { s.streak = 0; s.streakWk = T.wk; } s.streak++;
+      case 'zr': { need(isT); need(T.dow <= 4 || op.ts < SUNTHU_FROM, 'זריזין רק מראשון עד חמישי'); (op.list || []).forEach(i => { const s = S(i); if (s.zrDay === T.date) return; s.zrDay = T.date; (s.zd || (s.zd = {}))[T.date] = 1; if (s.streakWk !== T.wk) { s.streak = 0; s.streakWk = T.wk; } s.streak++;
           if (s.streak >= 5) { s.zr += 4; s.streak = 0; hist(s, { p: '⚡', t: 'זריזין פרו! 5 ימים ברצף, שווה 8', who: TEACHER, z: 4 }); }
           else { s.zr += 1; hist(s, { p: '☀️', t: 'זריזין, הגעת לפני 7:30', who: TEACHER, z: 1 }); }
           crunch(s); }); break; }
@@ -111,6 +114,11 @@
         C.treats = op.list.map(x => String(x || '').trim().slice(0, 40)).filter(Boolean); need(C.treats.length, 'צריך לפחות פינוק אחד'); break; }
       case 'cfgLevels': { need(isT); const L = (op.list || []).map(x => Math.round(+x)); need(L.length === 3, 'צריך 3 שלבים');
         need(L[0] > 0 && L[0] < L[1] && L[1] < L[2] && L[2] <= 100000, 'כל שלב צריך להיות גדול מהקודם'); C.lv = [0, ...L]; break; }
+      case 'zrFix': { need(isT); const s = S(op.s), d = String(op.d || ''); need(/^\d{4}-\d\d-\d\d$/.test(d), 'תאריך לא תקין'); need(d <= T.date, 'אי אפשר לתקן יום עתידי');
+        const on = zrOn(s, d); s.zd = s.zd || {};
+        if (op.on) { need(!on, 'כבר מסומן כזריז ביום הזה'); s.zd[d] = 1; s.zr += 1; hist(s, { p: '☀️', t: `תיקון: זריז ב-${d.slice(8)}/${d.slice(5, 7)}`, who: TEACHER, z: 1 }); crunch(s); }
+        else { need(on, 'היום הזה לא מסומן כזריז'); delete s.zd[d]; const h = s.hist.find(x => x.z > 0 && !x.u && x.ts && il(x.ts).date === d); const k = h ? h.z : 1; if (h) h.u = 1;
+          s.zr -= k; while (s.zr < 0 && s.crunches.length) { s.crunches.pop(); s.zr += 15; } if (s.zr < 0) s.zr = 0; if (s.zrDay === d) s.zrDay = ''; } break; }
       case 'msg': { need(isT); S(op.s).msg = String(op.tx || '').slice(0, 500); break; }
       case 'redeem': { need(r !== 'parent' && own(op.s)); const s = S(op.s), p = C.prizes.find(x => x.id === op.pz); need(p, 'הפרס לא קיים'); need(p.stock == null || p.stock > 0, 'הפרס אזל'); need(s.wallet >= p.cost, 'אין מספיק נקודות');
         s.wallet -= p.cost; if (p.stock != null) p.stock--; hist(s, { p: '🎁', t: 'בחרת פרס: ' + p.name, who: 'בנק הפרסים', w: -p.cost, pz: p.id }); feed({ s: s.name, p: '🎁', t: 'ביקש פרס: ' + p.name, who: 'בנק הפרסים' }); break; }
@@ -154,7 +162,8 @@
       case 'checkin': { need(r !== 'parent' && own(op.s)); const s = S(op.s); need(!s.arr.some(x => x.d === T.date), 'כבר נרשמת היום');
         if (C.loc && !isT) { need(isFinite(+op.lat) && isFinite(+op.lng), 'צריך לאשר גישה למיקום כדי להירשם');
           need(dist(+op.lat, +op.lng, C.loc.lat, C.loc.lng) <= C.loc.r, 'אפשר להירשם רק כשנמצאים בישיבה'); }
-        if (!isT) need(T.min >= 420 && T.min <= 660, 'אפשר ללחוץ "הגעתי" רק בין 7:00 ל-11:00');
+        if (!isT && op.ts >= SUNTHU_FROM) { need(T.dow <= 4, 'בשישי ובשבת אין רישום לתפילה'); need(T.min >= 420 && T.min <= 540, 'אפשר ללחוץ "הגעתי" רק בין 7:00 ל-9:00'); }
+        else if (!isT) need(T.min >= 420 && T.min <= 660, 'אפשר ללחוץ "הגעתי" רק בין 7:00 ל-11:00');
         s.arr.push({ d: T.date, t: T.min });
         if (T.min <= 480) add(s, 2, 'נרשם לתפילה עד 8:00', 'תפילה');
         if (s.deal && T.min <= s.deal.until) add(s, s.deal.pts, 'הגעה בזמן לתפילה 🎯', TEACHER); break; }
@@ -203,6 +212,6 @@
     return { date, idx: h % st.students.length, status: 'pending' };
   }
 
-  const KR = { tparts, homeLimit, dist, newStudent, defCfg, CATS, HOME, PRIZES, FLAVORS, VALUES, WHY, SUBJ, TREATS, TEACHER, il, init, syncRoster, apply, replay, check, agentFor, Bad };
+  const KR = { zrOn, tparts, homeLimit, dist, newStudent, defCfg, CATS, HOME, PRIZES, FLAVORS, VALUES, WHY, SUBJ, TREATS, TEACHER, il, init, syncRoster, apply, replay, check, agentFor, Bad };
   G.KR = KR;
 })(typeof window !== 'undefined' ? window : globalThis);
