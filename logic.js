@@ -106,6 +106,8 @@
         if (op.done) { s.tk.d = T.date; s.tk.at = ''; } else { need(/^\d\d:\d\d$/.test(op.at || ''), 'שעה לא תקינה'); s.tk.at = op.at; s.tk.ad = T.date; } break; }
       case 'cfgTreats': { need(isT); need(Array.isArray(op.list) && op.list.length >= 1 && op.list.length <= 12, 'צריך לפחות פינוק אחד');
         C.treats = op.list.map(x => String(x || '').trim().slice(0, 40)).filter(Boolean); need(C.treats.length, 'צריך לפחות פינוק אחד'); break; }
+      case 'cfgLevels': { need(isT); const L = (op.list || []).map(x => Math.round(+x)); need(L.length === 3, 'צריך 3 שלבים');
+        need(L[0] > 0 && L[0] < L[1] && L[1] < L[2] && L[2] <= 100000, 'כל שלב צריך להיות גדול מהקודם'); C.lv = [0, ...L]; break; }
       case 'msg': { need(isT); S(op.s).msg = String(op.tx || '').slice(0, 500); break; }
       case 'redeem': { need(r !== 'parent' && own(op.s)); const s = S(op.s), p = C.prizes.find(x => x.id === op.pz); need(p, 'הפרס לא קיים'); need(p.stock == null || p.stock > 0, 'הפרס אזל'); need(s.wallet >= p.cost, 'אין מספיק נקודות');
         s.wallet -= p.cost; if (p.stock != null) p.stock--; hist(s, { p: '🎁', t: 'בחרת פרס: ' + p.name, who: 'בנק הפרסים', w: -p.cost, pz: p.id }); feed({ s: s.name, p: '🎁', t: 'ביקש פרס: ' + p.name, who: 'בנק הפרסים' }); break; }
