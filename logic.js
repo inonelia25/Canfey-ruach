@@ -44,8 +44,9 @@
     const by = {}; st.students.forEach(s => by[s.id] = s);
     if (!st.cls.cfg) st.cls.cfg = defCfg();
     if (!st.cls.cfg.treats) st.cls.cfg.treats = TREATS.slice();
+    if (!st.cls.mig5) { (st.cls.aram || []).forEach(w => { if (/שְׁאַל לֵיהּ|שאל ליה/.test(w[0])) w[0] = 'שְׁלַח לֵיהּ'; }); st.cls.mig5 = 1; }
     if (!st.cls.mig4) { (st.cls.aram || []).forEach(w => { if (/שִׁנְצָא|שנצא/.test(w[0])) w[0] = 'פַּנְדָּא דְּמָרָא'; }); st.cls.mig4 = 1; }
-    if (!st.cls.mig3) { st.cls.aram = [['לֵיהּ','לו'],['פַּנְדָּא דְּמָרָא','בית היד של המעדר'],['קוּפִינָא דְּמָרָא','הברזל של המעדר'],['קְנָסָא','קנס'],['שְׁאַל לֵיהּ','שאל אותו'],['מַאי','מה'],['קָא מַגְבֵּית','גובה (מלשון לגבות)'],['אֵימָא לִי','אמור לי'],['גּוּפָא דְּעוּבְדָּא','גוף המעשה (מקרה)'],['הֵיכִי הֲוָה','איך היה']]; st.cls.mig3 = 1; }
+    if (!st.cls.mig3) { st.cls.aram = [['לֵיהּ','לו'],['פַּנְדָּא דְּמָרָא','בית היד של המעדר'],['קוּפִינָא דְּמָרָא','הברזל של המעדר'],['קְנָסָא','קנס'],['שְׁלַח לֵיהּ','שאל אותו'],['מַאי','מה'],['קָא מַגְבֵּית','גובה (מלשון לגבות)'],['אֵימָא לִי','אמור לי'],['גּוּפָא דְּעוּבְדָּא','גוף המעשה (מקרה)'],['הֵיכִי הֲוָה','איך היה']]; st.cls.mig3 = 1; }
     if (!st.cls.mig2) { const k = st.cls.cfg.cats['כיתה'] || (st.cls.cfg.cats['כיתה'] = []); if (!k.some(d => d[1] === 'היה עם ציוד על השולחן')) k.unshift(['🎒', 'היה עם ציוד על השולחן', 3]); st.cls.mig2 = 1; }
     if (!st.cls.mig1) { st.students.forEach(s => { s.goals = (s.goals || []).filter(g => KEEP_SUB.test(g.sub || '')); }); st.cls.mig1 = 1; }
     st.students = roster.map(r => { const s = by[r.id] || newStudent(r.id, r.name); s.name = r.name; s.first = r.first || r.name.split(' ')[0]; if (r.deal && !s.dealSet) { s.deal = r.deal; s.dealSet = 1; } return s; });
