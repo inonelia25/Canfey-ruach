@@ -44,6 +44,12 @@
     const by = {}; st.students.forEach(s => by[s.id] = s);
     if (!st.cls.cfg) st.cls.cfg = defCfg();
     if (!st.cls.cfg.treats) st.cls.cfg.treats = TREATS.slice();
+    if (!st.cls.mig7) { const day = '2026-11-07';
+      st.students.forEach(s => { let removed = false;
+        (s.hist || []).forEach(h => { if (!h.u && h.who === 'ההורים' && /המילים בארמית/.test(h.t || '') && h.ts && il(h.ts).date === day) { const w = h.w != null ? h.w : h.p;
+            s.wallet = Math.max(0, s.wallet - w); s.points = Math.max(0, s.points - (h.l != null ? h.l : w)); s.goalPts = Math.max(0, s.goalPts - (h.g != null ? h.g : w)); h.u = 1; removed = true; } });
+        if (removed && !(s.hist || []).some(h => !h.u && /ענה נכון על כל המילים בארמית/.test(h.t || ''))) { delete s.aramV; if (s.aramDay === day) s.aramDay = ''; } });
+      st.cls.feed = (st.cls.feed || []).filter(f => !(/המילים בארמית/.test(f.t || '') && f.ts && il(f.ts).date === day)); st.cls.mig7 = 1; }
     if (!st.cls.mig6) { (st.cls.cfg.home || []).forEach(h => { if (h[2] === 3) h[2] = 2; }); st.cls.mig6 = 1; }
     if (!st.cls.mig5) { (st.cls.aram || []).forEach(w => { if (/שְׁאַל לֵיהּ|שאל ליה/.test(w[0])) w[0] = 'שְׁלַח לֵיהּ'; }); st.cls.mig5 = 1; }
     if (!st.cls.mig4) { (st.cls.aram || []).forEach(w => { if (/שִׁנְצָא|שנצא/.test(w[0])) w[0] = 'פַּנְדָּא דְּמָרָא'; }); st.cls.mig4 = 1; }
@@ -66,6 +72,7 @@
   // was the student a "zariz" on this date? (new records + older history)
   function zrOn(s, date) { if (s.zd && s.zd[date]) return true; return s.hist.some(h => h.z > 0 && !h.u && h.ts && il(h.ts).date === date); }
   const ARAM_ONCE = Date.parse('2026-11-06T07:15:00Z');
+  const NO_PARENT_ARAM = Date.parse('2026-11-06T22:00:00Z'); // 7.11.2026 00:00 Israel
   class Bad extends Error {}
   const need = (c, m) => { if (!c) throw new Bad(m || 'לא מורשה'); };
 
@@ -193,7 +200,7 @@
         need(ag.status === 'pending', 'הסוכן של היום כבר סומן');
         ag.status = op.ok ? 'yes' : 'no'; if (op.ok) { st.cls.bonus += 10; st.cls.revealed.unshift(S(ag.idx).name); st.cls.revealed.length = Math.min(st.cls.revealed.length, 20); } break; }
       case 'aramSet': { need(isT); need(Array.isArray(op.list)); const nl = op.list.slice(0, 10).map(w => [String(w[0] || '').slice(0, 60), String(w[1] || '').slice(0, 120)]); if (JSON.stringify(nl) !== JSON.stringify(st.cls.aram)) st.cls.aramV = (st.cls.aramV || 1) + 1; st.cls.aram = nl; break; }
-      case 'aramMark': { need(r === 'parent' || isT); need(own(op.s)); const s = S(op.s); need(s.aramDay !== T.date, 'כבר סומן היום'); if (op.ts >= ARAM_ONCE) { need(s.aramV !== (st.cls.aramV || 1), 'כבר קיבל נקודות על המילים האלה. כשיהיו מילים חדשות אפשר שוב'); s.aramV = st.cls.aramV || 1; } s.aramDay = T.date; feed({ s: s.name, p: 2, t: 'אמר את המילים בארמית בעל פה', who: 'הורים' }); add(s, 2, 'אמר בעל פה את המילים בארמית', 'ההורים'); break; }
+      case 'aramMark': { need(r === 'parent' || isT); need(own(op.s)); need(isT || op.ts < NO_PARENT_ARAM, 'הנקודות על המילים בארמית ניתנות עכשיו רק בבוחן של התלמיד'); const s = S(op.s); need(s.aramDay !== T.date, 'כבר סומן היום'); if (op.ts >= ARAM_ONCE) { need(s.aramV !== (st.cls.aramV || 1), 'כבר קיבל נקודות על המילים האלה. כשיהיו מילים חדשות אפשר שוב'); s.aramV = st.cls.aramV || 1; } s.aramDay = T.date; feed({ s: s.name, p: 2, t: 'אמר את המילים בארמית בעל פה', who: 'הורים' }); add(s, 2, 'אמר בעל פה את המילים בארמית', 'ההורים'); break; }
       case 'aramQuiz': { need(r !== 'parent' && own(op.s)); const s = S(op.s), A = st.cls.aram || [], V = st.cls.aramV || 1; need(A.length, 'אין מילים');
         need(s.aramV !== V, 'כבר קיבלת נקודות על המילים האלה'); const ans = op.ans || {}; need(A.every((w, i) => ans[i] === w[1]), 'לא כל התשובות נכונות');
         s.aramV = V; s.aramDay = T.date; add(s, 5, 'ענה נכון על כל המילים בארמית 📜', 'בוחן ארמית'); break; }
