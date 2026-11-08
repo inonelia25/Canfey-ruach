@@ -601,6 +601,8 @@ body[data-role=teacher] .dhandle{display:block}
 #aq .big{font:900 34px Gush;margin:6px 0}
 
 .nav{left:0!important;right:0!important;margin:0 auto!important;width:max-content!important;transform:translateZ(0)!important;-webkit-transform:translateZ(0)!important;will-change:transform}
+
+.steps b.pend{background:rgba(244,207,107,.35)!important;color:#fff;box-shadow:inset 0 0 0 2px rgba(244,207,107,.9)}
 </style>
 </head>
 <body>
@@ -1033,8 +1035,8 @@ function render(){
   $('zrNum').textContent=Math.min(s.zr,15);$('ice').outerHTML=iceSVG(s.zr,s.flavor);
   $('zrCheer').textContent=s.zr>=15?'הקראנץ\' שלך!':ZR_CHEER[s.zr%ZR_CHEER.length];$('zrFlavor').textContent=s.flavor?'הטעם שלך: '+s.flavor+' 🍦':'';
   $('zrLeft').textContent=s.zr>=15?'הקראנץ\' שלך מחכה! 🍦':`עוד ${15-s.zr} לקראנץ'`;
-  {const w0=new Date(KR.il(Date.now()).wk+'T12:00:00Z');const wd=[0,1,2,3,4].map(i=>{const x=new Date(w0);x.setUTCDate(w0.getUTCDate()+i);return x.toISOString().slice(0,10)});const on=wd.map(d=>KR.zrOn(s,d));
-   $('streak').innerHTML=['א׳','ב׳','ג׳','ד׳','ה׳'].map((d,i)=>(i?`<em class="${on[i]&&on[i-1]?'on':''}"></em>`:'')+`<b class="${on[i]?'on':''}">${d}</b>`).join('');}
+  {const w0=new Date(KR.il(Date.now()).wk+'T12:00:00Z');const wd=[0,1,2,3,4].map(i=>{const x=new Date(w0);x.setUTCDate(w0.getUTCDate()+i);return x.toISOString().slice(0,10)});const on=wd.map(d=>KR.zrOn(s,d)),pend=wd.map((d,i)=>!on[i]&&(s.arr||[]).some(a=>a.d===d&&a.t<=450));
+   $('streak').innerHTML=['א׳','ב׳','ג׳','ד׳','ה׳'].map((d,i)=>(i?`<em class="${on[i]&&on[i-1]?'on':''}"></em>`:'')+`<b class="${on[i]?'on':pend[i]?'pend':''}" ${pend[i]?'title="מחכה לאישור המחנך"':''}>${d}</b>`).join('');}
   // class
   const ct=classTotal();$('ring').innerHTML=ringSVG(ct,CLASS_GOAL);$('clsPrize').textContent=CLASS_PRIZE;
   $('clsLeft').textContent=ct>=CLASS_GOAL?'':`עוד ${CLASS_GOAL-ct} נקודות`;

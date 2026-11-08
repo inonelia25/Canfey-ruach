@@ -44,6 +44,8 @@
     const by = {}; st.students.forEach(s => by[s.id] = s);
     if (!st.cls.cfg) st.cls.cfg = defCfg();
     if (!st.cls.cfg.treats) st.cls.cfg.treats = TREATS.slice();
+    if (!st.cls.mig8) { const wk = il(Date.parse(AUTO_ZR_DAY + 'T10:00:00Z')).wk;
+      st.students.forEach(s => { const a = (s.arr || []).find(x => x.d === AUTO_ZR_DAY); if (a && a.t <= 450) giveZr(s, AUTO_ZR_DAY, wk, 'm8-' + s.id, Date.parse(AUTO_ZR_DAY + 'T06:00:00Z')); }); st.cls.mig8 = 1; }
     if (!st.cls.mig7) { const day = '2026-11-07';
       st.students.forEach(s => { let removed = false;
         (s.hist || []).forEach(h => { if (!h.u && h.who === 'ההורים' && /המילים בארמית/.test(h.t || '') && h.ts && il(h.ts).date === day) { const w = h.w != null ? h.w : h.p;
@@ -73,6 +75,14 @@
   function zrOn(s, date) { if (s.zd && s.zd[date]) return true; return s.hist.some(h => h.z > 0 && !h.u && h.ts && il(h.ts).date === date); }
   const ARAM_ONCE = Date.parse('2026-11-06T07:15:00Z');
   const NO_PARENT_ARAM = Date.parse('2026-11-06T22:00:00Z'); // 7.11.2026 00:00 Israel
+  const AUTO_ZR_DAY = '2026-11-08';
+  function giveZr(s, date, wk, id, ts) { if (s.zrDay === date || zrOn(s, date)) return false; s.zrDay = date; (s.zd || (s.zd = {}))[date] = 1;
+    if (s.streakWk !== wk) { s.streak = 0; s.streakWk = wk; } s.streak++;
+    const h = s.streak >= 5 ? { p: '⚡', t: 'זריזין פרו! 5 ימים ברצף, שווה 8', z: 4 } : { p: '☀️', t: 'זריזין, הגעת לפני 7:30', z: 1 };
+    if (s.streak >= 5) s.streak = 0; s.zr += h.z; s.hist.unshift(Object.assign({ id, ts, who: 'המחנך ינון אליה' }, h)); if (s.hist.length > HIST_MAX) s.hist.length = HIST_MAX;
+    while (s.zr >= 15) { s.zr -= 15; const f = s.flavor || 'שוקולד נוגט'; s.crunches.push(f); s.points += 4; s.wallet += 4; s.wk[wk] = (s.wk[wk] || 0) + 4;
+      s.hist.unshift({ id: id + 'c' + s.crunches.length, ts, p: '🍦', t: `קיבלת קראנץ' ${f}! (מס' ${s.crunches.length})`, who: 'זריזין' }); }
+    return true; }
   class Bad extends Error {}
   const need = (c, m) => { if (!c) throw new Bad(m || 'לא מורשה'); };
 
@@ -176,6 +186,7 @@
         else if (!isT) need(T.min >= 420 && T.min <= 660, 'אפשר ללחוץ "הגעתי" רק בין 7:00 ל-11:00');
         s.arr.push({ d: T.date, t: T.min });
         if (T.min <= 480) add(s, 2, 'נרשם לתפילה עד 8:00', 'תפילה');
+        if (T.date === AUTO_ZR_DAY && T.min <= 450) giveZr(s, T.date, T.wk, hid('az'), op.ts);
         if (s.deal && T.min <= s.deal.until) add(s, s.deal.pts, 'הגעה בזמן לתפילה 🎯', TEACHER); break; }
       case 'deal': { need(isT); const s = S(op.s); s.dealSet = 1; if (op.off) { s.deal = null; break; }
         const u = Math.round(+op.until), p = Math.round(+op.pts); need(u >= 400 && u <= 660, 'שעה לא תקינה'); need(p > 0 && p <= 50, 'ניקוד לא תקין'); s.deal = { until: u, pts: p }; break; }
