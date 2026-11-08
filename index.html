@@ -599,6 +599,8 @@ body[data-role=teacher] .dhandle{display:block}
 #aq .op.ok{background:#2f9a63;color:#fff}#aq .op.no{background:#d9534f;color:#fff}
 #aq .x{border:0;background:none;font:400 14px Gush;color:#5a6b5d;margin-top:14px}
 #aq .big{font:900 34px Gush;margin:6px 0}
+
+.nav{left:0!important;right:0!important;margin:0 auto!important;width:max-content!important;transform:translateZ(0)!important;-webkit-transform:translateZ(0)!important;will-change:transform}
 </style>
 </head>
 <body>
@@ -656,7 +658,7 @@ body[data-role=teacher] .dhandle{display:block}
       <div class="checkin"><button class="btn" id="ciBtn">✋ הגעתי לתפילה</button><div class="sub" id="ciMsg" style="margin:8px 0 0;font-weight:700"></div></div>
       <div class="flvrow" id="flvRow"><div class="sub" style="margin:0 0 8px;font-weight:700">איזה קראנץ' אתה רוצה? 🍦</div><div class="flvs" id="flvs"></div></div>
       <div class="steps" id="streak"></div>
-      <div class="pro">5 ימים ברצף = <b>זריזין פרו ⚡</b> שווה 8</div>
+      <div class="pro">כל 5 הימים בשבוע (א׳–ה׳) = <b>זריזין פרו ⚡</b> שווה 8 · מתחיל מחדש כל ראשון</div>
       <div class="crrow"><div class="row" style="justify-content:space-between;margin-bottom:8px"><b style="font-size:16px">הקראנצ'ים שלי</b><span class="sub" style="margin:0;font-weight:700" id="crN"></span></div><div class="crs" id="crs"></div></div>
     </div>
 
@@ -1031,7 +1033,8 @@ function render(){
   $('zrNum').textContent=Math.min(s.zr,15);$('ice').outerHTML=iceSVG(s.zr,s.flavor);
   $('zrCheer').textContent=s.zr>=15?'הקראנץ\' שלך!':ZR_CHEER[s.zr%ZR_CHEER.length];$('zrFlavor').textContent=s.flavor?'הטעם שלך: '+s.flavor+' 🍦':'';
   $('zrLeft').textContent=s.zr>=15?'הקראנץ\' שלך מחכה! 🍦':`עוד ${15-s.zr} לקראנץ'`;
-  $('streak').innerHTML=['א׳','ב׳','ג׳','ד׳','ה׳'].map((d,i)=>(i?`<em class="${i<s.streak?'on':''}"></em>`:'')+`<b class="${i<s.streak?'on':''}">${d}</b>`).join('');
+  {const w0=new Date(KR.il(Date.now()).wk+'T12:00:00Z');const wd=[0,1,2,3,4].map(i=>{const x=new Date(w0);x.setUTCDate(w0.getUTCDate()+i);return x.toISOString().slice(0,10)});const on=wd.map(d=>KR.zrOn(s,d));
+   $('streak').innerHTML=['א׳','ב׳','ג׳','ד׳','ה׳'].map((d,i)=>(i?`<em class="${on[i]&&on[i-1]?'on':''}"></em>`:'')+`<b class="${on[i]?'on':''}">${d}</b>`).join('');}
   // class
   const ct=classTotal();$('ring').innerHTML=ringSVG(ct,CLASS_GOAL);$('clsPrize').textContent=CLASS_PRIZE;
   $('clsLeft').textContent=ct>=CLASS_GOAL?'':`עוד ${CLASS_GOAL-ct} נקודות`;
