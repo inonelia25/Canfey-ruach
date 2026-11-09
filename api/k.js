@@ -35,7 +35,7 @@ function view(st, me, R) {
   if (me.role === 'teacher') return Object.assign(base, { students: st.students, cls: Object.assign({}, st.cls, { agent: ag }) });
   const students = st.students.map((s, i) => i === me.a ? s : { id: s.id, name: s.name, first: s.first, goalPts: s.goalPts });
   const agent = { date: ag.date, status: ag.status, idx: ag.status === 'yes' ? ag.idx : -1 };
-  return Object.assign(base, { students, cls: { bonus: st.cls.bonus, feed: [], agent, revealed: st.cls.revealed, aram: st.cls.aram, aramV: st.cls.aramV || 1, cfg: st.cls.cfg, reqs: (st.cls.reqs || []).filter(q => q.list.includes(me.a)), tests: st.cls.tests || [] } });
+  return Object.assign(base, { students, cls: { bonus: st.cls.bonus, feed: [], agent, revealed: st.cls.revealed, aram: st.cls.aram, aramV: st.cls.aramV || 1, ann: st.cls.ann || [], cfg: st.cls.cfg, reqs: (st.cls.reqs || []).filter(q => q.list.includes(me.a)), tests: st.cls.tests || [] } });
 }
 
 const send = (res, code, obj) => { res.statusCode = code; res.setHeader('Content-Type', 'application/json; charset=utf-8'); res.setHeader('Cache-Control', 'no-store'); res.end(JSON.stringify(obj)); };
@@ -51,6 +51,17 @@ export default async function handler(req, res) {
     const db = makeStore();
     if (!db) return send(res, 503, { error: 'מסד הנתונים עוד לא מחובר' });
 
+    // personal report: the whole history of one student (teacher: anyone; student/parent: only himself)
+    if (req.method === 'GET' && url.searchParams.has('rep')) {
+      const i = me.role === 'teacher' ? +url.searchParams.get('s') : me.a; const r = R.students[i]; if (!r) return send(res, 404, { error: 'אין תלמיד כזה' });
+      const ops = (await db.lrange('kr:ops', 0, -1)).map((x, k) => Object.assign(JSON.parse(x), { i: k }));
+      const full = KR.fullHist(R.students, ops).students[i], live = (await load(db, R)).students[i];
+      const real = {}; (live.hist || []).forEach(h => real[h.id] = h);
+      const hist = full.hist.map(h => real[h.id] || h).filter(h => !h.u);
+      const out = { name: live.name, first: live.first, hist, arr: live.arr || [], goals: live.goals || [], crunches: (live.crunches || []).length, points: live.points, zr: live.zr };
+      if (me.role === 'teacher') { out.sc = r.sc; out.pc = r.pc; }
+      return send(res, 200, out);
+    }
     if (req.method === 'GET') return send(res, 200, view(await load(db, R), me, R));
 
     if (req.method === 'POST') {

@@ -409,6 +409,7 @@ body{padding-top:0!important}
 .aw{font:700 44px/1.1 Moshe,serif;text-align:center;color:#0D614A;margin-top:4px}
 .am{text-align:center;font-size:17px;margin-top:6px}
 .brep{background:#fff;color:#0b3d4a}.brep .ch{text-shadow:none}.brep .ch i{background:#eef7f8;box-shadow:none}
+.brpt{background:#F3EBD8;color:#173a2a}.brpt .ch{text-shadow:none}.brpt .ch i{background:#fff;box-shadow:none}
 .binit{background:linear-gradient(160deg,#2b3f9c,#1d2c78);color:#fff}
 .bgrp{background:#C3D48B;color:#12361f}.bgrp .ch{text-shadow:none}.bgrp .ch i{background:rgba(255,255,255,.6);box-shadow:none}
 .bgrp .chip{background:rgba(255,255,255,.55);color:#12361f}.bgrp .chip.on{background:#0D614A;color:#fff}
@@ -603,12 +604,33 @@ body[data-role=teacher] .dhandle{display:block}
 .nav{left:0!important;right:0!important;margin:0 auto!important;width:max-content!important;transform:translateZ(0)!important;-webkit-transform:translateZ(0)!important;will-change:transform}
 
 .steps b.pend{background:rgba(244,207,107,.35)!important;color:#fff;box-shadow:inset 0 0 0 2px rgba(244,207,107,.9)}
+
+#rpt{position:fixed!important;top:0!important;left:0!important;right:0!important;bottom:0!important;width:100vw!important;height:100%!important;z-index:90;background:#f6f3ea;color:#173a2a;overflow:auto;display:none;-webkit-overflow-scrolling:touch}
+#rpt.on{display:block}
+#rpt .rin{max-width:560px;margin:0 auto;padding:18px 18px 120px}
+#rpt .rtop{display:flex;align-items:center;gap:10px}
+#rpt .rx{border:0;background:#e3dccb;border-radius:99px;width:38px;height:38px;font:700 18px Gush;color:#173a2a}
+#rpt h2{font:900 26px Gush;margin:16px 0 2px}
+#rpt .rsub{font:400 15px Gush;opacity:.7;margin-bottom:12px}
+#rpt .seg{background:#e9e3d3}
+#rpt .seg button{color:#173a2a}#rpt .seg button.on{background:#173a2a;color:#fff}
+.rtiles{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:6px 0 16px}
+.rtile{background:#fff;border-radius:18px;padding:12px 6px;text-align:center;box-shadow:0 2px 8px rgba(0,0,0,.06)}
+.rtile b{display:block;font:900 26px Gush;color:#0b3d4a}.rtile span{font:400 13px Gush;opacity:.75}
+.rsec{font:900 18px Gush;margin:18px 0 8px}
+.rrow{display:flex;align-items:center;gap:10px;background:#fff;border-radius:14px;padding:9px 12px;margin-bottom:6px;font:400 15px Gush}
+.rrow .e{font-size:20px;width:26px;text-align:center}.rrow .t{flex:1}.rrow .c{opacity:.6;font-size:13px}.rrow .p{font-weight:700;color:#1f7a4a;min-width:42px;text-align:left}
+.rday{font:700 14px Gush;opacity:.65;margin:14px 2px 6px}
+.ract{position:fixed;bottom:0;left:0;right:0;background:linear-gradient(transparent,#f6f3ea 30%);padding:26px 16px calc(14px + env(safe-area-inset-bottom));display:flex;gap:8px;justify-content:center;max-width:560px;margin:0 auto}
+.ract .btn{font-size:14px;padding:11px 8px}
+.ract .wa{background:#25D366!important;color:#fff!important}
+@media print{body>*:not(#rpt){display:none!important}#rpt{position:static;display:block!important;background:#fff}.ract,.rtop .rx,#rpt .seg{display:none!important}.rrow,.rtile{box-shadow:none;border:1px solid #ddd;break-inside:avoid}}
 </style>
 </head>
 <body>
 <div class="sky"></div><canvas id="cf"></canvas>
 <div id="toast"></div>
-<div id="zpop" onclick="this.classList.remove('show')"><div class="zb"><div class="zt">יא זריז!</div><div class="zi" id="zpIce"></div><div class="zn" id="zpN"></div><div class="zs" id="zpSub"></div><div class="zh">הגעת לפני 7:30 ☀️ · +2 נקודות</div></div></div>
+<div id="zpop" onclick="this.classList.remove('show')"><div class="zb"><div class="zt">יא זריז!</div><div class="zi" id="zpIce"></div><div class="zn" id="zpN"></div><div class="zs" id="zpSub"></div><div class="zh">הגעת לפני 7:30 ☀️ · +0.5 נקודה</div></div></div>
 <div id="agOv" onclick="if(this.dataset.ready)this.classList.remove('show')"><div class="box" id="agBox"></div></div>
 <div id="cpop" onclick="if(!this.classList.contains('pick'))closePop()"><div class="cbox"><div class="cice" id="cpIce"></div><h3 id="cpTitle"></h3><div id="cpText"></div><div class="flv" id="cpFlv"></div></div></div>
 <div id="overlay" onclick="this.classList.remove('show')"><div><div id="ovMedal"></div><h3 id="ovTitle" class="gold-t"></h3><div id="ovText" style="font-size:17px;opacity:.85"></div><br><button class="btn" style="width:auto;padding:12px 40px">יאללה!</button></div></div>
@@ -781,6 +803,9 @@ body[data-role=teacher] .dhandle{display:block}
       <div class="donate"><b>💛 לתרום לכיתה</b><div class="sub" style="margin:4px 0 10px">הנקודות שתתרום נכנסות ליעד של כל הכיתה.</div>
         <div class="row" style="gap:8px" id="donBtns"></div><div class="sub" style="margin-top:8px" id="donSum"></div></div>
     </div>
+  <div class="card brpt"><div class="ch"><i>📄</i>הסיכום שלי</div>
+      <div class="sub" style="margin:-6px 0 12px">כל מה שנעשה בשבוע, בחודש או מתחילת השנה, במבט אחד.</div>
+      <button class="btn rptGo">פתח את הדוח</button></div>
   </section>
 
   <!-- PARENT -->
@@ -803,6 +828,9 @@ body[data-role=teacher] .dhandle{display:block}
     <div class="card brep"><div class="ch"><i>⏰</i>שעות ההגעה לתפילה</div>
       <div class="seg" data-tgt="p"><button class="on" data-per="week">שבוע</button><button data-per="month">חודש</button></div>
       <div id="pRep"></div></div>
+<div class="card brpt"><div class="ch"><i>📄</i>הסיכום של הבן</div>
+      <div class="sub" style="margin:-6px 0 12px">כל מה שנעשה בשבוע, בחודש או מתחילת השנה, במבט אחד.</div>
+      <button class="btn rptGo">פתח את הדוח</button></div>
     <div class="card b4"><div class="ch"><i>📈</i>ההתקדמות</div>
       <div class="stat"><span>נקודות</span><b id="pPts"></b></div>
       <div class="stat"><span>מדליה</span><b id="pLvl"></b></div>
@@ -843,6 +871,9 @@ body[data-role=teacher] .dhandle{display:block}
         <div id="trList" style="margin-top:8px"></div>
         <div class="tq" style="grid-template-columns:56px 1fr 70px"><input id="trE" placeholder="🍩" style="text-align:center;font-size:20px"><input id="trN" placeholder="שם הפינוק, למשל: סופגניות"><button id="trAdd">הוסף</button></div>
       </details></div>
+<div class="card brpt"><div class="ch"><i>📄</i>דוח אישי · <span class="sname"></span></div>
+      <div class="sub" style="margin:-6px 0 12px">כל מה שנעשה בשבוע, בחודש או מתחילת השנה, במבט אחד.</div>
+      <button class="btn rptGo">פתח את הדוח</button></div>
     <div class="card brep"><div class="ch"><i>⏰</i>דוח הגעה לתפילה</div>
       <div class="seg" data-tgt="t"><button class="on" data-per="week">שבוע</button><button data-per="month">חודש</button></div>
       <div id="tRep"></div>
@@ -866,7 +897,7 @@ body[data-role=teacher] .dhandle{display:block}
     <div class="card b5"><div class="ch"><i>🏠</i>מה ההורים סימנו היום</div>
       <ul class="tl" id="tFeed"></ul></div>
     <div class="card badm"><div class="ch"><i>⚙️</i>ניהול</div>
-      <div class="seg admseg" id="admSeg"><button class="on" data-a="prizes">פרסים</button><button data-a="deeds">ניקוד מחנך</button><button data-a="home">ניקוד הורים</button><button data-a="zr">זריזין קודמים</button><button data-a="loc">מיקום תפילה</button><button data-a="fix">תיקונים לתלמיד</button><button data-a="cls">איפוס</button><button data-a="lv">מדליה</button></div>
+      <div class="seg admseg" id="admSeg"><button class="on" data-a="prizes">פרסים</button><button data-a="deeds">ניקוד מחנך</button><button data-a="home">ניקוד הורים</button><button data-a="zr">זריזין קודמים</button><button data-a="loc">מיקום תפילה</button><button data-a="fix">תיקונים לתלמיד</button><button data-a="cls">איפוס</button><button data-a="lv">מדליה</button><button data-a="ann">הודעה לכולם</button></div>
       <div id="admBody"></div>
       <div class="admbtns"><button class="btn" id="admSave">שמור שינויים</button><button class="btn ghost" id="admUndo">בטל</button></div>
       <div class="sub" id="admNote" style="margin-top:8px"></div></div>
@@ -939,13 +970,13 @@ async function pull(){if(!ONLINE||inflight||queue.length||document.hidden)return
 function offline(e){if(e.code===401){try{localStorage.removeItem('kr_k')}catch(x){}$('ldTxt').innerHTML='הקישור הזה לא תקין.<br>בקשו מהמחנך ינון אליה את הקישור האישי.';$('loader').classList.add('show');return}
   if(e.code===503){$('ldTxt').textContent='האפליקציה בהקמה, נסו שוב בעוד כמה דקות 🙏';$('loader').classList.add('show');return}
   $('offl').classList.add('show')}
-function setupRole(){const nav=document.querySelector('.nav');document.body.dataset.role=ROLE;
+function setupRole(){const nav=document.querySelector('.nav');document.body.dataset.role=ROLE;if(location.hash==='#rep'&&ROLE!=='teacher'){history.replaceState(null,'',location.pathname+location.search);setTimeout(rptOpen,600)}
   if(ROLE==='teacher'){nav.style.display='';document.querySelector('.nav [data-r=teacher]').click()}
   else{nav.style.display='none';document.querySelector(`.nav [data-r=${ROLE}]`).click()}
   const s=state.students[ME];document.querySelector('.demo').textContent=ROLE==='teacher'?'מחובר כמחנך':ROLE==='parent'?'הורי '+(s.first||s.name):'';
   $('loader').classList.remove('show')}
 // new things from others (teacher, parents, friends) show up in the bell
-function afterSync(own){if(ROLE==='teacher'){teacherSync(own);return}setTimeout(()=>{agentMorning();whenFree(goalPop);setTimeout(()=>whenFree(day14),400);setTimeout(()=>whenFree(tkDue),800)},1000);const s=state.students[ME],K='kr_seen_'+ROLE+ME;let seen=0;try{seen=+localStorage.getItem(K)||0}catch(e){}
+function afterSync(own){setTimeout(()=>whenFree(annPop),700);if(ROLE==='teacher'){teacherSync(own);return}setTimeout(()=>{agentMorning();whenFree(goalPop);setTimeout(()=>whenFree(day14),400);setTimeout(()=>whenFree(tkDue),800)},1000);const s=state.students[ME],K='kr_seen_'+ROLE+ME;let seen=0;try{seen=+localStorage.getItem(K)||0}catch(e){}
   const top=Math.max(0,...s.hist.map(h=>h.ts||0));
   if(!own&&seen)s.hist.filter(h=>h.ts>seen).slice(0,6).reverse().forEach(h=>{const t=(typeof h.p==='number'?'+'+h.p+' · ':h.p+' ')+h.t+(h.who?' · '+h.who:'');notify(t,(s.first||s.name)+': '+t)});
   try{localStorage.setItem(K,Math.max(seen,top))}catch(e){}
@@ -1019,7 +1050,7 @@ setInterval(greet,4000);
 function levelUp(l,name){$('ovMedal').innerHTML=crestHTML(l,1,true);$('ovTitle').textContent='עלית רמה!';$('ovText').textContent=`${name}, הגעת למדליית ${LEVELS[l].name}`;$('overlay').classList.add('show');confetti(220)}
 const classTotal=()=>state.students.reduce((a,s)=>a+(s.goalPts||0),0)+(state.cls.bonus||0);
 
-function animNum(el,to){const from=+el.textContent||0;if(from===to){el.textContent=to;return}const t0=performance.now();(function f(t){const k=Math.min((t-t0)/700,1);el.textContent=Math.round(from+(to-from)*(1-Math.pow(1-k,3)));if(k<1)requestAnimationFrame(f)})(t0)}
+function animNum(el,to){const from=+el.textContent||0;if(from===to){el.textContent=to;return}const t0=performance.now();(function f(t){const k=Math.min((t-t0)/700,1);el.textContent=k<1?Math.round(from+(to-from)*(1-Math.pow(1-k,3))):to;if(k<1)requestAnimationFrame(f)})(t0)}
 
 function render(){
   const s=me(),l=lvlOf(s.points),L=LEVELS[l],N=LEVELS[l+1];
@@ -1267,7 +1298,7 @@ $('ciBtn').onclick=()=>{const s=me();if(todayArr(s))return;const L=(state.cls.cf
       e=>{b.disabled=false;renderCheckin();toast(e.code===1?'צריך לאשר גישה למיקום כדי להירשם':'לא הצלחתי לאתר מיקום, נסה שוב')},{enableHighAccuracy:true,timeout:15000,maximumAge:0});return}
   ciDo({})};
 function ciFx(){const s=me();const a=todayArr(s)||s.arr[s.arr.length-1];if(!a)return;const t=a.t;const ok=t<=450;
-  if(!ok){if(s.deal&&t<=s.deal.until){burstAt($('ciBtn'),70);toast(`🎯 עמדת ביעד! +${s.deal.pts+(t<=480?2:0)} נקודות`)}else toast(t<=480?`נרשם: ${fmtT(t)} · +2 נקודות. מחר מקדימים 💪`:`נרשם: ${fmtT(t)} · מחר מקדימים 💪`);return}
+  if(!ok){if(s.deal&&t<=s.deal.until){burstAt($('ciBtn'),70);toast(`🎯 עמדת ביעד! +${s.deal.pts+(t<=480?0.5:0)} נקודות`)}else toast(t<=480?`נרשם: ${fmtT(t)} · +0.5 נקודה. מחר מקדימים 💪`:`נרשם: ${fmtT(t)} · מחר מקדימים 💪`);return}
   if(s.deal)setTimeout(()=>toast(`🎯 ועוד +${s.deal.pts} על היעד האישי שלך`),5200);
   const n=Math.min(s.zr+1,15),left=15-n;const z=$('zpop');
   $('zpIce').innerHTML=iceSVG(n,s.flavor,1);$('zpN').textContent=`${n}/15`;
@@ -1338,7 +1369,7 @@ document.querySelectorAll('.card').forEach(el=>{el.classList.add('reveal');io.ob
 let admTab='prizes',draft=null,dirty=0;
 function admLoad(){const C=state.cls.cfg||KR.defCfg();draft=JSON.parse(JSON.stringify(C));draft.zr={};dirty=0}
 function admMark(){dirty=1;$('admNote').textContent='יש שינויים שלא נשמרו'}
-function admRender(){if(!$('admBody')||ROLE!=='teacher')return;document.querySelector('.admbtns').style.display=['fix','cls','loc','lv'].includes(admTab)?'none':'';if(!draft||!dirty)admLoad();const B=$('admBody');
+function admRender(){if(!$('admBody')||ROLE!=='teacher')return;document.querySelector('.admbtns').style.display=['fix','cls','loc','lv','ann'].includes(admTab)?'none':'';if(!draft||!dirty)admLoad();const B=$('admBody');
   const del='<button title="מחק">✕</button>';
   if(admTab==='prizes'){B.innerHTML=`<div class="ahead"><span></span><span>פרס</span><span>מחיר</span><span>מלאי</span><span></span></div>`+draft.prizes.map((p,i)=>`<div class="arow" data-i="${i}"><input class="em" data-f="e" value="${esc(p.e)}"><input data-f="name" value="${esc(p.name)}" placeholder="שם הפרס"><input class="num" data-f="cost" type="number" inputmode="numeric" value="${p.cost}"><input class="num" data-f="stock" type="number" inputmode="numeric" value="${p.stock==null?'':p.stock}" placeholder="∞">${del}</div>`).join('')+`<button class="aadd" data-add="1">+ פרס חדש</button><div class="sub" style="margin-top:8px">מלאי ריק = בלי הגבלה. כשהמלאי מגיע ל-0 הפרס מופיע כ"אזל".</div>`}
   else if(admTab==='zr'){B.innerHTML=`<div class="sub" style="margin:0 0 10px">כמה זריזין כל תלמיד כבר צבר לפני האפליקציה? כותבים מספר ולוחצים שמור. המספר <b>נוסף</b> למה שיש לו (מספר שלילי מתקן טעות). כל 15 הופכים לקראנץ'.</div><div class="ahead d" style="grid-template-columns:1fr 70px 80px"><span>תלמיד</span><span>יש לו</span><span>להוסיף</span></div>`+state.students.map((x,i)=>`<div class="arow" style="grid-template-columns:1fr 70px 80px" data-i="${i}"><span style="font:700 15px Gush">${esc(x.name)}</span><span style="text-align:center;font:700 15px Gush">${x.crunches.length*15+x.zr}</span><input class="num" data-zr="1" type="number" inputmode="numeric" value="${draft.zr&&draft.zr[i]||''}" placeholder="0"></div>`).join('')}
@@ -1372,6 +1403,12 @@ function admRender(){if(!$('admBody')||ROLE!=='teacher')return;document.querySel
     B.querySelectorAll('[data-undo]').forEach(b=>b.onclick=()=>{if(act({t:'undo',s:state.cur,h:b.dataset.undo}))admRender()});
     $('fxReset').onclick=()=>{if(!confirm(`לאפס את כל הנקודות, הזריזין והיסטוריה של ${x.name}? אפשר יהיה להחזיר.`))return;if(act({t:'reset',s:state.cur})){toast('התלמיד אופס');admRender()}};
     if($('fxRestore'))$('fxRestore').onclick=()=>{if(act({t:'restore',s:state.cur})){toast('↩︎ הנתונים הוחזרו');admRender()}}}
+  else if(admTab==='ann'){const A=(state.cls.ann||[]);B.innerHTML=`<div class="sub" style="margin:0 0 10px">הודעה שקופצת לכל התלמידים וההורים פעם אחת כשהם נכנסים לאפליקציה (למשל מזל טוב).</div>
+    <div class="arow" style="grid-template-columns:52px 1fr"><input id="anE" value="🎉" style="text-align:center;font-size:20px"><input id="anT" placeholder="למשל: מזל טוב לדוד ליום ההולדת!"></div>
+    <div class="arow" style="grid-template-columns:1fr 90px"><span style="font:400 15px Gush">כמה ימים להציג</span><input id="anD" class="num" type="number" value="3"></div>
+    <button class="btn" id="anGo">פרסם</button>
+    <div style="margin-top:14px">${A.map(a=>`<div class="arow" style="grid-template-columns:1fr 40px"><span style="font:400 15px Gush">${esc(a.e)} ${esc(a.tx)}<small style="display:block;opacity:.6">${a.until>Date.now()?'פעיל':'הסתיים'}</small></span><button onclick="if(act({t:'annDel',id:'${a.id}'}))admRender()">✕</button></div>`).join('')}</div>`;
+    $('anGo').onclick=()=>{if(act({t:'annAdd',e:$('anE').value,tx:$('anT').value,days:+$('anD').value})){toast('🎉 פורסם');admRender()}}}
   else if(admTab==='lv'){const LV=(state.cls.cfg&&state.cls.cfg.lv)||[0,120,300,600];B.innerHTML=`<div class="sub" style="margin:0 0 12px">כמה נקודות צריך כדי שסמל הכנפיים יעלה לכל צבע. ביהלום הסמל מלא לגמרי.</div>
     ${[['כסף',1],['זהב',2],['יהלום (מלא)',3]].map(([n,i])=>`<div class="arow" style="grid-template-columns:1fr 110px"><span style="font:700 16px Gush">${n}</span><input class="num" id="lv${i}" type="number" inputmode="numeric" value="${LV[i]}"></div>`).join('')}
     <button class="btn" id="lvGo" style="margin-top:6px">שמור</button>`;
@@ -1385,18 +1422,18 @@ function admRender(){if(!$('admBody')||ROLE!=='teacher')return;document.querySel
   else{B.innerHTML=Object.keys(draft.cats).map((c,ci)=>`<div class="acat" data-c="${ci}"><input data-cat="1" value="${esc(c)}"><button data-delcat="1" title="מחק קטגוריה">🗑</button></div>`+draft.cats[c].map((d,i)=>`<div class="arow d" data-c="${ci}" data-i="${i}"><input class="em" data-f="0" value="${esc(d[0])}"><input data-f="1" value="${esc(d[1])}"><input class="num" data-f="2" type="number" inputmode="numeric" value="${d[2]}">${del}</div>`).join('')+`<button class="aadd" data-c="${ci}" data-add="1">+ פעולה ב${esc(c)}</button>`).join('')+`<button class="aadd" data-newcat="1" style="margin-top:14px">+ קטגוריה חדשה</button>`}}
 function catAt(ci){return Object.keys(draft.cats)[ci]}
 $('admSeg').onclick=e=>{const b=e.target.closest('button');if(!b)return;if(dirty&&!confirm('יש שינויים שלא נשמרו. לעבור בלי לשמור?'))return;dirty=0;admTab=b.dataset.a;$('admSeg').querySelectorAll('button').forEach(x=>x.classList.toggle('on',x===b));$('admNote').textContent='';admRender()};
-$('admBody').addEventListener('input',e=>{if(['fix','cls','loc','lv'].includes(admTab))return;const t=e.target,row=t.closest('.arow');admMark();
+$('admBody').addEventListener('input',e=>{if(['fix','cls','loc','lv','ann'].includes(admTab))return;const t=e.target,row=t.closest('.arow');admMark();
   if(t.dataset.cat){const ci=+t.closest('.acat').dataset.c,old=catAt(ci),keys=Object.keys(draft.cats),o={};keys.forEach(k=>o[k===old?t.value:k]=draft.cats[k]);draft.cats=o;t.closest('.acat').nextElementSibling;return}
   if(!row)return;const i=+row.dataset.i,f=t.dataset.f;if(t.dataset.zr){draft.zr=draft.zr||{};draft.zr[i]=t.value;return}
   if(admTab==='prizes'){const p=draft.prizes[i];p[f]=f==='cost'?t.value:f==='stock'?t.value:t.value}
   else{const L=admTab==='home'?draft.home:draft.cats[catAt(+row.dataset.c)];L[i][+f]=t.value}});
-$('admBody').addEventListener('click',e=>{if(['fix','cls','loc','zr','lv'].includes(admTab))return;const b=e.target.closest('button');if(!b)return;
+$('admBody').addEventListener('click',e=>{if(['fix','cls','loc','zr','lv','ann'].includes(admTab))return;const b=e.target.closest('button');if(!b)return;
   if(b.dataset.add){if(admTab==='prizes')draft.prizes.push({id:'',e:'🎁',name:'',cost:50,stock:''});else if(admTab==='home')draft.home.push(['🏡','',3]);else draft.cats[catAt(+b.dataset.c)].push(['⭐','',5]);admMark();admRender();const ins=$('admBody').querySelectorAll('.arow input:not(.em):not(.num)');if(ins.length)ins[ins.length-1].focus();return}
   if(b.dataset.newcat){let n='קטגוריה חדשה',k=2;while(draft.cats[n])n='קטגוריה חדשה '+k++;draft.cats[n]=[['⭐','',5]];admMark();admRender();return}
   if(b.dataset.delcat){const c=catAt(+b.closest('.acat').dataset.c);if(!confirm(`למחוק את הקטגוריה "${c}" עם כל הפעולות שבה?`))return;delete draft.cats[c];admMark();admRender();return}
   const row=b.closest('.arow');if(!row)return;const i=+row.dataset.i;
   if(admTab==='prizes')draft.prizes.splice(i,1);else if(admTab==='home')draft.home.splice(i,1);else draft.cats[catAt(+row.dataset.c)].splice(i,1);admMark();admRender()});
-$('admSave').onclick=()=>{if(['loc','fix','cls','lv'].includes(admTab)){toast('כאן כל כפתור שומר מיד');return}if(!dirty){toast('אין שינויים');return}let op;
+$('admSave').onclick=()=>{if(['loc','fix','cls','lv','ann'].includes(admTab)){toast('כאן כל כפתור שומר מיד');return}if(!dirty){toast('אין שינויים');return}let op;
   if(admTab==='zr'){const list=Object.entries(draft.zr||{}).map(([i,n])=>({s:+i,n:+n})).filter(x=>x.n);if(!list.length){toast('לא נכתב אף מספר');return}op={t:'zrAdd',list}}
   else if(admTab==='prizes')op={t:'cfgPrizes',list:draft.prizes.map(p=>({id:p.id,e:p.e,name:p.name,cost:+p.cost,stock:p.stock===''||p.stock==null?null:+p.stock}))};
   else if(admTab==='home')op={t:'cfgHome',list:draft.home.map(d=>[d[0],d[1],+d[2]])};
@@ -1525,11 +1562,71 @@ function aqEnd(){const s=me(),V=state.cls.aramV||1,n=aq.order.length,good=n-aq.w
   if(s.aramV===V||ROLE!=='student'&&ROLE!=='teacher'){$('aqB').innerHTML=`<div style="font-size:52px">🏆</div><div class="big">${n} מתוך ${n}!</div><p style="font:400 16px Gush">מעולה! על המילים האלה כבר קיבלת נקודות, אז זה היה אימון.</p><button class="btn" onclick="$('aq').classList.remove('on')">סגור</button>`;return}
   const ans={};ARAM.forEach((w,i)=>ans[i]=w[1]);
   if(act({t:'aramQuiz',s:state.cur,ans})){$('aqB').innerHTML=`<div style="font-size:52px">🏆</div><div class="big">אלוף! ${n} מתוך ${n}</div><p style="font:700 18px Gush">קיבלת <b>+5 נקודות</b> על המילים בארמית</p><button class="btn" onclick="$('aq').classList.remove('on')">יישר כוח!</button>`;confetti(240)}else $('aq').classList.remove('on')}
+
+
+// ===== personal report (week / month / year) =====
+let RPT={i:-1,d:null,p:'week'};
+const HEB_M=['ינואר','פברואר','מרץ','אפריל','מאי','יוני','יולי','אוגוסט','ספטמבר','אוקטובר','נובמבר','דצמבר'];
+const dmy=d=>+d.slice(8)+'.'+(+d.slice(5,7));
+function rptRange(p){const T=KR.il(Date.now());const add=(d,n)=>{const x=new Date(d+'T12:00:00Z');x.setUTCDate(x.getUTCDate()+n);return x.toISOString().slice(0,10)};
+  if(p==='week')return{a:T.wk,b:add(T.wk,6),lbl:`השבוע · ${dmy(T.wk)}–${dmy(add(T.wk,6))}`};
+  if(p==='last'){const w=add(T.wk,-7);return{a:w,b:add(w,6),lbl:`שבוע שעבר · ${dmy(w)}–${dmy(add(w,6))}`}}
+  if(p==='month')return{a:T.date.slice(0,8)+'01',b:T.date.slice(0,8)+'31',lbl:'חודש '+HEB_M[+T.date.slice(5,7)-1]};
+  const y=+T.date.slice(0,4)-(+T.date.slice(5,7)<8?1:0);return{a:y+'-08-01',b:(y+1)+'-07-31',lbl:'מתחילת שנת הלימודים'}}
+async function rptOpen(){const i=ROLE==='teacher'?state.cur:ME;RPT={i,d:null,p:RPT.p||'week'};$('rpt').classList.add('on');document.body.style.overflow='hidden';
+  $('rName').textContent=state.students[i].name;$('rBody').innerHTML='<div class="sub">טוען…</div>';$('rAct').innerHTML='';
+  try{RPT.d=ONLINE?await (async()=>{const r=await fetch('/api/k?k='+encodeURIComponent(CODE)+'&rep=1&s='+i,{cache:'no-store'});if(!r.ok)throw 0;return r.json()})():null}catch(e){RPT.d=null}
+  if(!RPT.d){const s=state.students[i];RPT.d={name:s.name,first:s.first,hist:s.hist.filter(h=>!h.u),arr:s.arr||[],goals:s.goals||[]}}
+  rptRender()}
+function rptClose(){$('rpt').classList.remove('on');document.body.style.overflow=''}
+function rptData(){const d=RPT.d,R=rptRange(RPT.p),inR=x=>x>=R.a&&x<=R.b;
+  const H=d.hist.filter(h=>h.ts&&inR(KR.il(h.ts).date));
+  const num=h=>typeof h.p==='number'?h.p:0;
+  const earned=H.reduce((q,h)=>q+(num(h)>0?num(h):0),0);
+  const zr=H.filter(h=>h.z>0&&h.p==='☀️').length;
+  const arr=(d.arr||[]).filter(a=>inR(a.d));
+  const home=H.filter(h=>h.who==='ההורים'&&num(h)>0).length;
+  const prizes=H.filter(h=>h.pz||h.p==='🎁'),don=H.filter(h=>h.b);
+  const grp={};H.forEach(h=>{if(!(num(h)>0)&&!(h.z>0)&&h.p!=='🍦')return;const key=String(h.t).replace(/\s*\(.*?\)\s*$/,'').replace(/\d{1,2}:\d{2}/,'').trim();const g=grp[key]||(grp[key]={t:key,e:typeof h.p==='number'?'':h.p,n:0,p:0,who:h.who});g.n++;g.p+=num(h)});
+  const top=Object.values(grp).sort((a,b)=>b.p-a.p||b.n-a.n);
+  return{R,H,earned:Math.round(earned*2)/2,zr,arr,home,prizes,don,top}}
+function rptRender(){const d=RPT.d,X=rptData();$('rSub').textContent=X.R.lbl;
+  document.querySelectorAll('#rSeg button').forEach(b=>b.classList.toggle('on',b.dataset.p===RPT.p));
+  const em=h=>typeof h.p==='number'?(h.who==='ההורים'?'🏠':h.who&&h.who!=='המחנך ינון אליה'?'🤝':'⭐'):h.p;
+  let o=`<div class="rtiles"><div class="rtile"><b>${X.earned}</b><span>נקודות שהרוויח</span></div><div class="rtile"><b>${X.zr}</b><span>ימי זריזין ☀️</span></div><div class="rtile"><b>${X.arr.length}</b><span>הגעות לתפילה</span></div>
+    <div class="rtile"><b>${X.home}</b><span>מעשים טובים בבית</span></div><div class="rtile"><b>${X.prizes.length}</b><span>פרסים</span></div><div class="rtile"><b>${X.don.reduce((q,h)=>q+h.b,0)}</b><span>נקודות שתרם</span></div></div>`;
+  if(!X.H.length&&!X.arr.length)o+='<div class="sub" style="text-align:center;margin:30px 0">עוד אין פעילות בתקופה הזאת</div>';
+  if(X.top.length)o+=`<div class="rsec">במבט על</div>`+X.top.slice(0,12).map(g=>`<div class="rrow"><span class="e">${esc(g.e||'⭐')}</span><span class="t">${esc(g.t)}</span><span class="c">×${g.n}</span><span class="p">${g.p?'+'+g.p:''}</span></div>`).join('');
+  if(X.arr.length){const avg=Math.round(X.arr.reduce((q,a)=>q+a.t,0)/X.arr.length);o+=`<div class="rsec">תפילה</div><div class="rrow"><span class="e">🕖</span><span class="t">שעת הגעה ממוצעת</span><span class="p" style="color:#0b3d4a">${fmtT(avg)}</span></div><div class="rrow"><span class="e">☀️</span><span class="t">הגיע עד 7:30</span><span class="p" style="color:#0b3d4a">${X.arr.filter(a=>a.t<=450).length} מתוך ${X.arr.length}</span></div>`}
+  const by={};X.H.forEach(h=>{const k=KR.il(h.ts).date;(by[k]||(by[k]=[])).push(h)});
+  const days=Object.keys(by).sort().reverse();const DN=['ראשון','שני','שלישי','רביעי','חמישי','שישי','שבת'];
+  if(days.length)o+=`<div class="rsec">כל הפעילות</div>`+days.map(k=>`<div class="rday">יום ${DN[KR.il(Date.parse(k+'T12:00:00Z')).dow]} · ${dmy(k)}</div>`+by[k].map(h=>`<div class="rrow"><span class="e">${esc(em(h))}</span><span class="t">${esc(h.t)}${h.who?`<small style="display:block;opacity:.55">${esc(h.who)}</small>`:''}</span><span class="p" style="${typeof h.p==='number'&&h.p<0||h.w<0?'color:#a33':''}">${typeof h.p==='number'?(h.p>0?'+':'')+h.p:h.w<0?h.w:''}</span></div>`).join('')).join('');
+  $('rBody').innerHTML=o;
+  const T=ROLE==='teacher';$('rAct').innerHTML=(T?`<button class="btn wa" onclick="rptSend('s')">📲 לתלמיד</button><button class="btn wa" onclick="rptSend('p')">📲 להורים</button>`:`<button class="btn wa" onclick="rptSend('')">📲 שתף</button>`)+`<button class="btn" onclick="window.print()">🖨️ PDF</button>`}
+function rptText(who){const d=RPT.d,X=rptData(),f=d.first||d.name;
+  let t=(who==='s'?`היי ${f}! 💪 הסיכום שלך מכנפי רוח · ${X.R.lbl}`:who==='p'?`שלום להורי ${f} 🌟 הסיכום של ${f} מכנפי רוח · ${X.R.lbl}`:`הסיכום של ${f} מכנפי רוח · ${X.R.lbl}`)+'\n\n';
+  t+=`⭐ ${X.earned} נקודות\n☀️ ${X.zr} ימי זריזין\n🕖 ${X.arr.length} הגעות לתפילה\n`;if(X.home)t+=`🏠 ${X.home} מעשים טובים בבית\n`;
+  if(X.top.length)t+='\nבמבט על:\n'+X.top.slice(0,8).map(g=>`• ${g.t}${g.n>1?' ×'+g.n:''}${g.p?' (+'+g.p+')':''}`).join('\n')+'\n';
+  const code=who==='s'?d.sc:who==='p'?d.pc:'';if(code)t+=`\nהדוח המלא באפליקציה: ${location.origin}/?k=${code}#rep\n`;
+  return t+(ROLE==='teacher'?'\nהמחנך ינון אליה':'')}
+function rptSend(who){const t=rptText(who);if(navigator.share&&who===''){navigator.share({text:t}).catch(()=>{});return}location.href='https://wa.me/?text='+encodeURIComponent(t)}
+document.querySelectorAll('.rptGo').forEach(b=>b.onclick=rptOpen);
+document.addEventListener('click',e=>{const b=e.target.closest('#rSeg button');if(!b||!RPT.d)return;RPT.p=b.dataset.p;rptRender()});
+// ===== class announcements (mazal tov etc.) =====
+function annPop(){const A=(state.cls.ann||[]).filter(a=>a.until>Date.now());let seen=[];try{seen=JSON.parse(localStorage.getItem('kr_ann')||'[]')}catch(e){}
+  const a=A.find(x=>!seen.includes(x.id));if(!a)return;seen.push(a.id);try{localStorage.setItem('kr_ann',JSON.stringify(seen.slice(-60)))}catch(e){}
+  $('ovMedal').innerHTML=`<div style="font-size:96px">${esc(a.e||'🎉')}</div>`;$('ovTitle').textContent='מזל טוב!';$('ovText').textContent=a.tx;$('overlay').classList.add('show');confetti(260);
+  setTimeout(()=>whenFree(annPop),800)}
 // one pop-up at a time
 function whenFree(fn,tries=0){if(document.querySelector('#agOv.show,#overlay.show,#cpop.show,#tkpop.show,#zpop.show,#aq.on')&&tries<200){setTimeout(()=>whenFree(fn,tries+1),1500);return}fn()}
 // ===== start =====
 if(ONLINE){$('loader').classList.add('show');api('GET').then(v=>take(v)).catch(offline);
   setInterval(pull,30000);document.addEventListener('visibilitychange',()=>{if(!document.hidden)pull()});addEventListener('online',()=>{flush();pull()})}
 </script>
+<div id="rpt"><div class="rin"><div class="rtop"><button class="rx" onclick="rptClose()">✕</button><b style="font:700 16px Gush;flex:1">כנפי רוח · דוח אישי</b></div>
+  <h2 id="rName"></h2><div class="rsub" id="rSub"></div>
+  <div class="seg" id="rSeg"><button data-p="week" class="on">השבוע</button><button data-p="last">שבוע שעבר</button><button data-p="month">החודש</button><button data-p="year">כל השנה</button></div>
+  <div id="rBody"><div class="sub">טוען…</div></div></div>
+  <div class="ract" id="rAct"></div></div>
 </body>
 </html>

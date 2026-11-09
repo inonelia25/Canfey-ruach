@@ -21,7 +21,7 @@
     'הפתעה':[['⭐','שמתי לב!',5],['🌟','משהו מיוחד',8]] };
   const defCfg = () => ({ prizes: PRIZES.map((p, i) => ({ id: 'p' + i, e: p[0], name: p[1], cost: p[2], stock: null })),
     cats: JSON.parse(JSON.stringify(CATS)), home: HOME.map(h => h.slice()), treats: TREATS.slice() });
-  const HIST_MAX = 120, FEED_MAX = 150;
+  let HIST_MAX = 120; const FEED_MAX = 150;
 
   // ---- Israel time ----
   const fmt = new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Jerusalem', year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', hourCycle: 'h23', weekday: 'short' });
@@ -83,6 +83,7 @@
     while (s.zr >= 15) { s.zr -= 15; const f = s.flavor || 'שוקולד נוגט'; s.crunches.push(f); s.points += 4; s.wallet += 4; s.wk[wk] = (s.wk[wk] || 0) + 4;
       s.hist.unshift({ id: id + 'c' + s.crunches.length, ts, p: '🍦', t: `קיבלת קראנץ' ${f}! (מס' ${s.crunches.length})`, who: 'זריזין' }); }
     return true; }
+  const HALF_FROM = Date.parse('2026-11-09T08:40:00Z');
   class Bad extends Error {}
   const need = (c, m) => { if (!c) throw new Bad(m || 'לא מורשה'); };
 
@@ -139,6 +140,9 @@
         if (op.on) { need(!on, 'כבר מסומן כזריז ביום הזה'); s.zd[d] = 1; s.zr += 1; hist(s, { p: '☀️', t: `תיקון: זריז ב-${d.slice(8)}/${d.slice(5, 7)}`, who: TEACHER, z: 1 }); crunch(s); }
         else { need(on, 'היום הזה לא מסומן כזריז'); delete s.zd[d]; const h = s.hist.find(x => x.z > 0 && !x.u && x.ts && il(x.ts).date === d); const k = h ? h.z : 1; if (h) h.u = 1;
           s.zr -= k; while (s.zr < 0 && s.crunches.length) { s.crunches.pop(); s.zr += 15; } if (s.zr < 0) s.zr = 0; if (s.zrDay === d) s.zrDay = ''; } break; }
+      case 'annAdd': { need(isT); const tx = String(op.tx || '').trim().slice(0, 200); need(tx, 'כתוב את ההודעה'); const days = Math.min(30, Math.max(1, Math.round(+op.days || 3)));
+        const A = st.cls.ann || (st.cls.ann = []); A.unshift({ id: hid('a'), e: String(op.e || '🎉').slice(0, 8), tx, until: op.ts + days * 864e5 }); if (A.length > 20) A.length = 20; break; }
+      case 'annDel': { need(isT); st.cls.ann = (st.cls.ann || []).filter(a => a.id !== op.id); break; }
       case 'msg': { need(isT); S(op.s).msg = String(op.tx || '').slice(0, 500); break; }
       case 'redeem': { need(r !== 'parent' && own(op.s)); const s = S(op.s), p = C.prizes.find(x => x.id === op.pz); need(p, 'הפרס לא קיים'); need(p.stock == null || p.stock > 0, 'הפרס אזל'); need(s.wallet >= p.cost, 'אין מספיק נקודות');
         s.wallet -= p.cost; if (p.stock != null) p.stock--; hist(s, { p: '🎁', t: 'בחרת פרס: ' + p.name, who: 'בנק הפרסים', w: -p.cost, pz: p.id }); feed({ s: s.name, p: '🎁', t: 'ביקש פרס: ' + p.name, who: 'בנק הפרסים' }); break; }
@@ -185,7 +189,7 @@
         if (!isT && op.ts >= SUNTHU_FROM) { need(T.dow <= 4, 'בשישי ובשבת אין רישום לתפילה'); need(T.min >= 420 && T.min <= 540, 'אפשר ללחוץ "הגעתי" רק בין 7:00 ל-9:00'); }
         else if (!isT) need(T.min >= 420 && T.min <= 660, 'אפשר ללחוץ "הגעתי" רק בין 7:00 ל-11:00');
         s.arr.push({ d: T.date, t: T.min });
-        if (T.min <= 480) add(s, 2, 'נרשם לתפילה עד 8:00', 'תפילה');
+        if (T.min <= 480) add(s, op.ts >= HALF_FROM ? 0.5 : 2, 'נרשם לתפילה עד 8:00', 'תפילה');
         if (T.date === AUTO_ZR_DAY && T.min <= 450) giveZr(s, T.date, T.wk, hid('az'), op.ts);
         if (s.deal && T.min <= s.deal.until) add(s, s.deal.pts, 'הגעה בזמן לתפילה 🎯', TEACHER); break; }
       case 'deal': { need(isT); const s = S(op.s); s.dealSet = 1; if (op.off) { s.deal = null; break; }
@@ -226,6 +230,9 @@
   }
   // replay: bad ops are skipped (they change nothing)
   function replay(st, ops) { ops.forEach(op => { const snap = JSON.stringify(st); try { apply(st, op); } catch (e) { if (!(e instanceof Bad)) throw e; Object.assign(st, JSON.parse(snap)); st.n = op.i + 1; } }); return st; }
+  // whole-year history for reports: replay everything from the start, without the per-op safety copy
+  function fullHist(roster, ops) { const keep = HIST_MAX; HIST_MAX = 1e6; const st = init(roster);
+    try { ops.forEach(op => { try { apply(st, op); } catch (e) { if (!(e instanceof Bad)) throw e; st.n = op.i + 1; } }); syncRoster(st, roster); } finally { HIST_MAX = keep; } return st; }
   // try an op on a copy: returns error text or ''
   function check(st, op) { try { apply(JSON.parse(JSON.stringify(st)), op); return ''; } catch (e) { if (e instanceof Bad) return e.message; throw e; } }
 
@@ -236,6 +243,6 @@
     return { date, idx: h % st.students.length, status: 'pending' };
   }
 
-  const KR = { zrOn, tparts, homeLimit, dist, newStudent, defCfg, CATS, HOME, PRIZES, FLAVORS, VALUES, WHY, SUBJ, TREATS, TEACHER, il, init, syncRoster, apply, replay, check, agentFor, Bad };
+  const KR = { zrOn, tparts, homeLimit, dist, newStudent, defCfg, CATS, HOME, PRIZES, FLAVORS, VALUES, WHY, SUBJ, TREATS, TEACHER, il, init, syncRoster, apply, replay, fullHist, check, agentFor, Bad };
   G.KR = KR;
 })(typeof window !== 'undefined' ? window : globalThis);
