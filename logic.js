@@ -141,7 +141,14 @@
         else { need(on, 'היום הזה לא מסומן כזריז'); delete s.zd[d]; const h = s.hist.find(x => x.z > 0 && !x.u && x.ts && il(x.ts).date === d); const k = h ? h.z : 1; if (h) h.u = 1;
           s.zr -= k; while (s.zr < 0 && s.crunches.length) { s.crunches.pop(); s.zr += 15; } if (s.zr < 0) s.zr = 0; if (s.zrDay === d) s.zrDay = ''; } break; }
       case 'annAdd': { need(isT); const tx = String(op.tx || '').trim().slice(0, 200); need(tx, 'כתוב את ההודעה'); const days = Math.min(30, Math.max(1, Math.round(+op.days || 3)));
-        const A = st.cls.ann || (st.cls.ann = []); A.unshift({ id: hid('a'), e: String(op.e || '🎉').slice(0, 8), tx, until: op.ts + days * 864e5 }); if (A.length > 20) A.length = 20; break; }
+        const A = st.cls.ann || (st.cls.ann = []); const to = Number.isInteger(op.s) && st.students[op.s] ? op.s : -1;
+        A.unshift({ id: hid('a'), e: String(op.e || '🎉').slice(0, 8), tx, until: op.ts + days * 864e5, s: to, w: [] }); if (A.length > 20) A.length = 20; break; }
+      // send a mazal tov to the student of an announcement (no points)
+      case 'wish': { const a = (st.cls.ann || []).find(x => x.id === op.id); need(a && a.s >= 0 && st.students[a.s], 'אין למי לשלוח');
+        need(op.ts < a.until, 'ההודעה כבר הסתיימה'); need(!(r === 'student' && op.a === a.s), 'אי אפשר לשלוח לעצמך 🙂');
+        const key = isT ? 't' : r[0] + op.a; a.w = a.w || []; need(!a.w.includes(key), 'כבר שלחת מזל טוב 🎉'); a.w.push(key);
+        const fs = isT ? null : S(op.a), from = isT ? TEACHER : r === 'parent' ? 'הורי ' + (fs.first || fs.name) : (fs.name || fs.first);
+        hist(S(a.s), { p: '🎉', t: from + (r === 'parent' ? ' שלחו' : ' שלח') + ' לך מזל טוב!', who: from }); break; }
       case 'annDel': { need(isT); st.cls.ann = (st.cls.ann || []).filter(a => a.id !== op.id); break; }
       case 'msg': { need(isT); S(op.s).msg = String(op.tx || '').slice(0, 500); break; }
       case 'redeem': { need(r !== 'parent' && own(op.s)); const s = S(op.s), p = C.prizes.find(x => x.id === op.pz); need(p, 'הפרס לא קיים'); need(p.stock == null || p.stock > 0, 'הפרס אזל'); need(s.wallet >= p.cost, 'אין מספיק נקודות');

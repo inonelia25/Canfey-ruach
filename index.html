@@ -633,7 +633,7 @@ body[data-role=teacher] .dhandle{display:block}
 <div id="zpop" onclick="this.classList.remove('show')"><div class="zb"><div class="zt">יא זריז!</div><div class="zi" id="zpIce"></div><div class="zn" id="zpN"></div><div class="zs" id="zpSub"></div><div class="zh">הגעת לפני 7:30 ☀️ · +0.5 נקודה</div></div></div>
 <div id="agOv" onclick="if(this.dataset.ready)this.classList.remove('show')"><div class="box" id="agBox"></div></div>
 <div id="cpop" onclick="if(!this.classList.contains('pick'))closePop()"><div class="cbox"><div class="cice" id="cpIce"></div><h3 id="cpTitle"></h3><div id="cpText"></div><div class="flv" id="cpFlv"></div></div></div>
-<div id="overlay" onclick="this.classList.remove('show')"><div><div id="ovMedal"></div><h3 id="ovTitle" class="gold-t"></h3><div id="ovText" style="font-size:17px;opacity:.85"></div><br><button class="btn" style="width:auto;padding:12px 40px">יאללה!</button></div></div>
+<div id="overlay" onclick="this.classList.remove('show')"><div><div id="ovMedal"></div><h3 id="ovTitle" class="gold-t"></h3><div id="ovText" style="font-size:17px;opacity:.85"></div><br><button class="btn" id="ovBtn" style="width:auto;padding:12px 40px">יאללה!</button></div></div>
 
 <div class="loader" id="loader"><div class="lc"></div><div id="ldTxt">טוען את כנפי רוח...</div></div>
 <div class="offl" id="offl">אין חיבור כרגע · הפעולות יישמרו כשהחיבור יחזור</div>
@@ -976,7 +976,7 @@ function setupRole(){const nav=document.querySelector('.nav');document.body.data
   const s=state.students[ME];document.querySelector('.demo').textContent=ROLE==='teacher'?'מחובר כמחנך':ROLE==='parent'?'הורי '+(s.first||s.name):'';
   $('loader').classList.remove('show')}
 // new things from others (teacher, parents, friends) show up in the bell
-function afterSync(own){setTimeout(()=>whenFree(annPop),700);if(ROLE==='teacher'){teacherSync(own);return}setTimeout(()=>{agentMorning();whenFree(goalPop);setTimeout(()=>whenFree(day14),400);setTimeout(()=>whenFree(tkDue),800)},1000);const s=state.students[ME],K='kr_seen_'+ROLE+ME;let seen=0;try{seen=+localStorage.getItem(K)||0}catch(e){}
+function afterSync(own){setTimeout(()=>whenFree(annPop),700);if(ROLE==='teacher'){teacherSync(own);return}setTimeout(()=>{whenFree(agentMorning);whenFree(goalPop);setTimeout(()=>whenFree(day14),400);setTimeout(()=>whenFree(tkDue),800)},1000);const s=state.students[ME],K='kr_seen_'+ROLE+ME;let seen=0;try{seen=+localStorage.getItem(K)||0}catch(e){}
   const top=Math.max(0,...s.hist.map(h=>h.ts||0));
   if(!own&&seen)s.hist.filter(h=>h.ts>seen).slice(0,6).reverse().forEach(h=>{const t=(typeof h.p==='number'?'+'+h.p+' · ':h.p+' ')+h.t+(h.who?' · '+h.who:'');notify(t,(s.first||s.name)+': '+t)});
   try{localStorage.setItem(K,Math.max(seen,top))}catch(e){}
@@ -1405,10 +1405,12 @@ function admRender(){if(!$('admBody')||ROLE!=='teacher')return;document.querySel
     if($('fxRestore'))$('fxRestore').onclick=()=>{if(act({t:'restore',s:state.cur})){toast('↩︎ הנתונים הוחזרו');admRender()}}}
   else if(admTab==='ann'){const A=(state.cls.ann||[]);B.innerHTML=`<div class="sub" style="margin:0 0 10px">הודעה שקופצת לכל התלמידים וההורים פעם אחת כשהם נכנסים לאפליקציה (למשל מזל טוב).</div>
     <div class="arow" style="grid-template-columns:52px 1fr"><input id="anE" value="🎉" style="text-align:center;font-size:20px"><input id="anT" placeholder="למשל: מזל טוב לדוד ליום ההולדת!"></div>
+    <div class="arow" style="grid-template-columns:1fr"><select id="anS" style="font:400 15px Gush;padding:10px;border-radius:12px;border:1px solid #ccd"><option value="-1">למי שולחים מזל טוב? (לא חובה)</option>${state.students.map((x,i)=>`<option value="${i}">${esc(x.name)}</option>`).join('')}</select></div>
+    <div class="sub" style="margin:0 0 8px;font-size:13px">אם בוחרים תלמיד, בחלון יופיע כפתור "שלח מזל טוב" וכל אחד יוכל לשלוח לו ברכה (בלי נקודות).</div>
     <div class="arow" style="grid-template-columns:1fr 90px"><span style="font:400 15px Gush">כמה ימים להציג</span><input id="anD" class="num" type="number" value="3"></div>
     <button class="btn" id="anGo">פרסם</button>
-    <div style="margin-top:14px">${A.map(a=>`<div class="arow" style="grid-template-columns:1fr 40px"><span style="font:400 15px Gush">${esc(a.e)} ${esc(a.tx)}<small style="display:block;opacity:.6">${a.until>Date.now()?'פעיל':'הסתיים'}</small></span><button onclick="if(act({t:'annDel',id:'${a.id}'}))admRender()">✕</button></div>`).join('')}</div>`;
-    $('anGo').onclick=()=>{if(act({t:'annAdd',e:$('anE').value,tx:$('anT').value,days:+$('anD').value})){toast('🎉 פורסם');admRender()}}}
+    <div style="margin-top:14px">${A.map(a=>`<div class="arow" style="grid-template-columns:1fr 40px"><span style="font:400 15px Gush">${esc(a.e)} ${esc(a.tx)}<small style="display:block;opacity:.6">${a.until>Date.now()?'פעיל':'הסתיים'}${a.s>=0&&state.students[a.s]?` · ${(a.w||[]).length} שלחו מזל טוב ל${esc(state.students[a.s].first||state.students[a.s].name)}`:''}</small></span><button onclick="if(act({t:'annDel',id:'${a.id}'}))admRender()">✕</button></div>`).join('')}</div>`;
+    $('anGo').onclick=()=>{const si=+$('anS').value;if(act({t:'annAdd',e:$('anE').value,tx:$('anT').value,days:+$('anD').value,s:si>=0?si:undefined})){toast('🎉 פורסם');admRender()}}}
   else if(admTab==='lv'){const LV=(state.cls.cfg&&state.cls.cfg.lv)||[0,120,300,600];B.innerHTML=`<div class="sub" style="margin:0 0 12px">כמה נקודות צריך כדי שסמל הכנפיים יעלה לכל צבע. ביהלום הסמל מלא לגמרי.</div>
     ${[['כסף',1],['זהב',2],['יהלום (מלא)',3]].map(([n,i])=>`<div class="arow" style="grid-template-columns:1fr 110px"><span style="font:700 16px Gush">${n}</span><input class="num" id="lv${i}" type="number" inputmode="numeric" value="${LV[i]}"></div>`).join('')}
     <button class="btn" id="lvGo" style="margin-top:6px">שמור</button>`;
@@ -1613,10 +1615,16 @@ function rptSend(who){const t=rptText(who);if(navigator.share&&who===''){navigat
 document.querySelectorAll('.rptGo').forEach(b=>b.onclick=rptOpen);
 document.addEventListener('click',e=>{const b=e.target.closest('#rSeg button');if(!b||!RPT.d)return;RPT.p=b.dataset.p;rptRender()});
 // ===== class announcements (mazal tov etc.) =====
+new MutationObserver(()=>{const o=$('overlay');if(!o.classList.contains('show')){const b=$('ovBtn');b.textContent='יאללה!';b.onclick=null;b.disabled=false}}).observe(document.getElementById('overlay'),{attributes:true,attributeFilter:['class']});
 function annPop(){const A=(state.cls.ann||[]).filter(a=>a.until>Date.now());let seen=[];try{seen=JSON.parse(localStorage.getItem('kr_ann')||'[]')}catch(e){}
   const a=A.find(x=>!seen.includes(x.id));if(!a)return;seen.push(a.id);try{localStorage.setItem('kr_ann',JSON.stringify(seen.slice(-60)))}catch(e){}
-  $('ovMedal').innerHTML=`<div style="font-size:96px">${esc(a.e||'🎉')}</div>`;$('ovTitle').textContent='מזל טוב!';$('ovText').textContent=a.tx;$('overlay').classList.add('show');confetti(260);
-  setTimeout(()=>whenFree(annPop),800)}
+  $('ovMedal').innerHTML=`<div style="font-size:96px">${esc(a.e||'🎉')}</div>`;$('ovTitle').textContent='מזל טוב!';$('ovText').textContent=a.tx;
+  const b=$('ovBtn'),self=ROLE==='student'&&a.s===ME,can=a.s>=0&&state.students[a.s]&&!self;
+  if(self)b.textContent='תודה! 🙏';
+  else if(can){const k=ROLE==='teacher'?'t':ROLE[0]+ME;const done=(a.w||[]).includes(k);const nm=state.students[a.s].first||state.students[a.s].name;
+    b.textContent=done?'כבר שלחת מזל טוב ✓':`🎉 שלח מזל טוב ל${nm}`;
+    b.onclick=e=>{if(done)return;if(act({t:'wish',id:a.id}))toast(`🎉 המזל טוב נשלח ל${nm}`)}}
+  $('overlay').classList.add('show');confetti(260);setTimeout(()=>whenFree(annPop),800)}
 // one pop-up at a time
 function whenFree(fn,tries=0){if(document.querySelector('#agOv.show,#overlay.show,#cpop.show,#tkpop.show,#zpop.show,#aq.on')&&tries<200){setTimeout(()=>whenFree(fn,tries+1),1500);return}fn()}
 // ===== start =====
