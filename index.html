@@ -94,7 +94,7 @@ button{font-family:inherit}
 .zcheer{color:var(--goldTxt);font-weight:700;font-size:16px;margin:4px 0 2px}
 .steps{display:flex;align-items:center;margin:16px 0 8px}
 .steps b{width:30px;height:30px;border-radius:50%;display:grid;place-items:center;font-size:12px;font-weight:700;background:rgba(255,255,255,.1);flex:none;color:#ffffffaa}
-.steps b.on{background:var(--gold);color:var(--ink);box-shadow:0 0 12px rgba(244,207,107,.6)}
+.steps b.on{background:linear-gradient(135deg,#f6d77a,#d9a238 50%,#b07a18);color:#3a2604;box-shadow:0 0 0 2px #fff3c4,0 0 14px rgba(244,207,107,.9);font-size:0}.steps b.on::after{content:'✓';font-size:15px;font-weight:900}
 .steps em{flex:1;height:2px;background:rgba(255,255,255,.14)}
 .steps em.on{background:#e8b84e}
 .pro{font-size:13px;opacity:.8;font-weight:300}
@@ -193,7 +193,7 @@ html{background:#61d0df}body{background:transparent!important}
 .card .sub,.card .pro{opacity:.95}
 .card .steps b{background:rgba(255,255,255,.22);color:#fff}
 .card .steps em{background:rgba(255,255,255,.3)}
-.card .steps b.on{background:var(--gold);color:var(--ink)}
+.card .steps b.on{background:linear-gradient(135deg,#ffe08a,#f0b93a 50%,#c8892a);color:#3a2604}.card .steps em.on{background:#f4cf6b!important;height:3px}
 .card .zcount small{opacity:.8}
 .card .tl:before{background:linear-gradient(rgba(255,233,160,.8),rgba(255,233,160,0))}
 .card .tl .dot{background:rgba(0,20,60,.35)}
@@ -1087,7 +1087,7 @@ function render(){
   $('stuChips').innerHTML=state.students.map((x,i)=>`<button class="chip ${i===state.cur?'on':''}" onclick="pick(${i})">${x.name}</button>`).join('');
   state.zAuto=state.zAuto||new Set();state.students.forEach((x,i)=>{const a=todayArr(x);const k=x.id+'|'+TODAY;if(a&&a.t<=450&&x.zrDay!==TODAY&&!state.zAuto.has(k)){state.zAuto.add(k);state.zToday.add(i)}if(x.zrDay===TODAY)state.zToday.delete(i)});
   if($('zAutoN')){const n=state.students.filter(x=>{const a=todayArr(x);return a&&a.t<=450}).length;$('zAutoN').textContent=n?`${n} נרשמו עד 7:30 וכבר מסומנים. בודקים ולוחצים אישור.`:'עדיין אף אחד לא נרשם עד 7:30 היום.'}
-  $('zGrid').innerHTML=state.students.map((x,i)=>x.zrDay===TODAY?`<button class="zs done" disabled><div class="av">✓</div>${x.name}<small>קיבל זריז היום ✓</small></button>`:`<button class="zs ${state.zToday.has(i)?'on':''}" onclick="zt(${i})"><div class="av">${x.name[0]}</div>${x.name}<small>${todayArr(x)?'🕒 '+fmtT(todayArr(x).t)+' · ':''}${x.zr}/15 · רצף ${x.streak}${x.crunches&&x.crunches.length?' · 🍦'+x.crunches.length:''}${x.flavor?' · '+x.flavor:''}</small></button>`).join('');
+  $('zGrid').innerHTML=state.students.map((x,i)=>x.zrDay===TODAY?`<button class="zs done" disabled><div class="av">✓</div>${x.name}<small>קיבל זריז היום ✓</small></button>`:`<button class="zs ${state.zToday.has(i)?'on':''}" onclick="zt(${i})"><div class="av">${x.name[0]}</div>${x.name}<small>${todayArr(x)?'🕒 '+fmtT(todayArr(x).t)+' · ':''}${x.zr}/15 · השבוע ${KR.wkDays(KR.il(Date.now()).wk).filter(d=>KR.zrOn(x,d)).length}/5${x.crunches&&x.crunches.length?' · 🍦'+x.crunches.length:''}${x.flavor?' · '+x.flavor:''}</small></button>`).join('');
   {const td=state.cls.feed.filter(f=>f.ts&&KR.il(f.ts).date===TODAY);const li=f=>`<li><div class="dot">${typeof f.p==='number'?'+'+f.p:f.p}</div><div><div>${esc(f.s)}: ${esc(f.t)}</div><div class="who">${esc(f.who)} · ${fmtT(KR.il(f.ts).min)}</div></div></li>`;
    $('tFeed').innerHTML=td.length?td.slice(0,3).map(li).join('')+(td.length>3?`<li style="list-style:none;display:block;padding:0"><details><summary style="cursor:pointer;font:700 15px Gush;padding:6px 0">הצג את כל היום (${td.length})</summary><ul class="tl" style="margin:6px 0 0;padding:0">${td.slice(3).map(li).join('')}</ul></details></li>`:''):'<li style="opacity:.8;list-style:none">היום עדיין אין סימונים מההורים</li>'}
 }
