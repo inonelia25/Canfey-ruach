@@ -406,6 +406,7 @@ body{padding-top:0!important}
 .checkin{margin-top:16px;text-align:center}
 .ba{background:#C3D48B;color:#12361f}.ba .ch{text-shadow:none}.ba .ch i{background:rgba(255,255,255,.6);box-shadow:none}
 #v-student>.ba{order:5}
+#v-student>.bgrp{order:5}#v-student>.brpt{order:9}
 .aw{font:700 44px/1.1 Moshe,serif;text-align:center;color:#0D614A;margin-top:4px}
 .am{text-align:center;font-size:17px;margin-top:6px}
 .brep{background:#fff;color:#0b3d4a}.brep .ch{text-shadow:none}.brep .ch i{background:#eef7f8;box-shadow:none}
@@ -1067,7 +1068,7 @@ function render(){
   $('zrNum').textContent=Math.min(s.zr,15);$('ice').outerHTML=iceSVG(s.zr,s.flavor);
   $('zrCheer').textContent=s.zr>=15?'הקראנץ\' שלך!':ZR_CHEER[s.zr%ZR_CHEER.length];$('zrFlavor').textContent=s.flavor?'הטעם שלך: '+s.flavor+' 🍦':'';
   $('zrLeft').textContent=s.zr>=15?'הקראנץ\' שלך מחכה! 🍦':`עוד ${15-s.zr} לקראנץ'`;
-  {const w0=new Date(KR.il(Date.now()).wk+'T12:00:00Z');const wd=[0,1,2,3,4].map(i=>{const x=new Date(w0);x.setUTCDate(w0.getUTCDate()+i);return x.toISOString().slice(0,10)});const on=wd.map(d=>KR.zrOn(s,d)),pend=wd.map(()=>false);
+  {const w0=new Date(KR.il(Date.now()).wk+'T12:00:00Z');const wd=[0,1,2,3,4].map(i=>{const x=new Date(w0);x.setUTCDate(w0.getUTCDate()+i);return x.toISOString().slice(0,10)});const on=wd.map(d=>KR.zrOn(s,d)),pend=wd.map((d,i)=>!on[i]&&(s.arr||[]).some(a=>a.d===d&&a.t<=450));
    $('streak').innerHTML=['א׳','ב׳','ג׳','ד׳','ה׳'].map((d,i)=>(i?`<em class="${on[i]&&on[i-1]?'on':''}"></em>`:'')+`<b class="${on[i]?'on':pend[i]?'pend':''}" ${pend[i]?'title="מחכה לאישור המחנך"':''}>${d}</b>`).join('');}
   // class
   const ct=classTotal();$('ring').innerHTML=ringSVG(ct,CLASS_GOAL);$('clsPrize').textContent=CLASS_PRIZE;
@@ -1301,16 +1302,16 @@ $('ciBtn').onclick=()=>{const s=me();if(todayArr(s))return;const L=(state.cls.cf
 function ciFx(){const s=me();const a=todayArr(s)||s.arr[s.arr.length-1];if(!a)return;const t=a.t;const ok=t<=450;
   if(!ok){if(s.deal&&t<=s.deal.until){burstAt($('ciBtn'),70);toast(`🎯 עמדת ביעד! +${s.deal.pts+(t<=480?0.5:0)} נקודות`)}else toast(t<=480?`נרשם: ${fmtT(t)} · +0.5 נקודה. מחר מקדימים 💪`:`נרשם: ${fmtT(t)} · מחר מקדימים 💪`);return}
   if(s.deal)setTimeout(()=>toast(`🎯 ועוד +${s.deal.pts} על היעד האישי שלך`),5200);
-  const pro=s.hist.find(h=>h.d===a.d&&h.z>0&&!h.u);if(pro&&pro.pro){proSeen(pro.id);zShow(s,1);return}zShow(s,0)}
+  const g=s.hist.find(h=>h.d===a.d&&h.z>0&&!h.u);if(g){proSeen(g.id);zShow(s,g.pro?1:0,1);return}zShow(s,0,0)}
 // the zrizin card: a normal morning, or "zrizin pro" (all 5 days of the week)
-function zShow(s,pro){const n=Math.min(s.zr,15)||15,left=15-n;const z=$('zpop');
-  $('zpT').textContent=pro?'זריזין פרו! ⚡':'יא זריז!';$('zpH').textContent=pro?'5 ימים ברצף, מראשון עד חמישי · שווה 8 זריזין':'הגעת לפני 7:30 ☀️ · +0.5 נקודה';
+function zShow(s,pro,got){const n=Math.min(s.zr,15)||15,left=15-n;const z=$('zpop');
+  $('zpT').textContent=pro?'זריזין פרו! ⚡':'יא זריז!';$('zpH').textContent=pro?'5 ימים ברצף, מראשון עד חמישי · שווה 8 זריזין':got===2?'המחנך אישר לך זריז להיום ☀️':got?'הגעת לפני 7:30 ☀️':'הגעת לפני 7:30 ☀️ · אחרי שהמחנך יאשר תקבל זריז (סימן זהב)';
   $('zpIce').innerHTML=iceSVG(n,s.flavor,1);$('zpN').textContent=`${n}/15`;
   $('zpSub').textContent=left?`אתה מתקרב לקראנץ' שלך! עוד ${left} ${left===1?'בוקר':'בקרים'} 🍦`:'זהו! הקראנץ\' שלך מחכה לך 🍦';
   z.classList.toggle('pro',!!pro);z.classList.remove('show');void z.offsetWidth;z.classList.add('show');confetti(pro?420:220);if(pro)setTimeout(()=>confetti(300),900);clearTimeout(z._t);z._t=setTimeout(()=>z.classList.remove('show'),pro?7000:5000)}
 function proSeen(id){let L=[];try{L=JSON.parse(localStorage.getItem('kr_pro')||'[]')}catch(e){}if(!L.includes(id))L.push(id);try{localStorage.setItem('kr_pro',JSON.stringify(L.slice(-30)))}catch(e){}return L}
 function proPop(){if(ROLE!=='student')return;const s=state.students[ME];let L=[];try{L=JSON.parse(localStorage.getItem('kr_pro')||'[]')}catch(e){}
-  const h=s.hist.find(x=>x.pro&&!x.u&&!L.includes(x.id)&&Date.now()-x.ts<7*864e5);if(!h)return;proSeen(h.id);zShow(s,1)}
+  const N=s.hist.filter(x=>x.z>0&&x.d&&!x.u&&!L.includes(x.id)&&Date.now()-x.ts<2*864e5);if(!N.length)return;N.forEach(x=>proSeen(x.id));const h=N.find(x=>x.pro)||N[0];zShow(s,h.pro?1:0,2)}
 function renderCheckin(){const s=me(),a=todayArr(s),b=$('ciBtn');if(!b)return;const T0=KR.il(Date.now()),m=T0.min,wkend=T0.dow>4,closed=!a&&ROLE!=='teacher'&&(wkend||m<420||m>540);
   b.disabled=!!a||closed;b.textContent=a?`✓ נרשמת היום ב-${fmtT(a.t)}`:closed?(wkend?'שבת שלום 🕯️':'✋ הגעתי לתפילה · 7:00–9:00'):'✋ הגעתי לתפילה';
   $('ciMsg').textContent=a?(a.t<=450?'יא זריז! הגעת לפני 7:30 ☀️':'נרשם. מחר מקדימים 💪'):closed?(wkend?'בשישי ובשבת אין רישום. נתראה ביום ראשון ☀️':m<420?'הכפתור נפתח ב-7:00 בבוקר ☀️':'ההרשמה להיום נסגרה ב-9:00. מחר מקדימים 💪'):'לוחצים כשנכנסים לתפילה, והמחנך רואה את השעה.';

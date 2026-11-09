@@ -214,7 +214,7 @@
         else if (!isT) need(T.min >= 420 && T.min <= 660, 'אפשר ללחוץ "הגעתי" רק בין 7:00 ל-11:00');
         s.arr.push({ d: T.date, t: T.min });
         if (T.min <= 480) add(s, op.ts >= HALF_FROM ? 0.5 : 2, 'נרשם לתפילה עד 8:00', 'תפילה');
-        if (op.ts >= ZR2_FROM) { if (T.min <= 450 && T.dow <= 4) zrMark(s, T.date, hid('az'), op.ts, TEACHER); }
+        if (op.ts >= ZR2_FROM) { /* zariz only after the teacher approves (zr op) */ }
         else if (T.date === AUTO_ZR_DAY && T.min <= 450) giveZr(s, T.date, T.wk, hid('az'), op.ts);
         else if (T.date === '2026-11-09' && T.min <= 450) zrMark(s, T.date, hid('az'), op.ts, TEACHER);
         if (s.deal && T.min <= s.deal.until) add(s, s.deal.pts, 'הגעה בזמן לתפילה 🎯', TEACHER); break; }
