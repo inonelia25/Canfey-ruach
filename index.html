@@ -536,7 +536,7 @@ body[data-role=teacher] .dhandle{display:block}
 .tl .dot{box-shadow:none!important}
 .zs .av,.card .zs .av{box-shadow:none!important}
 
-.jump{position:sticky;top:0;z-index:50;display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;margin:10px -20px 0;padding:8px 20px;padding-top:calc(8px + env(safe-area-inset-top));background:none;pointer-events:none}.jump button{pointer-events:auto}
+.jump{position:sticky;top:0;z-index:50;display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;margin:10px -20px 0;padding:8px 20px;padding-top:calc(8px + env(safe-area-inset-top));background:none;pointer-events:auto;-webkit-overflow-scrolling:touch;overscroll-behavior-x:contain}
 .jump::-webkit-scrollbar{display:none}
 .jump button{flex:none;border:0;border-radius:999px;padding:7px 14px;font:700 13.5px Gush;background:rgba(255,255,255,.72);color:#0b3d4a;white-space:nowrap;backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);box-shadow:0 3px 10px rgba(0,30,45,.18)}
 .jump button.on{background:#0b3d4a;color:#fff}
@@ -1525,7 +1525,7 @@ setInterval(tkDue,60000);
   bar.innerHTML=cards.map((c,i)=>{const n=name(c);return n?`<button data-i="${i}">${esc(SHORT[n]||n)}</button>`:''}).join('');
   bar.onclick=e=>{const b=e.target.closest('button');if(!b)return;const c=cards[+b.dataset.i];scrollTo({top:c.getBoundingClientRect().top+scrollY-bar.offsetHeight-6,behavior:'smooth'})};
   addEventListener('scroll',()=>{if($('v-teacher').classList.contains('hide'))return;let cur=0;const y=bar.offsetHeight+30;cards.forEach((c,i)=>{if(c.getBoundingClientRect().top<=y)cur=i});
-    bar.querySelectorAll('button').forEach(b=>{const on=+b.dataset.i===cur;if(on&&!b.classList.contains('on'))b.scrollIntoView({inline:'center',block:'nearest'});b.classList.toggle('on',on)})},{passive:true})})();
+    bar.querySelectorAll('button').forEach(b=>{const on=+b.dataset.i===cur;if(on&&!b.classList.contains('on')){const r=b.getBoundingClientRect(),q=bar.getBoundingClientRect();bar.scrollBy({left:r.left+r.width/2-(q.left+q.width/2),behavior:'smooth'})}b.classList.toggle('on',on)})},{passive:true})})();
 
 // ===== school days helper (Sunday-Thursday) =====
 const DN=['א׳','ב׳','ג׳','ד׳','ה׳','ו׳','ש׳'];
