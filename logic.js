@@ -44,6 +44,8 @@
     const by = {}; st.students.forEach(s => by[s.id] = s);
     if (!st.cls.cfg) st.cls.cfg = defCfg();
     if (!st.cls.cfg.treats) st.cls.cfg.treats = TREATS.slice();
+    if (!st.cls.mig10) { const day = '2026-11-09';
+      st.students.forEach(s => { const a = (s.arr || []).find(x => x.d === day); if (a && a.t <= 450) zrMark(s, day, 'm10-' + s.id, Date.parse(day + 'T06:00:00Z'), TEACHER); }); st.cls.mig10 = 1; }
     if (!st.cls.mig8) { const wk = il(Date.parse(AUTO_ZR_DAY + 'T10:00:00Z')).wk;
       st.students.forEach(s => { const a = (s.arr || []).find(x => x.d === AUTO_ZR_DAY); if (a && a.t <= 450) giveZr(s, AUTO_ZR_DAY, wk, 'm8-' + s.id, Date.parse(AUTO_ZR_DAY + 'T06:00:00Z')); }); st.cls.mig8 = 1; }
     if (!st.cls.mig7) { const day = '2026-11-07';
@@ -72,7 +74,20 @@
   const tparts = t => { const m = String(t).match(/^(\p{Extended_Pictographic}\S*)\s+(.*)$/u); return m ? [m[1], m[2]] : ['🎁', String(t)]; };
   const SUNTHU_FROM = Date.parse('2026-11-06T07:00:00Z');
   // was the student a "zariz" on this date? (new records + older history)
-  function zrOn(s, date) { if (s.zd && s.zd[date]) return true; return s.hist.some(h => h.z > 0 && !h.u && h.ts && il(h.ts).date === date); }
+  // which school day a zariz record belongs to (a fix made today can be for an earlier day; the "before the app" count has no day)
+  function zrDate(h) { if (h.d) return h.d; if (/מלפני האפליקציה|תיקון זריזין:/.test(h.t || '')) return '';
+    const m = /ב-(\d\d)\/(\d\d)/.exec(h.t || ''); if (m && h.ts) return il(h.ts).date.slice(0, 4) + '-' + m[2] + '-' + m[1]; return h.ts ? il(h.ts).date : ''; }
+  function zrOn(s, date) { if (s.zd && s.zd[date]) return true; return s.hist.some(h => h.z > 0 && !h.u && zrDate(h) === date); }
+  // the five school days (Sunday-Thursday) of a week
+  const wkDays = wk => [0, 1, 2, 3, 4].map(i => { const x = new Date(wk + 'T12:00:00Z'); x.setUTCDate(x.getUTCDate() + i); return x.toISOString().slice(0, 10); });
+  // mark a zariz day. All five days of the week = "zrizin pro": the fifth day is worth 4, so the week is worth 8
+  function zrMark(s, date, id, ts, who, fix) { if (zrOn(s, date)) return false; (s.zd || (s.zd = {}))[date] = 1; s.zrDay = date;
+    const wk = il(Date.parse(date + 'T12:00:00Z')).wk, all = wkDays(wk).every(d => zrOn(s, d));
+    const h = all ? { p: '⚡', t: 'זריזין פרו! 5 ימים ברצף, שווה 8', z: 4, pro: 1 } : { p: '☀️', t: fix ? `תיקון: זריז ב-${date.slice(8)}/${date.slice(5, 7)}` : 'זריזין, הגעת לפני 7:30', z: 1 };
+    s.zr += h.z; s.hist.unshift(Object.assign({ id, ts, who, d: date }, h)); if (s.hist.length > HIST_MAX) s.hist.length = HIST_MAX;
+    while (s.zr >= 15) { s.zr -= 15; const f = s.flavor || 'שוקולד נוגט'; s.crunches.push(f); s.points += 4; s.wallet += 4; s.wk[wk] = (s.wk[wk] || 0) + 4;
+      s.hist.unshift({ id: id + 'c' + s.crunches.length, ts, p: '🍦', t: `קיבלת קראנץ' ${f}! (מס' ${s.crunches.length})`, who: 'זריזין' }); }
+    return true; }
   const ARAM_ONCE = Date.parse('2026-11-06T07:15:00Z');
   const NO_PARENT_ARAM = Date.parse('2026-11-06T22:00:00Z'); // 7.11.2026 00:00 Israel
   const AUTO_ZR_DAY = '2026-11-08';
@@ -84,6 +99,7 @@
       s.hist.unshift({ id: id + 'c' + s.crunches.length, ts, p: '🍦', t: `קיבלת קראנץ' ${f}! (מס' ${s.crunches.length})`, who: 'זריזין' }); }
     return true; }
   const HALF_FROM = Date.parse('2026-11-09T08:40:00Z');
+  const ZR2_FROM = Date.parse('2026-11-09T16:00:00Z'); // from here: check-in before 7:30 = zariz automatically, pro = all 5 days of the week
   class Bad extends Error {}
   const need = (c, m) => { if (!c) throw new Bad(m || 'לא מורשה'); };
 
@@ -109,7 +125,7 @@
           const op3 = op.ts >= HOME2_FROM ? 2 : 3; s.homeCount++; feed({ s: s.name, p: op3, t, who: 'הורים' }); add(s, op3, t, 'ההורים', 1); break; }
       { need(r === 'parent' || isT); need(own(op.s)); const s = S(op.s), h = C.home[op.h]; need(h);
         const hp = (op.ts < HOME2_FROM && h[2] === 2) ? 3 : h[2]; s.homeCount++; feed({ s: s.name, p: hp, t: h[1], who: 'הורים' }); s.count[h[1]] = (s.count[h[1]] || 0) + 1; add(s, hp, h[1], 'ההורים'); break; }
-      case 'zr': { need(isT); need(T.dow <= 4 || op.ts < SUNTHU_FROM, 'זריזין רק מראשון עד חמישי'); (op.list || []).forEach(i => { const s = S(i); if (s.zrDay === T.date) return; s.zrDay = T.date; (s.zd || (s.zd = {}))[T.date] = 1; if (s.streakWk !== T.wk) { s.streak = 0; s.streakWk = T.wk; } s.streak++;
+      case 'zr': { need(isT); need(T.dow <= 4 || op.ts < SUNTHU_FROM, 'זריזין רק מראשון עד חמישי'); if (op.ts >= ZR2_FROM) { (op.list || []).forEach((i, k) => zrMark(S(i), T.date, hid('zr' + k), op.ts, TEACHER)); break; } (op.list || []).forEach(i => { const s = S(i); if (s.zrDay === T.date) return; s.zrDay = T.date; (s.zd || (s.zd = {}))[T.date] = 1; if (s.streakWk !== T.wk) { s.streak = 0; s.streakWk = T.wk; } s.streak++;
           if (s.streak >= 5) { s.zr += 4; s.streak = 0; hist(s, { p: '⚡', t: 'זריזין פרו! 5 ימים ברצף, שווה 8', who: TEACHER, z: 4 }); }
           else { s.zr += 1; hist(s, { p: '☀️', t: 'זריזין, הגעת לפני 7:30', who: TEACHER, z: 1 }); }
           crunch(s); }); break; }
@@ -137,8 +153,9 @@
         need(L[0] > 0 && L[0] < L[1] && L[1] < L[2] && L[2] <= 100000, 'כל שלב צריך להיות גדול מהקודם'); C.lv = [0, ...L]; break; }
       case 'zrFix': { need(isT); const s = S(op.s), d = String(op.d || ''); need(/^\d{4}-\d\d-\d\d$/.test(d), 'תאריך לא תקין'); need(d <= T.date, 'אי אפשר לתקן יום עתידי');
         const on = zrOn(s, d); s.zd = s.zd || {};
+        if (op.on && op.ts >= ZR2_FROM) { need(!on, 'כבר מסומן כזריז ביום הזה'); need(il(Date.parse(d + 'T12:00:00Z')).dow <= 4, 'זריזין רק מראשון עד חמישי'); zrMark(s, d, hid('zf'), op.ts, TEACHER, 1); break; }
         if (op.on) { need(!on, 'כבר מסומן כזריז ביום הזה'); s.zd[d] = 1; s.zr += 1; hist(s, { p: '☀️', t: `תיקון: זריז ב-${d.slice(8)}/${d.slice(5, 7)}`, who: TEACHER, z: 1 }); crunch(s); }
-        else { need(on, 'היום הזה לא מסומן כזריז'); delete s.zd[d]; const h = s.hist.find(x => x.z > 0 && !x.u && x.ts && il(x.ts).date === d); const k = h ? h.z : 1; if (h) h.u = 1;
+        else { need(on, 'היום הזה לא מסומן כזריז'); delete s.zd[d]; const h = s.hist.find(x => x.z > 0 && !x.u && zrDate(x) === d); const k = h ? h.z : 1; if (h) h.u = 1;
           s.zr -= k; while (s.zr < 0 && s.crunches.length) { s.crunches.pop(); s.zr += 15; } if (s.zr < 0) s.zr = 0; if (s.zrDay === d) s.zrDay = ''; } break; }
       case 'annAdd': { need(isT); const tx = String(op.tx || '').trim().slice(0, 200); need(tx, 'כתוב את ההודעה'); const days = Math.min(30, Math.max(1, Math.round(+op.days || 3)));
         const A = st.cls.ann || (st.cls.ann = []); const to = Number.isInteger(op.s) && st.students[op.s] ? op.s : -1;
@@ -197,7 +214,9 @@
         else if (!isT) need(T.min >= 420 && T.min <= 660, 'אפשר ללחוץ "הגעתי" רק בין 7:00 ל-11:00');
         s.arr.push({ d: T.date, t: T.min });
         if (T.min <= 480) add(s, op.ts >= HALF_FROM ? 0.5 : 2, 'נרשם לתפילה עד 8:00', 'תפילה');
-        if (T.date === AUTO_ZR_DAY && T.min <= 450) giveZr(s, T.date, T.wk, hid('az'), op.ts);
+        if (op.ts >= ZR2_FROM) { if (T.min <= 450 && T.dow <= 4) zrMark(s, T.date, hid('az'), op.ts, TEACHER); }
+        else if (T.date === AUTO_ZR_DAY && T.min <= 450) giveZr(s, T.date, T.wk, hid('az'), op.ts);
+        else if (T.date === '2026-11-09' && T.min <= 450) zrMark(s, T.date, hid('az'), op.ts, TEACHER);
         if (s.deal && T.min <= s.deal.until) add(s, s.deal.pts, 'הגעה בזמן לתפילה 🎯', TEACHER); break; }
       case 'deal': { need(isT); const s = S(op.s); s.dealSet = 1; if (op.off) { s.deal = null; break; }
         const u = Math.round(+op.until), p = Math.round(+op.pts); need(u >= 400 && u <= 660, 'שעה לא תקינה'); need(p > 0 && p <= 50, 'ניקוד לא תקין'); s.deal = { until: u, pts: p }; break; }
@@ -250,6 +269,6 @@
     return { date, idx: h % st.students.length, status: 'pending' };
   }
 
-  const KR = { zrOn, tparts, homeLimit, dist, newStudent, defCfg, CATS, HOME, PRIZES, FLAVORS, VALUES, WHY, SUBJ, TREATS, TEACHER, il, init, syncRoster, apply, replay, fullHist, check, agentFor, Bad };
+  const KR = { zrOn, zrDate, wkDays, tparts, homeLimit, dist, newStudent, defCfg, CATS, HOME, PRIZES, FLAVORS, VALUES, WHY, SUBJ, TREATS, TEACHER, il, init, syncRoster, apply, replay, fullHist, check, agentFor, Bad };
   G.KR = KR;
 })(typeof window !== 'undefined' ? window : globalThis);

@@ -497,6 +497,7 @@ body[data-role=teacher] .dhandle{display:block}
 
 #zpop{position:fixed;inset:0;z-index:300;display:grid;place-items:center;background:rgba(4,24,36,.82);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);opacity:0;pointer-events:none;transition:opacity .3s}
 #zpop.show{opacity:1;pointer-events:auto}
+#zpop.pro .zb{background:linear-gradient(160deg,#f4cf6b,#c8932a 45%,#7a4f0c);box-shadow:0 30px 70px rgba(0,0,0,.5),inset 0 0 0 3px rgba(255,246,214,.8)}#zpop.pro .zt{font-size:62px;background:none;color:#fff;-webkit-text-fill-color:#fff;text-shadow:0 4px 0 #7a4f0c,0 10px 24px rgba(0,0,0,.35)}#zpop.pro .zh{color:#fff6d6;font-weight:700}
 #zpop .zb{text-align:center;padding:30px 26px;margin:0 22px;border-radius:34px;background:linear-gradient(170deg,#1a7f8f,#0b3d4a);box-shadow:0 30px 70px rgba(0,0,0,.5),inset 0 0 0 2px rgba(244,207,107,.5);transform:scale(.6);transition:transform .55s cubic-bezier(.2,1.6,.4,1)}#zpop.show .zb{transform:none}
 #zpop .zt{font:900 76px/1 Gush;background:linear-gradient(135deg,#9a6510,#d9a238 22%,#ffe39a 44%,#fff6d6 52%,#f0c25a 62%,#b07a18 84%,#e6b44c);-webkit-background-clip:text;background-clip:text;color:transparent;filter:drop-shadow(0 6px 12px rgba(0,0,0,.35));letter-spacing:-1px}
 #zpop .zi{width:120px;margin:14px auto 4px;animation:zbob 1.6s ease-in-out infinite}#zpop .zi svg{width:100%;height:auto}
@@ -630,7 +631,7 @@ body[data-role=teacher] .dhandle{display:block}
 <body>
 <div class="sky"></div><canvas id="cf"></canvas>
 <div id="toast"></div>
-<div id="zpop" onclick="this.classList.remove('show')"><div class="zb"><div class="zt">יא זריז!</div><div class="zi" id="zpIce"></div><div class="zn" id="zpN"></div><div class="zs" id="zpSub"></div><div class="zh">הגעת לפני 7:30 ☀️ · +0.5 נקודה</div></div></div>
+<div id="zpop" onclick="this.classList.remove('show')"><div class="zb"><div class="zt" id="zpT">יא זריז!</div><div class="zi" id="zpIce"></div><div class="zn" id="zpN"></div><div class="zs" id="zpSub"></div><div class="zh" id="zpH">הגעת לפני 7:30 ☀️ · +0.5 נקודה</div></div></div>
 <div id="agOv" onclick="if(this.dataset.ready)this.classList.remove('show')"><div class="box" id="agBox"></div></div>
 <div id="cpop" onclick="if(!this.classList.contains('pick'))closePop()"><div class="cbox"><div class="cice" id="cpIce"></div><h3 id="cpTitle"></h3><div id="cpText"></div><div class="flv" id="cpFlv"></div></div></div>
 <div id="overlay" onclick="this.classList.remove('show')"><div><div id="ovMedal"></div><h3 id="ovTitle" class="gold-t"></h3><div id="ovText" style="font-size:17px;opacity:.85"></div><br><button class="btn" id="ovBtn" style="width:auto;padding:12px 40px">יאללה!</button></div></div>
@@ -976,7 +977,7 @@ function setupRole(){const nav=document.querySelector('.nav');document.body.data
   const s=state.students[ME];document.querySelector('.demo').textContent=ROLE==='teacher'?'מחובר כמחנך':ROLE==='parent'?'הורי '+(s.first||s.name):'';
   $('loader').classList.remove('show')}
 // new things from others (teacher, parents, friends) show up in the bell
-function afterSync(own){setTimeout(()=>whenFree(annPop),700);if(ROLE==='teacher'){teacherSync(own);return}setTimeout(()=>{whenFree(agentMorning);whenFree(goalPop);setTimeout(()=>whenFree(day14),400);setTimeout(()=>whenFree(tkDue),800)},1000);const s=state.students[ME],K='kr_seen_'+ROLE+ME;let seen=0;try{seen=+localStorage.getItem(K)||0}catch(e){}
+function afterSync(own){setTimeout(()=>whenFree(annPop),700);if(ROLE==='teacher'){teacherSync(own);return}setTimeout(()=>{whenFree(agentMorning);whenFree(proPop);whenFree(goalPop);setTimeout(()=>whenFree(day14),400);setTimeout(()=>whenFree(tkDue),800)},1000);const s=state.students[ME],K='kr_seen_'+ROLE+ME;let seen=0;try{seen=+localStorage.getItem(K)||0}catch(e){}
   const top=Math.max(0,...s.hist.map(h=>h.ts||0));
   if(!own&&seen)s.hist.filter(h=>h.ts>seen).slice(0,6).reverse().forEach(h=>{const t=(typeof h.p==='number'?'+'+h.p+' · ':h.p+' ')+h.t+(h.who?' · '+h.who:'');notify(t,(s.first||s.name)+': '+t)});
   try{localStorage.setItem(K,Math.max(seen,top))}catch(e){}
@@ -1066,7 +1067,7 @@ function render(){
   $('zrNum').textContent=Math.min(s.zr,15);$('ice').outerHTML=iceSVG(s.zr,s.flavor);
   $('zrCheer').textContent=s.zr>=15?'הקראנץ\' שלך!':ZR_CHEER[s.zr%ZR_CHEER.length];$('zrFlavor').textContent=s.flavor?'הטעם שלך: '+s.flavor+' 🍦':'';
   $('zrLeft').textContent=s.zr>=15?'הקראנץ\' שלך מחכה! 🍦':`עוד ${15-s.zr} לקראנץ'`;
-  {const w0=new Date(KR.il(Date.now()).wk+'T12:00:00Z');const wd=[0,1,2,3,4].map(i=>{const x=new Date(w0);x.setUTCDate(w0.getUTCDate()+i);return x.toISOString().slice(0,10)});const on=wd.map(d=>KR.zrOn(s,d)),pend=wd.map((d,i)=>!on[i]&&(s.arr||[]).some(a=>a.d===d&&a.t<=450));
+  {const w0=new Date(KR.il(Date.now()).wk+'T12:00:00Z');const wd=[0,1,2,3,4].map(i=>{const x=new Date(w0);x.setUTCDate(w0.getUTCDate()+i);return x.toISOString().slice(0,10)});const on=wd.map(d=>KR.zrOn(s,d)),pend=wd.map(()=>false);
    $('streak').innerHTML=['א׳','ב׳','ג׳','ד׳','ה׳'].map((d,i)=>(i?`<em class="${on[i]&&on[i-1]?'on':''}"></em>`:'')+`<b class="${on[i]?'on':pend[i]?'pend':''}" ${pend[i]?'title="מחכה לאישור המחנך"':''}>${d}</b>`).join('');}
   // class
   const ct=classTotal();$('ring').innerHTML=ringSVG(ct,CLASS_GOAL);$('clsPrize').textContent=CLASS_PRIZE;
@@ -1300,10 +1301,16 @@ $('ciBtn').onclick=()=>{const s=me();if(todayArr(s))return;const L=(state.cls.cf
 function ciFx(){const s=me();const a=todayArr(s)||s.arr[s.arr.length-1];if(!a)return;const t=a.t;const ok=t<=450;
   if(!ok){if(s.deal&&t<=s.deal.until){burstAt($('ciBtn'),70);toast(`🎯 עמדת ביעד! +${s.deal.pts+(t<=480?0.5:0)} נקודות`)}else toast(t<=480?`נרשם: ${fmtT(t)} · +0.5 נקודה. מחר מקדימים 💪`:`נרשם: ${fmtT(t)} · מחר מקדימים 💪`);return}
   if(s.deal)setTimeout(()=>toast(`🎯 ועוד +${s.deal.pts} על היעד האישי שלך`),5200);
-  const n=Math.min(s.zr+1,15),left=15-n;const z=$('zpop');
+  const pro=s.hist.find(h=>h.d===a.d&&h.z>0&&!h.u);if(pro&&pro.pro){proSeen(pro.id);zShow(s,1);return}zShow(s,0)}
+// the zrizin card: a normal morning, or "zrizin pro" (all 5 days of the week)
+function zShow(s,pro){const n=Math.min(s.zr,15)||15,left=15-n;const z=$('zpop');
+  $('zpT').textContent=pro?'זריזין פרו! ⚡':'יא זריז!';$('zpH').textContent=pro?'5 ימים ברצף, מראשון עד חמישי · שווה 8 זריזין':'הגעת לפני 7:30 ☀️ · +0.5 נקודה';
   $('zpIce').innerHTML=iceSVG(n,s.flavor,1);$('zpN').textContent=`${n}/15`;
   $('zpSub').textContent=left?`אתה מתקרב לקראנץ' שלך! עוד ${left} ${left===1?'בוקר':'בקרים'} 🍦`:'זהו! הקראנץ\' שלך מחכה לך 🍦';
-  z.classList.remove('show');void z.offsetWidth;z.classList.add('show');confetti(220);clearTimeout(z._t);z._t=setTimeout(()=>z.classList.remove('show'),5000)}
+  z.classList.toggle('pro',!!pro);z.classList.remove('show');void z.offsetWidth;z.classList.add('show');confetti(pro?420:220);if(pro)setTimeout(()=>confetti(300),900);clearTimeout(z._t);z._t=setTimeout(()=>z.classList.remove('show'),pro?7000:5000)}
+function proSeen(id){let L=[];try{L=JSON.parse(localStorage.getItem('kr_pro')||'[]')}catch(e){}if(!L.includes(id))L.push(id);try{localStorage.setItem('kr_pro',JSON.stringify(L.slice(-30)))}catch(e){}return L}
+function proPop(){if(ROLE!=='student')return;const s=state.students[ME];let L=[];try{L=JSON.parse(localStorage.getItem('kr_pro')||'[]')}catch(e){}
+  const h=s.hist.find(x=>x.pro&&!x.u&&!L.includes(x.id)&&Date.now()-x.ts<7*864e5);if(!h)return;proSeen(h.id);zShow(s,1)}
 function renderCheckin(){const s=me(),a=todayArr(s),b=$('ciBtn');if(!b)return;const T0=KR.il(Date.now()),m=T0.min,wkend=T0.dow>4,closed=!a&&ROLE!=='teacher'&&(wkend||m<420||m>540);
   b.disabled=!!a||closed;b.textContent=a?`✓ נרשמת היום ב-${fmtT(a.t)}`:closed?(wkend?'שבת שלום 🕯️':'✋ הגעתי לתפילה · 7:00–9:00'):'✋ הגעתי לתפילה';
   $('ciMsg').textContent=a?(a.t<=450?'יא זריז! הגעת לפני 7:30 ☀️':'נרשם. מחר מקדימים 💪'):closed?(wkend?'בשישי ובשבת אין רישום. נתראה ביום ראשון ☀️':m<420?'הכפתור נפתח ב-7:00 בבוקר ☀️':'ההרשמה להיום נסגרה ב-9:00. מחר מקדימים 💪'):'לוחצים כשנכנסים לתפילה, והמחנך רואה את השעה.';
