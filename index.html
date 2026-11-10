@@ -629,7 +629,7 @@ body[data-role=teacher] .dhandle{display:block}
 @media print{body>*:not(#rpt){display:none!important}#rpt{position:static;display:block!important;background:#fff}.ract,.rtop .rx,#rpt .seg{display:none!important}.rrow,.rtile{box-shadow:none;border:1px solid #ddd;break-inside:avoid}}
 
 .bel{background:linear-gradient(160deg,#2b3a8f,#1d2766);color:#fff}.bel .ch i{background:rgba(255,255,255,.15)}
-#v-student>.bel{order:2}
+.bel .sub{color:#dfe4ff!important}#v-student>.bel{order:2}#v-student>.jump{order:1}
 .elc{display:flex;gap:10px;align-items:flex-start;background:rgba(255,255,255,.1);border-radius:18px;padding:11px 12px;margin-bottom:7px;font:400 15px Gush}
 .elc .av{width:38px;height:38px;border-radius:50%;background:#f4cf6b;color:#1d2766;display:grid;place-items:center;font:900 18px Gush;flex:none}
 .elc b{display:block;font:700 16px Gush}.elc small{opacity:.8;display:block;line-height:1.35}
@@ -684,6 +684,7 @@ body[data-role=teacher] .dhandle{display:block}
       <div class="sub" id="lvlNext"></div>
     </div>
 
+    <div class="jump" id="sJump"></div>
     <div class="msg hide" id="msgCard"><small>הודעה מהמחנך ינון אליה</small><div id="msgText"></div></div>
 
     <div class="card b1" data-burst="1">
@@ -1575,7 +1576,7 @@ function zfRender(){const x=state.students[zfS];if(!x)return;$('zfList').innerHT
   return `<div class="zr"><b>${dLbl(d)}</b><span>${a?'🕒 '+fmtT(a.t):'לא נרשם'} · ${on?'☀️ זריז':'—'}</span><button class="${on?'n':'y'}" onclick="zfSet('${d}',${on?0:1})">${on?'בטל זריז':'סמן זריז'}</button></div>`}).join('')}
 function zfSet(d,on){if(act({t:'zrFix',s:zfS,d,on})){toast(on?'☀️ סומן זריז':'הזריז בוטל');zfRender()}}
 $('zFixBtn').onclick=zfOpen;
-const _render14=render;render=function(){_render14();renderBoard();renderEl();if($('el')&&$('el').classList.contains('on')&&!(document.activeElement&&document.activeElement.id==='elTx'))elDraw()};
+const _render14=render;render=function(){_render14();renderBoard();renderEl();setTimeout(sJumpBuild,80);if($('el')&&$('el').classList.contains('on')&&!(document.activeElement&&document.activeElement.id==='elTx'))elDraw()};
 
 // ===== Aramaic quiz =====
 const AQ_EXTRA=['בוא ושמע','מה הסיבה?','נשאלה להם שאלה','פשוט! ברור!','כך גם','למד מכאן','קושיה','או גם','לא נצרך','השאלה נשארת פתוחה','הוא אמר','מכאן ואילך'];
@@ -1596,6 +1597,18 @@ function aqEnd(){const s=me(),V=state.cls.aramV||1,n=aq.order.length,good=n-aq.w
 
 
 
+
+// ===== student: jump bar (same idea as the teacher's) =====
+const S_SHORT={'זריזין מקדימים למצוות':'זריזין','בחירות לוועד הכיתה':'בחירות','הסוכן X':'הסוכן X','השינה שלי':'שינה','היעדים שלי במבחנים':'יעדים','תן כוח לחבר':'תן כוח','לומדים בחבורה למבחן':'חבורה','היעד של כל הכיתה':'יעד כיתתי','התגים שלי':'תגים','מילים בארמית':'ארמית','מה עשיתי לאחרונה':'מה עשיתי','ההתקדמות שלי':'התקדמות','בנק הפרסים':'פרסים','הסיכום שלי':'הסיכום שלי'};
+function sJumpBuild(){const bar=$('sJump');if(!bar||$('v-student').classList.contains('hide'))return;
+  const cards=[...document.querySelectorAll('#v-student > .card')].filter(c=>!c.classList.contains('hide')&&c.offsetParent!==null).sort((a,b)=>a.getBoundingClientRect().top-b.getBoundingClientRect().top);
+  const name=c=>{const h=c.querySelector('.ch');if(!h)return '';const t=h.cloneNode(true);t.querySelectorAll('i,.sname,small').forEach(x=>x.remove());const n=t.textContent.replace(/[·:].*$/,'').trim();return S_SHORT[n]||n.split(' ').slice(0,2).join(' ')};
+  const key=cards.map(name).join('|');if(bar._key===key)return;bar._key=key;bar._cards=cards;
+  bar.innerHTML=cards.map((c,i)=>{const n=name(c);return n?`<button data-i="${i}">${esc(n)}</button>`:''}).join('')}
+document.addEventListener('click',e=>{if(e.target.closest('.nav'))setTimeout(sJumpBuild,120)});
+document.addEventListener('click',e=>{const b=e.target.closest('#sJump button');if(!b)return;const bar=$('sJump'),c=bar._cards[+b.dataset.i];scrollTo({top:c.getBoundingClientRect().top+scrollY-bar.offsetHeight-6,behavior:'smooth'})});
+addEventListener('scroll',()=>{const bar=$('sJump');if(!bar||!bar._cards||$('v-student').classList.contains('hide'))return;let cur=-1;const y=bar.offsetHeight+30;bar._cards.forEach((c,i)=>{if(c.getBoundingClientRect().top<=y)cur=i});
+  bar.querySelectorAll('button').forEach(b=>{const on=+b.dataset.i===cur;if(on&&!b.classList.contains('on')){const r=b.getBoundingClientRect(),q=bar.getBoundingClientRect();bar.scrollBy({left:r.left+r.width/2-(q.left+q.width/2),behavior:'smooth'})}b.classList.toggle('on',on)})},{passive:true});
 // ===== class committee elections (ועד הכיתה) =====
 const EL_INFO='ועד הכיתה מארגן פעילויות לכיתה ומוביל יוזמות כיתתיות: חברתיות ולימודיות.';
 let elPick=new Set();
@@ -1603,7 +1616,7 @@ const elE=()=>state.cls.el||{stage:'off',seats:3,cands:[],win:[]};
 const nmOf=i=>(state.students[i]||{}).name||'';
 function elCand(c,extra=''){return `<div class="elc"><span class="av">${esc(nmOf(c.s)[0]||'?')}</span><span style="flex:1"><b>${esc(nmOf(c.s))}</b><small>${esc(c.tx)}</small></span>${extra}</div>`}
 function renderEl(){const E=elE();
-  const cs=$('elCardS');if(cs){const on=ROLE!=='teacher'&&E.stage!=='off';cs.classList.toggle('hide',!on);
+  const cs=$('elCardS');if(cs){const on=E.stage!=='off';cs.classList.toggle('hide',!on);
     if(on){const mine=E.cands.find(c=>c.s===ME);
       $('elStuBody').innerHTML=E.stage==='reg'?`<div class="sub" style="color:#fff;font-weight:700">📝 ההרשמה פתוחה! ${E.cands.length?E.cands.length+' כבר נרשמו.':'עוד אף אחד לא נרשם, תהיה הראשון?'}</div>${mine?'<div class="sub" style="color:#f4cf6b">✓ נרשמת כמועמד</div>':''}`
         :E.stage==='vote'?`<div class="sub" style="color:#fff;font-weight:700">${ROLE==='parent'?(E.voted?'✓ הבן כבר הצביע':'🗳️ ההצבעה פתוחה'):(E.voted?'✓ הצבעת! ההצבעה חשאית':'🗳️ ההצבעה פתוחה! בחר עד '+E.seats+' מועמדים')}</div>`
