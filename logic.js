@@ -166,6 +166,19 @@
         const key = isT ? 't' : r[0] + op.a; a.w = a.w || []; need(!a.w.includes(key), 'כבר שלחת מזל טוב 🎉'); a.w.push(key);
         const fs = isT ? null : S(op.a), from = isT ? TEACHER : r === 'parent' ? 'הורי ' + (fs.first || fs.name) : (fs.name || fs.first);
         hist(S(a.s), { p: '🎉', t: from + (r === 'parent' ? ' שלחו' : ' שלח') + ' לך מזל טוב!', who: from }); break; }
+      // class committee elections (ועד הכיתה): teacher opens registration -> voting -> publishes winners
+      case 'elSet': { need(isT); const E = st.cls.el || (st.cls.el = { stage: 'off', seats: 3, cands: [], votes: {}, win: [] });
+        if (op.stage) { need(['off', 'reg', 'vote', 'done'].includes(op.stage)); if (op.stage === 'vote') need(E.cands.length >= 1, 'עוד אין מועמדים');
+          if (op.stage === 'reg' && op.fresh) { E.cands = []; E.votes = {}; E.win = []; } E.stage = op.stage; E.v = (E.v || 0) + 1; }
+        if (op.seats != null) { const k = Math.round(+op.seats); need(k >= 1 && k <= 10, 'מספר מקומות לא תקין'); E.seats = k; } break; }
+      case 'elReg': { const E = st.cls.el; need(E && E.stage === 'reg', 'ההרשמה סגורה'); need(r === 'student' || isT); need(own(op.s)); S(op.s);
+        E.cands = E.cands.filter(c => c.s !== op.s); if (!op.off) { const tx = String(op.tx || '').trim().slice(0, 300); need(tx.length >= 5, 'כתוב בקצרה למה אתה רוצה ומה תעשה');
+          E.cands.push({ s: op.s, tx, ts: op.ts }); } break; }
+      case 'elVote': { const E = st.cls.el; need(E && E.stage === 'vote', 'ההצבעה לא פתוחה'); need(r === 'student'); E.votes = E.votes || {}; need(!E.votes[op.a] && !E.voted, 'כבר הצבעת 🙂');
+        const L = [...new Set((op.list || []).map(Number))]; need(L.length >= 1 && L.length <= E.seats, `אפשר לבחור עד ${E.seats} מועמדים`);
+        L.forEach(i => need(E.cands.some(c => c.s === i), 'מועמד לא קיים')); E.votes[op.a] = L; break; }
+      case 'elWin': { need(isT); const E = st.cls.el; need(E, 'אין בחירות'); const L = [...new Set((op.list || []).map(Number))]; L.forEach(i => S(i)); need(L.length >= 1, 'בחר את הנבחרים');
+        E.win = L; E.stage = 'done'; E.v = (E.v || 0) + 1; break; }
       case 'annDel': { need(isT); st.cls.ann = (st.cls.ann || []).filter(a => a.id !== op.id); break; }
       case 'msg': { need(isT); S(op.s).msg = String(op.tx || '').slice(0, 500); break; }
       case 'redeem': { need(r !== 'parent' && own(op.s)); const s = S(op.s), p = C.prizes.find(x => x.id === op.pz); need(p, 'הפרס לא קיים'); need(p.stock == null || p.stock > 0, 'הפרס אזל'); need(s.wallet >= p.cost, 'אין מספיק נקודות');

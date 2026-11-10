@@ -627,6 +627,21 @@ body[data-role=teacher] .dhandle{display:block}
 .ract .btn{font-size:14px;padding:11px 8px}
 .ract .wa{background:#25D366!important;color:#fff!important}
 @media print{body>*:not(#rpt){display:none!important}#rpt{position:static;display:block!important;background:#fff}.ract,.rtop .rx,#rpt .seg{display:none!important}.rrow,.rtile{box-shadow:none;border:1px solid #ddd;break-inside:avoid}}
+
+.bel{background:linear-gradient(160deg,#2b3a8f,#1d2766);color:#fff}.bel .ch i{background:rgba(255,255,255,.15)}
+#v-student>.bel{order:2}
+.elc{display:flex;gap:10px;align-items:flex-start;background:rgba(255,255,255,.1);border-radius:18px;padding:11px 12px;margin-bottom:7px;font:400 15px Gush}
+.elc .av{width:38px;height:38px;border-radius:50%;background:#f4cf6b;color:#1d2766;display:grid;place-items:center;font:900 18px Gush;flex:none}
+.elc b{display:block;font:700 16px Gush}.elc small{opacity:.8;display:block;line-height:1.35}
+.elc .vn{margin-inline-start:auto;font:900 18px Gush;color:#f4cf6b;align-self:center}
+#el{position:fixed!important;top:0!important;left:0!important;right:0!important;bottom:0!important;z-index:95;background:linear-gradient(170deg,#2b3a8f,#141c4f);color:#fff;overflow:auto;display:none;-webkit-overflow-scrolling:touch}
+#el.on{display:block}#el .rin{max-width:560px;margin:0 auto;padding:18px 18px 130px}
+#el h2{font:900 30px Gush;margin:14px 0 4px}#el .lead2{font:400 16px/1.45 Gush;opacity:.9;margin-bottom:14px}
+#el textarea{background:rgba(255,255,255,.12);margin:8px 0}
+#el .pick{width:100%;text-align:right;border:0;color:#fff;cursor:pointer}#el .pick.on{background:#f4cf6b;color:#1d2766}#el .pick.on small{opacity:.85}
+#el .x{border:0;background:rgba(255,255,255,.15);color:#fff;border-radius:99px;width:38px;height:38px;font:700 18px Gush}
+#el .elbar{position:fixed;bottom:0;left:0;right:0;padding:24px 16px calc(14px + env(safe-area-inset-bottom));background:linear-gradient(transparent,#141c4f 35%);max-width:560px;margin:0 auto}
+.elstg{display:grid;grid-template-columns:repeat(2,1fr);gap:6px;margin:6px 0 12px}.elstg button{border:0;border-radius:99px;padding:9px 6px;font:700 14px Gush;background:rgba(255,255,255,.14);color:#fff}.elstg button.on{background:#f4cf6b;color:#1d2766}
 </style>
 </head>
 <body>
@@ -688,6 +703,10 @@ body[data-role=teacher] .dhandle{display:block}
       <div class="crrow"><div class="row" style="justify-content:space-between;margin-bottom:8px"><b style="font-size:16px">הקראנצ'ים שלי</b><span class="sub" style="margin:0;font-weight:700" id="crN"></span></div><div class="crs" id="crs"></div></div>
     </div>
 
+    <div class="card bel hide" id="elCardS"><div class="ch"><i>🗳️</i>בחירות לוועד הכיתה</div>
+      <div class="sub" style="margin:-6px 0 10px">ועד הכיתה מארגן פעילויות לכיתה ומוביל יוזמות כיתתיות: חברתיות ולימודיות.</div>
+      <div id="elStuBody"></div>
+      <button class="btn" id="elOpenS">פתח את הבחירות</button></div>
     <div class="card bx" id="agentCard">
       <div class="ch"><i>🕶️</i>הסוכן X</div>
       <div class="agrow"><div class="agwrap" id="agWrap"><svg viewBox="0 0 200 230" class="agent"><defs>
@@ -876,6 +895,8 @@ body[data-role=teacher] .dhandle{display:block}
 <div class="card brpt"><div class="ch"><i>📄</i>דוח אישי · <span class="sname"></span></div>
       <div class="sub" style="margin:-6px 0 12px">כל מה שנעשה בשבוע, בחודש או מתחילת השנה, במבט אחד.</div>
       <button class="btn rptGo">פתח את הדוח</button></div>
+    <div class="card bel" id="elCardT"><div class="ch"><i>🗳️</i>בחירות לוועד הכיתה</div>
+      <div id="elTBody"></div></div>
     <div class="card brep"><div class="ch"><i>⏰</i>דוח הגעה לתפילה</div>
       <div class="seg" data-tgt="t"><button class="on" data-per="week">שבוע</button><button data-per="month">חודש</button></div>
       <div id="tRep"></div>
@@ -978,7 +999,7 @@ function setupRole(){const nav=document.querySelector('.nav');document.body.data
   const s=state.students[ME];document.querySelector('.demo').textContent=ROLE==='teacher'?'מחובר כמחנך':ROLE==='parent'?'הורי '+(s.first||s.name):'';
   $('loader').classList.remove('show')}
 // new things from others (teacher, parents, friends) show up in the bell
-function afterSync(own){setTimeout(()=>whenFree(annPop),700);if(ROLE==='teacher'){teacherSync(own);return}setTimeout(()=>{whenFree(agentMorning);whenFree(proPop);whenFree(goalPop);setTimeout(()=>whenFree(day14),400);setTimeout(()=>whenFree(tkDue),800)},1000);const s=state.students[ME],K='kr_seen_'+ROLE+ME;let seen=0;try{seen=+localStorage.getItem(K)||0}catch(e){}
+function afterSync(own){setTimeout(()=>whenFree(annPop),700);if(ROLE==='teacher'){teacherSync(own);return}setTimeout(()=>{whenFree(agentMorning);whenFree(elPop);whenFree(proPop);whenFree(goalPop);setTimeout(()=>whenFree(day14),400);setTimeout(()=>whenFree(tkDue),800)},1000);const s=state.students[ME],K='kr_seen_'+ROLE+ME;let seen=0;try{seen=+localStorage.getItem(K)||0}catch(e){}
   const top=Math.max(0,...s.hist.map(h=>h.ts||0));
   if(!own&&seen)s.hist.filter(h=>h.ts>seen).slice(0,6).reverse().forEach(h=>{const t=(typeof h.p==='number'?'+'+h.p+' · ':h.p+' ')+h.t+(h.who?' · '+h.who:'');notify(t,(s.first||s.name)+': '+t)});
   try{localStorage.setItem(K,Math.max(seen,top))}catch(e){}
@@ -1529,7 +1550,7 @@ setInterval(tkDue,60000);
 // ===== teacher: jump bar to every section =====
 (function(){const bar=$('tJump');if(!bar)return;const cards=[...document.querySelectorAll('#v-teacher > .card')];
   const name=c=>{const h=c.querySelector('.ch');if(!h)return '';const t=h.cloneNode(true);t.querySelectorAll('i,.sname').forEach(x=>x.remove());return t.textContent.replace(/[·:].*$/,'').trim()};
-  const SHORT={'נקודות מהירות':'נקודות','הסוכן X של היום':'הסוכן X','זריזין היום':'זריזין','יוזמה מבורכת':'יוזמה','לומדים בחבורה למבחן':'חבורה','דוח הגעה לתפילה':'הגעה לתפילה','מילים בארמית':'ארמית','הודעת הפתעה':'הודעה','יעדים במבחנים':'יעדים','מה ההורים סימנו היום':'הורים','ניהול':'ניהול'};
+  const SHORT={'נקודות מהירות':'נקודות','הסוכן X של היום':'הסוכן X','זריזין היום':'זריזין','יוזמה מבורכת':'יוזמה','לומדים בחבורה למבחן':'חבורה','דוח הגעה לתפילה':'הגעה לתפילה','מילים בארמית':'ארמית','הודעת הפתעה':'הודעה','יעדים במבחנים':'יעדים','מה ההורים סימנו היום':'הורים','בחירות לוועד הכיתה':'בחירות','דוח אישי':'דוח','ניהול':'ניהול'};
   bar.innerHTML=cards.map((c,i)=>{const n=name(c);return n?`<button data-i="${i}">${esc(SHORT[n]||n)}</button>`:''}).join('');
   bar.onclick=e=>{const b=e.target.closest('button');if(!b)return;const c=cards[+b.dataset.i];scrollTo({top:c.getBoundingClientRect().top+scrollY-bar.offsetHeight-6,behavior:'smooth'})};
   addEventListener('scroll',()=>{if($('v-teacher').classList.contains('hide'))return;let cur=0;const y=bar.offsetHeight+30;cards.forEach((c,i)=>{if(c.getBoundingClientRect().top<=y)cur=i});
@@ -1554,7 +1575,7 @@ function zfRender(){const x=state.students[zfS];if(!x)return;$('zfList').innerHT
   return `<div class="zr"><b>${dLbl(d)}</b><span>${a?'🕒 '+fmtT(a.t):'לא נרשם'} · ${on?'☀️ זריז':'—'}</span><button class="${on?'n':'y'}" onclick="zfSet('${d}',${on?0:1})">${on?'בטל זריז':'סמן זריז'}</button></div>`}).join('')}
 function zfSet(d,on){if(act({t:'zrFix',s:zfS,d,on})){toast(on?'☀️ סומן זריז':'הזריז בוטל');zfRender()}}
 $('zFixBtn').onclick=zfOpen;
-const _render14=render;render=function(){_render14();renderBoard()};
+const _render14=render;render=function(){_render14();renderBoard();renderEl();if($('el')&&$('el').classList.contains('on')&&!(document.activeElement&&document.activeElement.id==='elTx'))elDraw()};
 
 // ===== Aramaic quiz =====
 const AQ_EXTRA=['בוא ושמע','מה הסיבה?','נשאלה להם שאלה','פשוט! ברור!','כך גם','למד מכאן','קושיה','או גם','לא נצרך','השאלה נשארת פתוחה','הוא אמר','מכאן ואילך'];
@@ -1574,6 +1595,57 @@ function aqEnd(){const s=me(),V=state.cls.aramV||1,n=aq.order.length,good=n-aq.w
   if(act({t:'aramQuiz',s:state.cur,ans})){$('aqB').innerHTML=`<div style="font-size:52px">🏆</div><div class="big">אלוף! ${n} מתוך ${n}</div><p style="font:700 18px Gush">קיבלת <b>+5 נקודות</b> על המילים בארמית</p><button class="btn" onclick="$('aq').classList.remove('on')">יישר כוח!</button>`;confetti(240)}else $('aq').classList.remove('on')}
 
 
+
+// ===== class committee elections (ועד הכיתה) =====
+const EL_INFO='ועד הכיתה מארגן פעילויות לכיתה ומוביל יוזמות כיתתיות: חברתיות ולימודיות.';
+let elPick=new Set();
+const elE=()=>state.cls.el||{stage:'off',seats:3,cands:[],win:[]};
+const nmOf=i=>(state.students[i]||{}).name||'';
+function elCand(c,extra=''){return `<div class="elc"><span class="av">${esc(nmOf(c.s)[0]||'?')}</span><span style="flex:1"><b>${esc(nmOf(c.s))}</b><small>${esc(c.tx)}</small></span>${extra}</div>`}
+function renderEl(){const E=elE();
+  const cs=$('elCardS');if(cs){const on=ROLE!=='teacher'&&E.stage!=='off';cs.classList.toggle('hide',!on);
+    if(on){const mine=E.cands.find(c=>c.s===ME);
+      $('elStuBody').innerHTML=E.stage==='reg'?`<div class="sub" style="color:#fff;font-weight:700">📝 ההרשמה פתוחה! ${E.cands.length?E.cands.length+' כבר נרשמו.':'עוד אף אחד לא נרשם, תהיה הראשון?'}</div>${mine?'<div class="sub" style="color:#f4cf6b">✓ נרשמת כמועמד</div>':''}`
+        :E.stage==='vote'?`<div class="sub" style="color:#fff;font-weight:700">${ROLE==='parent'?(E.voted?'✓ הבן כבר הצביע':'🗳️ ההצבעה פתוחה'):(E.voted?'✓ הצבעת! ההצבעה חשאית':'🗳️ ההצבעה פתוחה! בחר עד '+E.seats+' מועמדים')}</div>`
+        :`<div class="sub" style="color:#fff;font-weight:700">🎉 הנבחרים לוועד הכיתה: ${E.win.map(i=>esc(nmOf(i))).join(', ')}</div>`;
+      $('elOpenS').textContent=E.stage==='reg'?(ROLE==='parent'?'לפרטים':mine?'עריכת ההרשמה שלי':'אני רוצה להיות בוועד הכיתה'):E.stage==='vote'?(E.voted||ROLE==='parent'?'למועמדים':'להצבעה'):'לנבחרים'}}
+  const tb=$('elTBody');if(tb){const st=E.stage,res={};Object.values((state.cls.el||{}).votes||{}).forEach(L=>L.forEach(i=>res[i]=(res[i]||0)+1));
+    const nv=Object.keys((state.cls.el||{}).votes||{}).length;const sorted=E.cands.slice().sort((a,b)=>(res[b.s]||0)-(res[a.s]||0));
+    tb.innerHTML=`<div class="sub" style="color:#fff;opacity:.85;margin:-6px 0 8px">${EL_INFO}</div>
+      <div class="elstg">${[['off','סגור'],['reg','📝 הרשמת מועמדים'],['vote','🗳️ הצבעה'],['done','🎉 תוצאות']].map(([k,l])=>`<button class="${st===k?'on':''}" onclick="elStage('${k}')">${l}</button>`).join('')}</div>
+      <div class="tq" style="grid-template-columns:1fr 70px;margin-bottom:10px"><span style="font:400 15px Gush;align-self:center">כמה נבחרים לוועד?</span><input class="num" type="number" value="${E.seats}" onchange="act({t:'elSet',seats:+this.value})"></div>
+      <div class="sub" style="color:#fff;font-weight:700;margin-bottom:6px">${E.cands.length} מועמדים${st==='vote'||st==='done'?` · ${nv} מתוך ${state.students.length} הצביעו`:''}</div>
+      ${(st==='vote'||st==='done'?sorted:E.cands).map(c=>elCand(c,st==='vote'||st==='done'?`<span class="vn">${res[c.s]||0}</span>`:'')).join('')||'<div class="sub" style="color:#fff;opacity:.7">עוד אין מועמדים</div>'}
+      ${st==='vote'||st==='done'?`<button class="btn" style="margin-top:10px" onclick="elPublish()">🎉 פרסם את ${E.seats} הנבחרים</button>`:''}
+      ${st==='done'&&E.win.length?`<div class="sub" style="color:#f4cf6b;margin-top:8px;font-weight:700">פורסם: ${E.win.map(i=>esc(nmOf(i))).join(', ')}</div>`:''}
+      <div class="sub" style="color:#fff;opacity:.7;margin-top:10px;font-size:13px">ההצבעה חשאית: רק אתה רואה את הספירה.</div>`}}
+function elStage(k){const E=elE();if(k==='reg'&&E.stage==='done'&&!confirm('להתחיל בחירות חדשות? המועמדים והקולות הקודמים יימחקו.'))return;
+  if(k==='vote'&&!confirm('לפתוח את ההצבעה? ההרשמה תיסגר.'))return;act({t:'elSet',stage:k,fresh:k==='reg'&&E.stage==='done'?1:0})&&toast('עודכן ✓')}
+function elPublish(){const E=state.cls.el,res={};Object.values(E.votes||{}).forEach(L=>L.forEach(i=>res[i]=(res[i]||0)+1));
+  const top=E.cands.slice().sort((a,b)=>(res[b.s]||0)-(res[a.s]||0)).slice(0,E.seats).map(c=>c.s);
+  if(!confirm('לפרסם לכל הכיתה את הנבחרים?\n'+top.map(nmOf).join('\n')))return;if(act({t:'elWin',list:top}))toast('🎉 פורסם')}
+function elOpen(){elPick=new Set();$('el').classList.add('on');document.body.style.overflow='hidden';elDraw()}
+function elClose(){$('el').classList.remove('on');document.body.style.overflow=''}
+function elDraw(){const E=elE(),mine=E.cands.find(c=>c.s===ME),stu=ROLE==='student';let o='',bar='';
+  if(E.stage==='reg'){o=`<h2>בחירות לוועד הכיתה 🗳️</h2><div class="lead2">${EL_INFO}<br>רוצה להיות חלק? נרשמים כמועמד וכותבים בקצרה למה אתה רוצה ומה תעשה בשביל הכיתה.</div>`;
+    if(stu)o+=`<textarea id="elTx" maxlength="300" placeholder="למשל: אני רוצה לארגן טיול כיתתי וחברותות לפני מבחנים...">${esc(mine?mine.tx:'')}</textarea>`;
+    o+=`<div class="rsec" style="font:900 18px Gush;margin:14px 0 8px">המועמדים עד עכשיו</div>`+(E.cands.map(c=>elCand(c)).join('')||'<div class="sub" style="color:#fff;opacity:.7">עוד אין מועמדים</div>');
+    if(stu)bar=`<button class="btn" onclick="elSend()">${mine?'שמור שינויים':'✋ אני רוצה להיות בוועד הכיתה'}</button>${mine?`<button class="btn ghost" style="margin-top:8px;background:rgba(255,255,255,.15)!important;color:#fff!important" onclick="if(act({t:'elReg',s:ME,off:1})){toast('ההרשמה בוטלה');elDraw()}">ביטול ההרשמה</button>`:''}`}
+  else if(E.stage==='vote'){const can=stu&&!E.voted;o=`<h2>הצבעה לוועד הכיתה 🗳️</h2><div class="lead2">${can?`בחר עד <b>${E.seats}</b> מועמדים. ההצבעה חשאית, ואפשר להצביע רק פעם אחת.`:E.voted?'✓ ההצבעה נקלטה. תודה! התוצאות יפורסמו בקרוב.':'אלה המועמדים.'}</div>`+
+      E.cands.map(c=>can?`<button class="elc pick ${elPick.has(c.s)?'on':''}" onclick="elTog(${c.s})"><span class="av">${elPick.has(c.s)?'✓':esc(nmOf(c.s)[0])}</span><span style="flex:1"><b>${esc(nmOf(c.s))}</b><small>${esc(c.tx)}</small></span></button>`:elCand(c)).join('');
+    if(can)bar=`<button class="btn" ${elPick.size?'':'disabled'} onclick="elVote()">🗳️ הצבע (${elPick.size}/${E.seats})</button>`}
+  else if(E.stage==='done'){o=`<h2>הנבחרים לוועד הכיתה 🎉</h2><div class="lead2">${EL_INFO}</div>`+E.win.map(i=>elCand({s:i,tx:(E.cands.find(c=>c.s===i)||{}).tx||''},'<span class="vn">⭐</span>')).join('')}
+  $('elBody').innerHTML=o;$('elBar').innerHTML=bar;$('elBar').style.display=bar?'':'none'}
+function elTog(i){const E=elE();if(elPick.has(i))elPick.delete(i);else{if(elPick.size>=E.seats){toast(`אפשר לבחור עד ${E.seats}`);return}elPick.add(i)}elDraw()}
+function elSend(){if(act({t:'elReg',s:ME,tx:$('elTx').value})){toast('✓ נרשמת כמועמד לוועד הכיתה!');confetti(160);elDraw()}}
+function elVote(){if(!confirm('לשלוח את ההצבעה? אי אפשר לשנות אחר כך.'))return;if(act({t:'elVote',list:[...elPick]})){toast('🗳️ ההצבעה נקלטה!');confetti(200);elDraw()}}
+// a window once per stage: registration opened / voting opened / winners
+function elPop(){if(ROLE==='teacher')return;const E=elE();if(E.stage==='off')return;const K='kr_el_'+E.v;let seen=0;try{seen=localStorage.getItem(K)}catch(e){}if(seen)return;try{localStorage.setItem(K,1)}catch(e){}
+  const T={reg:['נפתחה ההרשמה לוועד הכיתה! 🗳️',EL_INFO+' רוצה להיות בוועד? נרשמים באפליקציה.'],vote:['ההצבעה לוועד הכיתה נפתחה! 🗳️',`בוחרים עד ${E.seats} מועמדים. ההצבעה חשאית.`],done:['מזל טוב לנבחרי ועד הכיתה! 🎉',E.win.map(nmOf).join(' · ')]}[E.stage];
+  $('ovMedal').innerHTML='<div style="font-size:90px">'+(E.stage==='done'?'🎉':'🗳️')+'</div>';$('ovTitle').textContent=T[0];$('ovText').textContent=T[1];
+  const b=$('ovBtn');b.textContent=E.stage==='done'?'יאללה!':ROLE==='parent'?'לפרטים':E.stage==='reg'?'לפרטים ולהרשמה':'להצבעה';b.onclick=()=>setTimeout(elOpen,50);
+  $('overlay').classList.add('show');confetti(E.stage==='done'?300:150)}
+document.addEventListener('click',e=>{if(e.target.closest('#elOpenS'))elOpen()});
 // ===== personal report (week / month / year) =====
 let RPT={i:-1,d:null,p:'week'};
 const HEB_M=['ינואר','פברואר','מרץ','אפריל','מאי','יוני','יולי','אוגוסט','ספטמבר','אוקטובר','נובמבר','דצמבר'];
@@ -1644,5 +1716,7 @@ if(ONLINE){$('loader').classList.add('show');api('GET').then(v=>take(v)).catch(o
   <div class="seg" id="rSeg"><button data-p="week" class="on">השבוע</button><button data-p="last">שבוע שעבר</button><button data-p="month">החודש</button><button data-p="year">כל השנה</button></div>
   <div id="rBody"><div class="sub">טוען…</div></div></div>
   <div class="ract" id="rAct"></div></div>
+<div id="el"><div class="rin"><div style="display:flex;align-items:center;gap:10px"><button class="x" onclick="elClose()">✕</button><b style="font:700 16px Gush;flex:1">כנפי רוח · בחירות</b></div>
+  <div id="elBody"></div></div><div class="elbar" id="elBar"></div></div>
 </body>
 </html>
