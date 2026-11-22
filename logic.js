@@ -99,6 +99,8 @@
       s.hist.unshift({ id: id + 'c' + s.crunches.length, ts, p: '🍦', t: `קיבלת קראנץ' ${f}! (מס' ${s.crunches.length})`, who: 'זריזין' }); }
     return true; }
   const HALF_FROM = Date.parse('2026-11-09T08:40:00Z');
+  // from here, a student's own points no longer add to the class goal (the teacher will decide what does)
+  const CLS_LOCK = Date.parse('2026-11-22T11:40:00Z');
   const ZR2_FROM = Date.parse('2026-11-09T16:00:00Z'); // from here: check-in before 7:30 = zariz automatically, pro = all 5 days of the week
   class Bad extends Error {}
   const need = (c, m) => { if (!c) throw new Bad(m || 'לא מורשה'); };
@@ -112,7 +114,7 @@
     let hk = 0;
     const hist = (s, h) => { s.hist.unshift(Object.assign({ id: hid(hk++), ts: op.ts }, h)); if (s.hist.length > HIST_MAX) s.hist.length = HIST_MAX; };
     const feed = f => { st.cls.feed.unshift(Object.assign({ id: hid(hk++), ts: op.ts }, f)); if (st.cls.feed.length > FEED_MAX) st.cls.feed.length = FEED_MAX; };
-    const add = (s, p, t, who, q, noGoal) => { s.points += p; s.wallet += p; if (!noGoal) s.goalPts += p; s.wk[T.wk] = (s.wk[T.wk] || 0) + p; hist(s, { p, t, who, q: q ? 1 : 0, w: p, l: p, g: noGoal ? 0 : p }); };
+    const add = (s, p, t, who, q, noGoal) => { if (op.ts >= CLS_LOCK) noGoal = 1; s.points += p; s.wallet += p; if (!noGoal) s.goalPts += p; s.wk[T.wk] = (s.wk[T.wk] || 0) + p; hist(s, { p, t, who, q: q ? 1 : 0, w: p, l: p, g: noGoal ? 0 : p }); };
     const crunch = s => { while (s.zr >= 15) { s.zr -= 15; const f = s.flavor || 'שוקולד נוגט'; s.crunches.push(f); add(s, 4, 'בונוס 15 זריזין', 'זריזין', 0, 1);
       hist(s, { p: '🍦', t: `קיבלת קראנץ' ${f}! (מס' ${s.crunches.length})`, who: 'זריזין' }); } };
 
@@ -235,8 +237,8 @@
         const u = Math.round(+op.until), p = Math.round(+op.pts); need(u >= 400 && u <= 660, 'שעה לא תקינה'); need(p > 0 && p <= 50, 'ניקוד לא תקין'); s.deal = { until: u, pts: p }; break; }
       case 'adj': { need(isT); const s = S(op.s), p = Math.round(+op.p); need(p && Math.abs(p) <= 1000, 'מספר לא תקין');
         const t = String(op.tx || '').trim().slice(0, 140) || (p > 0 ? 'תוספת נקודות' : 'הורדת נקודות');
-        need(s.wallet + p >= 0 || p > 0, 'אין לו מספיק נקודות לשימוש להוריד'); s.points = Math.max(0, s.points + p); s.wallet = Math.max(0, s.wallet + p); s.goalPts = Math.max(0, s.goalPts + p);
-        s.wk[T.wk] = (s.wk[T.wk] || 0) + p; hist(s, { p, t, who: TEACHER, w: p, l: p, g: p }); break; }
+        need(s.wallet + p >= 0 || p > 0, 'אין לו מספיק נקודות לשימוש להוריד'); s.points = Math.max(0, s.points + p); s.wallet = Math.max(0, s.wallet + p); const g = op.ts >= CLS_LOCK ? 0 : p; s.goalPts = Math.max(0, s.goalPts + g);
+        s.wk[T.wk] = (s.wk[T.wk] || 0) + p; hist(s, { p, t, who: TEACHER, w: p, l: p, g }); break; }
       case 'undo': { need(isT); const s = S(op.s), h = s.hist.find(x => x.id === op.h); need(h, 'הפעולה לא נמצאה'); const sg = h.u ? 1 : -1; // undo, or bring back
         const w = h.w != null ? h.w : (typeof h.p === 'number' ? h.p : 0), l = h.l != null ? h.l : (typeof h.p === 'number' ? h.p : 0), g = h.g != null ? h.g : l;
         need(w || l || g || h.z || h.b, 'לפעולה הזו אין מה לבטל');
