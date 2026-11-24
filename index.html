@@ -718,7 +718,7 @@ body[data-role=teacher] .dhandle{display:block}
       <div class="crrow"><div class="row" style="justify-content:space-between;margin-bottom:8px"><b style="font-size:16px">הקראנצ'ים שלי</b><span class="sub" style="margin:0;font-weight:700" id="crN"></span></div><div class="crs" id="crs"></div></div>
     </div>
 
-    <div class="card bqz hide" id="qzCardS"><div class="ch"><i>📖</i>בחנים</div>
+    <div class="card bqz hide" id="qzCardS"><div class="ch"><i>📖</i>מבדקי הצלחה</div>
       <div id="qzStuBody"></div></div>
     <div class="card bel hide" id="elCardS"><div class="ch"><i>🗳️</i>בחירות לוועד הכיתה</div>
       <div class="sub" style="margin:-6px 0 10px">ועד הכיתה מארגן פעילויות לכיתה ומוביל יוזמות כיתתיות: חברתיות ולימודיות.</div>
@@ -912,10 +912,10 @@ body[data-role=teacher] .dhandle{display:block}
 <div class="card brpt"><div class="ch"><i>📄</i>דוח אישי · <span class="sname"></span></div>
       <div class="sub" style="margin:-6px 0 12px">כל מה שנעשה בשבוע, בחודש או מתחילת השנה, במבט אחד.</div>
       <button class="btn rptGo">פתח את הדוח</button></div>
-    <div class="card bqz" id="qzCardT"><div class="ch"><i>📖</i>בחנים · ציונים</div>
+    <div class="card bqz" id="qzCardT"><div class="ch"><i>📖</i>מבדקי הצלחה · ציונים</div>
       <div id="qzTBody"></div>
-      <details style="margin-top:14px"><summary style="font:900 16px Gush;cursor:pointer">➕ בוחן חדש</summary>
-        <input id="qzTitle" class="inp" placeholder="שם הבוחן, למשל: חומש · שמות פרק ב׳" style="margin-top:10px">
+      <details style="margin-top:14px"><summary style="font:900 16px Gush;cursor:pointer">➕ מבדק הצלחה חדש</summary>
+        <input id="qzTitle" class="inp" placeholder="שם המבדק, למשל: מבדק הצלחה בגמרא · פרק המניח" style="margin-top:10px">
         <textarea id="qzText" rows="8" placeholder="מדביקים את השאלות כמו שהן: 1. שאלה... ואחריה התשובות א. ב. ג. ד., ✓ ליד התשובה הנכונה" style="margin-top:8px;min-height:160px"></textarea>
         <button class="btn" id="qzGo" style="margin-top:8px">פרסם לתלמידים</button></details></div>
     <div class="card bel" id="elCardT"><div class="ch"><i>🗳️</i>בחירות לוועד הכיתה</div>
@@ -1573,7 +1573,7 @@ setInterval(tkDue,60000);
 // ===== teacher: jump bar to every section =====
 (function(){const bar=$('tJump');if(!bar)return;const cards=[...document.querySelectorAll('#v-teacher > .card')];
   const name=c=>{const h=c.querySelector('.ch');if(!h)return '';const t=h.cloneNode(true);t.querySelectorAll('i,.sname').forEach(x=>x.remove());return t.textContent.replace(/[·:].*$/,'').trim()};
-  const SHORT={'נקודות מהירות':'נקודות','הסוכן X של היום':'הסוכן X','זריזין היום':'זריזין','יוזמה מבורכת':'יוזמה','לומדים בחבורה למבחן':'חבורה','דוח הגעה לתפילה':'הגעה לתפילה','מילים בארמית':'ארמית','הודעת הפתעה':'הודעה','יעדים במבחנים':'יעדים','מה ההורים סימנו היום':'הורים','בחירות לוועד הכיתה':'בחירות','בחנים':'בחנים','דוח אישי':'דוח','ניהול':'ניהול'};
+  const SHORT={'נקודות מהירות':'נקודות','הסוכן X של היום':'הסוכן X','זריזין היום':'זריזין','יוזמה מבורכת':'יוזמה','לומדים בחבורה למבחן':'חבורה','דוח הגעה לתפילה':'הגעה לתפילה','מילים בארמית':'ארמית','הודעת הפתעה':'הודעה','יעדים במבחנים':'יעדים','מה ההורים סימנו היום':'הורים','בחירות לוועד הכיתה':'בחירות','מבדקי הצלחה':'מבדקים','דוח אישי':'דוח','ניהול':'ניהול'};
   bar.innerHTML=cards.map((c,i)=>{const n=name(c);return n?`<button data-i="${i}">${esc(SHORT[n]||n)}</button>`:''}).join('');
   bar.onclick=e=>{const b=e.target.closest('button');if(!b)return;const c=cards[+b.dataset.i];scrollTo({top:c.getBoundingClientRect().top+scrollY-bar.offsetHeight-6,behavior:'smooth'})};
   addEventListener('scroll',()=>{if($('v-teacher').classList.contains('hide'))return;let cur=0;const y=bar.offsetHeight+30;cards.forEach((c,i)=>{if(c.getBoundingClientRect().top<=y)cur=i});
@@ -1621,7 +1621,7 @@ function aqEnd(){const s=me(),V=state.cls.aramV||1,n=aq.order.length,good=n-aq.w
 
 
 // ===== student: jump bar (same idea as the teacher's) =====
-const S_SHORT={'זריזין מקדימים למצוות':'זריזין','בחירות לוועד הכיתה':'בחירות','בחנים':'בחנים','הסוכן X':'הסוכן X','השינה שלי':'שינה','היעדים שלי במבחנים':'יעדים','תן כוח לחבר':'תן כוח','לומדים בחבורה למבחן':'חבורה','היעד של כל הכיתה':'יעד כיתתי','התגים שלי':'תגים','מילים בארמית':'ארמית','מה עשיתי לאחרונה':'מה עשיתי','ההתקדמות שלי':'התקדמות','בנק הפרסים':'פרסים','הסיכום שלי':'הסיכום שלי'};
+const S_SHORT={'זריזין מקדימים למצוות':'זריזין','בחירות לוועד הכיתה':'בחירות','מבדקי הצלחה':'מבדקים','הסוכן X':'הסוכן X','השינה שלי':'שינה','היעדים שלי במבחנים':'יעדים','תן כוח לחבר':'תן כוח','לומדים בחבורה למבחן':'חבורה','היעד של כל הכיתה':'יעד כיתתי','התגים שלי':'תגים','מילים בארמית':'ארמית','מה עשיתי לאחרונה':'מה עשיתי','ההתקדמות שלי':'התקדמות','בנק הפרסים':'פרסים','הסיכום שלי':'הסיכום שלי'};
 function sJumpBuild(){const bar=$('sJump');if(!bar||$('v-student').classList.contains('hide'))return;
   const cards=[...document.querySelectorAll('#v-student > .card')].filter(c=>!c.classList.contains('hide')&&c.offsetParent!==null).sort((a,b)=>a.getBoundingClientRect().top-b.getBoundingClientRect().top);
   const name=c=>{const h=c.querySelector('.ch');if(!h)return '';const t=h.cloneNode(true);t.querySelectorAll('i,.sname,small').forEach(x=>x.remove());const n=t.textContent.replace(/[·:].*$/,'').trim();return S_SHORT[n]||n.split(' ').slice(0,2).join(' ')};
@@ -1638,14 +1638,14 @@ const qzList=()=>state.cls.quizzes||[];
 function qzShuffle(id,qi,n){const k=id+'|'+qi+'|'+(ME||0);let h=2166136261;for(const c of k){h^=c.charCodeAt(0);h=Math.imul(h,16777619)>>>0}const a=[...Array(n).keys()];for(let i=n-1;i>0;i--){h=Math.imul(h^(h>>>13),1597334677)>>>0;const j=h%(i+1);[a[i],a[j]]=[a[j],a[i]]}return a}
 function renderQz(){const L=qzList();
   const cs=$('qzCardS');if(cs){const on=ROLE!=='teacher'&&L.length>0;cs.classList.toggle('hide',!on);
-    if(on)$('qzStuBody').innerHTML=L.map(z=>`<div class="qzrow"><span>${esc(z.title)}</span>${z.mine?`<b>${z.mine.sc!=null?z.mine.sc:'✓'}</b>`:ROLE==='student'?`<button class="btn" style="width:auto;padding:8px 16px;margin-inline-start:auto" onclick="qzOpen('${z.id}')">להתחיל</button>`:'<b class="no">עוד לא ענה</b>'}</div>`).join('')+'<div class="sub" style="margin-top:8px">אין על הבחנים נקודות. המחנך רואה את הציון.</div>'}
-  const tb=$('qzTBody');if(tb){if(!L.length){tb.innerHTML='<div class="sub">עוד אין בחנים</div>';return}if(!L.find(z=>z.id===qzSel))qzSel=L[0].id;const z=L.find(x=>x.id===qzSel),res=z.res||{};
+    if(on)$('qzStuBody').innerHTML=L.map(z=>`<div class="qzrow"><span>${esc(z.title)}</span>${z.mine?`<b>${z.mine.sc!=null?z.mine.sc:'✓'}</b>`:ROLE==='student'?`<button class="btn" style="width:auto;padding:8px 16px;margin-inline-start:auto" onclick="qzOpen('${z.id}')">להתחיל</button>`:'<b class="no">עוד לא ענה</b>'}</div>`).join('')+'<div class="sub" style="margin-top:8px">אין על המבדקים נקודות. המחנך רואה את הציון.</div>'}
+  const tb=$('qzTBody');if(tb){if(!L.length){tb.innerHTML='<div class="sub">עוד אין מבדקים</div>';return}if(!L.find(z=>z.id===qzSel))qzSel=L[0].id;const z=L.find(x=>x.id===qzSel),res=z.res||{};
     const done=Object.values(res).filter(r=>r.sc!=null),avg=done.length?Math.round(done.reduce((a,r)=>a+r.sc,0)/done.length):null;
     tb.innerHTML=`<div class="qzsel">${L.map(x=>`<button class="${x.id===qzSel?'on':''}" onclick="qzSel='${x.id}';renderQz()">${esc(x.title)}</button>`).join('')}</div>
       <div class="sub" style="font-weight:700;margin-bottom:8px">${done.length} מתוך ${state.students.length} ענו${avg!=null?` · ממוצע ${avg}`:''} · ${z.open?'🟢 פתוח':'🔒 סגור'}</div>
       ${state.students.map((st,i)=>({st,i,r:res[i]})).sort((a,b)=>(b.r?1:0)-(a.r?1:0)||a.st.name.localeCompare(b.st.name,'he')).map(({st,i,r})=>`<div class="qzrow"><span>${esc(st.name)}</span>${r?`<b>${r.sc}</b>`:'<b class="no">לא ענה</b>'}</div>`).join('')}
-      <div class="row" style="gap:8px;margin-top:10px"><button class="btn" onclick="act({t:'quizOpen',id:'${z.id}',open:${z.open?0:1}})">${z.open?'🔒 סגור את הבוחן':'🟢 פתח מחדש'}</button><button class="btn" style="background:rgba(255,255,255,.15)!important;color:#fff!important" onclick="qzCopy()">📋 העתק ציונים</button></div>
-      <button class="agnew" style="color:#f3c9a0" onclick="if(confirm('למחוק את הבוחן וכל הציונים שלו?'))act({t:'quizDel',id:'${z.id}'})">מחיקת הבוחן</button>`}}
+      <div class="row" style="gap:8px;margin-top:10px"><button class="btn" onclick="act({t:'quizOpen',id:'${z.id}',open:${z.open?0:1}})">${z.open?'🔒 סגור את המבדק':'🟢 פתח מחדש'}</button><button class="btn" style="background:rgba(255,255,255,.15)!important;color:#fff!important" onclick="qzCopy()">📋 העתק ציונים</button></div>
+      <button class="agnew" style="color:#f3c9a0" onclick="if(confirm('למחוק את המבדק וכל הציונים שלו?'))act({t:'quizDel',id:'${z.id}'})">מחיקת המבדק</button>`}}
 function qzCopy(){const z=qzList().find(x=>x.id===qzSel);if(!z)return;const t=z.title+'\n'+state.students.map((s,i)=>s.name+'\t'+((z.res||{})[i]?z.res[i].sc:'לא ענה')).join('\n');
   (navigator.clipboard?navigator.clipboard.writeText(t):Promise.reject()).then(()=>toast('📋 הציונים הועתקו')).catch(()=>prompt('העתק:',t))}
 function qzParse(txt){const qs=[];let cur=null;txt.split(/\n/).map(l=>l.trim()).filter(Boolean).forEach(l=>{
@@ -1655,22 +1655,26 @@ function qzParse(txt){const qs=[];let cur=null;txt.split(/\n/).map(l=>l.trim()).
     else if(cur&&!cur.o.length)cur.q+=' '+l});return qs}
 document.addEventListener('click',e=>{if(!e.target.closest('#qzGo'))return;const qs=qzParse($('qzText').value);if(!qs.length){toast('לא מצאתי שאלות. כל שאלה מתחילה במספר ונקודה');return}
   const bad=qs.findIndex(q=>q.a<0);if(bad>=0){toast(`בשאלה ${bad+1} חסר ✓ ליד התשובה הנכונה`);return}
-  if(!confirm(`לפרסם "${$('qzTitle').value||'בוחן'}" עם ${qs.length} שאלות?`))return;
-  if(act({t:'quizSet',title:$('qzTitle').value,qs})){$('qzText').value='';$('qzTitle').value='';toast('📖 הבוחן פורסם')}});
+  if(!confirm(`לפרסם "${$('qzTitle').value||'מבדק הצלחה'}" עם ${qs.length} שאלות?`))return;
+  if(act({t:'quizSet',title:$('qzTitle').value,qs})){$('qzText').value='';$('qzTitle').value='';toast('📖 המבדק פורסם')}});
 function qzOpen(id){const z=qzList().find(x=>x.id===id);if(!z)return;QZ={id,ans:z.qs.map(()=>-1)};$('qz').classList.add('on');document.body.style.overflow='hidden';qzDraw()}
 function qzClose(){$('qz').classList.remove('on');document.body.style.overflow=''}
-function qzDraw(){const z=qzList().find(x=>x.id===QZ.id);if(!z)return qzClose();const m=z.mine;let o=`<h2>${esc(z.title)}</h2>`;
-  if(m){o+=m.sc!=null?`<div class="score">${m.sc}</div><div class="sub" style="text-align:center;color:#f3e3c8">${m.ok} מתוך ${z.qs.length} נכונות</div>`:'<div class="sub" style="color:#f3e3c8">✓ התשובות נשלחו. הציון יופיע עוד רגע.</div>'}
+function qzDraw(){const z=qzList().find(x=>x.id===QZ.id);if(!z)return qzClose();const m=z.mine;if(m&&m.sc!=null&&QZ.sent&&!QZ.popped){QZ.popped=1;qzScorePop(z)}let o=`<h2>${esc(z.title)}</h2>`;
+  if(m){o+=m.sc!=null?`<div class="score">${m.sc}</div><div class="sub" style="text-align:center;color:#f3e3c8">${m.ok} מתוך ${z.qs.length} נכונות</div>`:'<div class="sub" style="color:#f3e3c8;text-align:center;font-size:18px;margin-top:14px">⏳ בודק את התשובות…</div>'}
   else o+='<div class="sub" style="color:#f3e3c8">בוחרים תשובה אחת בכל שאלה. אפשר לשלוח רק פעם אחת.</div>';
   z.qs.forEach((x,qi)=>{const ord=qzShuffle(z.id,qi,x.o.length);o+=`<div class="qq">${qi+1}. ${esc(x.q)}</div>`+ord.map(oi=>{let c='';
       if(m){if(x.a===oi)c='ok';else if(m.ans[qi]===oi)c='bad'}else if(QZ.ans[qi]===oi)c='on';
       return `<button class="op ${c}" ${m?'disabled':`onclick="QZ.ans[${qi}]=${oi};qzDraw()"`}>${esc(x.o[oi])}</button>`}).join('')});
   $('qzBody').innerHTML=o;const left=QZ.ans.filter(v=>v<0).length;
   $('qzBar').innerHTML=m?'<button class="btn" onclick="qzClose()">סגור</button>':`<button class="btn" ${left?'disabled':''} onclick="qzSend()">${left?`נשארו ${left} שאלות`:'שלח תשובות'}</button>`}
-function qzSend(){if(!confirm('לשלוח את התשובות? אי אפשר לשנות אחר כך.'))return;if(act({t:'quizAns',id:QZ.id,ans:QZ.ans})){toast('📖 נשלח!');scrollTo(0,0);$('qz').scrollTop=0;setTimeout(()=>{pull&&pull();},800)}}
+function qzSend(){if(!confirm('לשלוח את התשובות? אי אפשר לשנות אחר כך.'))return;if(act({t:'quizAns',id:QZ.id,ans:QZ.ans})){QZ.sent=1;toast('📖 נשלח!');scrollTo(0,0);$('qz').scrollTop=0;setTimeout(()=>{pull&&pull();},800)}}
+
+function qzScorePop(z){const m=z.mine,sc=m.sc;$('ovMedal').innerHTML=`<div style="font:900 96px Gush;color:#f4cf6b;line-height:1">${sc}</div>`;
+  $('ovTitle').textContent=sc>=90?'מצוין! 🌟':sc>=75?'כל הכבוד! 👏':sc>=55?'יפה, אפשר עוד 💪':'שווה לחזור על החומר 📖';
+  $('ovText').textContent=`הציון שלך ב${z.title}: ${m.ok} מתוך ${z.qs.length} תשובות נכונות. ${m.ok<z.qs.length?'סגור כדי לראות איפה טעית.':''}`;$('overlay').classList.add('show');if(sc>=75)confetti(sc>=90?280:160)}
 // a window once per new quiz
 function qzPop(){if(ROLE!=='student')return;const z=qzList().find(x=>x.open&&!x.mine);if(!z)return;const K='kr_qz_'+z.id;let seen=0;try{seen=localStorage.getItem(K)}catch(e){}if(seen)return;try{localStorage.setItem(K,1)}catch(e){}
-  $('ovMedal').innerHTML='<div style="font-size:90px">📖</div>';$('ovTitle').textContent='בוחן חדש!';$('ovText').textContent=z.title+' · '+z.qs.length+' שאלות';
+  $('ovMedal').innerHTML='<div style="font-size:90px">📖</div>';$('ovTitle').textContent='מבדק הצלחה חדש!';$('ovText').textContent=z.title+' · '+z.qs.length+' שאלות';
   const b=$('ovBtn');b.textContent='להתחיל';b.onclick=()=>setTimeout(()=>qzOpen(z.id),50);$('overlay').classList.add('show')}
 // ===== class committee elections (ועד הכיתה) =====
 const EL_INFO='ועד הכיתה מארגן פעילויות לכיתה ומוביל יוזמות כיתתיות: חברתיות ולימודיות.';
@@ -1794,7 +1798,7 @@ if(ONLINE){$('loader').classList.add('show');api('GET').then(v=>take(v)).catch(o
   <div class="ract" id="rAct"></div></div>
 <div id="el"><div class="rin"><div style="display:flex;align-items:center;gap:10px"><button class="x" onclick="elClose()">✕</button><b style="font:700 16px Gush;flex:1">כנפי רוח · בחירות</b></div>
   <div id="elBody"></div></div><div class="elbar" id="elBar"></div></div>
-<div id="qz"><div class="rin"><div style="display:flex;align-items:center;gap:10px"><button class="x" onclick="qzClose()">✕</button><b style="font:700 16px Gush;flex:1">כנפי רוח · בוחן</b></div>
+<div id="qz"><div class="rin"><div style="display:flex;align-items:center;gap:10px"><button class="x" onclick="qzClose()">✕</button><b style="font:700 16px Gush;flex:1">כנפי רוח · מבדק הצלחה</b></div>
   <div id="qzBody"></div></div><div class="bar" id="qzBar"></div></div>
 </body>
 </html>
