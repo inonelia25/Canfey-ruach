@@ -44,6 +44,11 @@
     const by = {}; st.students.forEach(s => by[s.id] = s);
     if (!st.cls.cfg) st.cls.cfg = defCfg();
     if (!st.cls.cfg.treats) st.cls.cfg.treats = TREATS.slice();
+    if (!st.cls.mig11) { (st.cls.quizzes || (st.cls.quizzes = [])).unshift({ id: 'q1', title: 'חומש · שמות פרק א׳', open: 1, res: {}, qs: [
+      { q: 'מה הן "עָרֵי מִסְכְּנוֹת" (פסוק יא)?', o: ['ערים שבהן גרו האנשים המסכנים של מצרים', 'ערי אוצרות ומחסנים של המלך', 'ערים שנבנו לבני ישראל כדי שיגורו בהן', 'ערי מבצר על הגבול לקראת מלחמה'], a: 1 },
+      { q: 'מה פירוש "בְּפָרֶךְ" לפי רש״י (פסוק יג)?', o: ['עבודה שנעשית מהר מאוד', 'עבודה בשדה בלבד', 'עבודה שמפרכת את הגוף ומשברת אותו', 'עבודה שמקבלים עליה שכר נמוך'], a: 2 },
+      { q: 'למה פרעה לא יצא למלחמה גלויה נגד בני ישראל, לפי הרמב״ן?', o: ['כי לא היה לו מספיק צבא', 'כי פחד מה׳', 'כי השרים לא היו מסכימים, וזו הייתה נראית כבגידה במי שהמלך הקודם הזמין', 'כי בני ישראל היו חבריו הטובים'], a: 2 },
+      { q: 'מה קרה לבני ישראל ככל שהמצרים עינו אותם יותר (פסוק יב)?', o: ['הם התרבו והתחזקו עוד יותר: "כֵּן יִרְבֶּה וְכֵן יִפְרֹץ"', 'הם ברחו ממצרים', 'מספרם ירד מאוד', 'הם התחילו לעבוד בשביל פרעה מרצונם'], a: 0 }] }); st.cls.mig11 = 1; }
     if (!st.cls.mig10) { const day = '2026-11-09';
       st.students.forEach(s => { const a = (s.arr || []).find(x => x.d === day); if (a && a.t <= 450) zrMark(s, day, 'm10-' + s.id, Date.parse(day + 'T06:00:00Z'), TEACHER); }); st.cls.mig10 = 1; }
     if (!st.cls.mig8) { const wk = il(Date.parse(AUTO_ZR_DAY + 'T10:00:00Z')).wk;
@@ -181,6 +186,17 @@
         L.forEach(i => need(E.cands.some(c => c.s === i), 'מועמד לא קיים')); E.votes[op.a] = L; break; }
       case 'elWin': { need(isT); const E = st.cls.el; need(E, 'אין בחירות'); const L = [...new Set((op.list || []).map(Number))]; L.forEach(i => S(i)); need(L.length >= 1, 'בחר את הנבחרים');
         E.win = L; E.stage = 'done'; E.v = (E.v || 0) + 1; break; }
+      // quizzes (no points, a grade the teacher sees)
+      case 'quizSet': { need(isT); const title = String(op.title || '').trim().slice(0, 80); need(title, 'כתוב שם לבוחן');
+        const qs = (op.qs || []).slice(0, 30).map(x => ({ q: String(x.q || '').slice(0, 300), o: (x.o || []).slice(0, 6).map(y => String(y).slice(0, 200)), a: Math.round(+x.a) }));
+        need(qs.length >= 1, 'אין שאלות'); qs.forEach((x, i) => need(x.q && x.o.length >= 2 && x.a >= 0 && x.a < x.o.length, `בשאלה ${i + 1} חסרה תשובה נכונה (✓)`));
+        const Q = st.cls.quizzes || (st.cls.quizzes = []); Q.unshift({ id: hid('q'), title, qs, open: 1, res: {} }); if (Q.length > 30) Q.length = 30; break; }
+      case 'quizOpen': { need(isT); const z = (st.cls.quizzes || []).find(x => x.id === op.id); need(z); z.open = op.open ? 1 : 0; break; }
+      case 'quizDel': { need(isT); st.cls.quizzes = (st.cls.quizzes || []).filter(x => x.id !== op.id); break; }
+      case 'quizAns': { need(r === 'student'); const z = (st.cls.quizzes || []).find(x => x.id === op.id); need(z, 'הבוחן לא נמצא'); need(z.open, 'הבוחן סגור');
+        z.res = z.res || {}; need(!z.res[op.a] && !z.mine, 'כבר ענית על הבוחן הזה'); const ans = (op.ans || []).map(Number); need(ans.length === z.qs.length, 'צריך לענות על כל השאלות');
+        const known = z.qs.every(x => x.a != null); const ok = known ? ans.filter((v, i) => v === z.qs[i].a).length : null;
+        z.res[op.a] = { ans, ok, sc: ok == null ? null : Math.round(ok / z.qs.length * 100), ts: op.ts }; break; }
       case 'annDel': { need(isT); st.cls.ann = (st.cls.ann || []).filter(a => a.id !== op.id); break; }
       case 'msg': { need(isT); S(op.s).msg = String(op.tx || '').slice(0, 500); break; }
       case 'redeem': { need(r !== 'parent' && own(op.s)); const s = S(op.s), p = C.prizes.find(x => x.id === op.pz); need(p, 'הפרס לא קיים'); need(p.stock == null || p.stock > 0, 'הפרס אזל'); need(s.wallet >= p.cost, 'אין מספיק נקודות');

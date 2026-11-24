@@ -30,6 +30,9 @@ async function load(db, R) {
 
 // elections: votes are secret. A student sees only the candidates, whether he voted and (at the end) the winners
 function elView(E, a) { if (!E) return null; return { stage: E.stage, seats: E.seats, v: E.v || 0, cands: E.cands, win: E.stage === 'done' ? E.win : [], voted: !!(E.votes || {})[a], n: Object.keys(E.votes || {}).length }; }
+// quizzes: a student gets the questions without the answers; after he answers, his own result and the right answers
+function quizView(Q, a) { return (Q || []).filter(z => z.open || (z.res || {})[a]).map(z => { const mine = (z.res || {})[a] || null;
+  return { id: z.id, title: z.title, open: z.open, mine, qs: z.qs.map(x => mine ? x : { q: x.q, o: x.o }) }; }); }
 function view(st, me, R) {
   const T = KR.il(Date.now());
   const ag = KR.agentFor(st, T.date, process.env.KR_SECRET || R.teacher);
@@ -37,7 +40,7 @@ function view(st, me, R) {
   if (me.role === 'teacher') return Object.assign(base, { students: st.students, cls: Object.assign({}, st.cls, { agent: ag }) });
   const students = st.students.map((s, i) => i === me.a ? s : { id: s.id, name: s.name, first: s.first, goalPts: s.goalPts });
   const agent = { date: ag.date, status: ag.status, idx: ag.status === 'yes' ? ag.idx : -1 };
-  return Object.assign(base, { students, cls: { bonus: st.cls.bonus, feed: [], agent, revealed: st.cls.revealed, aram: st.cls.aram, aramV: st.cls.aramV || 1, ann: st.cls.ann || [], cfg: st.cls.cfg, el: elView(st.cls.el, me.a), reqs: (st.cls.reqs || []).filter(q => q.list.includes(me.a)), tests: st.cls.tests || [] } });
+  return Object.assign(base, { students, cls: { bonus: st.cls.bonus, feed: [], agent, revealed: st.cls.revealed, aram: st.cls.aram, aramV: st.cls.aramV || 1, ann: st.cls.ann || [], cfg: st.cls.cfg, el: elView(st.cls.el, me.a), quizzes: quizView(st.cls.quizzes, me.a), reqs: (st.cls.reqs || []).filter(q => q.list.includes(me.a)), tests: st.cls.tests || [] } });
 }
 
 const send = (res, code, obj) => { res.statusCode = code; res.setHeader('Content-Type', 'application/json; charset=utf-8'); res.setHeader('Cache-Control', 'no-store'); res.end(JSON.stringify(obj)); };
