@@ -32,7 +32,7 @@ async function load(db, R) {
 function elView(E, a) { if (!E) return null; return { stage: E.stage, seats: E.seats, v: E.v || 0, cands: E.cands, win: E.stage === 'done' ? E.win : [], voted: !!(E.votes || {})[a], n: Object.keys(E.votes || {}).length }; }
 // quizzes: a student gets the questions without the answers; after he answers, his own result and the right answers
 function quizView(Q, a) { return (Q || []).filter(z => z.open || (z.res || {})[a]).map(z => { const mine = (z.res || {})[a] || null;
-  return { id: z.id, title: z.title, open: z.open, mine, qs: z.qs.map(x => mine ? x : { q: x.q, o: x.o }) }; }); }
+  return { id: z.id, title: z.title, open: z.open, until: z.until || 0, mine, qs: z.qs.map(x => mine ? x : { q: x.q, o: x.o }) }; }); }
 function view(st, me, R) {
   const T = KR.il(Date.now());
   const ag = KR.agentFor(st, T.date, process.env.KR_SECRET || R.teacher);

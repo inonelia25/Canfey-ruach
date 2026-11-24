@@ -1633,19 +1633,22 @@ addEventListener('scroll',()=>{const bar=$('sJump');if(!bar||!bar._cards||$('v-s
   bar.querySelectorAll('button').forEach(b=>{const on=+b.dataset.i===cur;if(on&&!b.classList.contains('on')){const r=b.getBoundingClientRect(),q=bar.getBoundingClientRect();bar.scrollBy({left:r.left+r.width/2-(q.left+q.width/2),behavior:'smooth'})}b.classList.toggle('on',on)})},{passive:true});
 
 // ===== quizzes (no points, a grade for the teacher) =====
+const qzLate=z=>z.until&&Date.now()>z.until;const qzUntilTxt=z=>z.until?'עד '+fmtT(KR.il(z.until).min)+(KR.il(z.until).date!==KR.il(Date.now()).date?' ב־'+dmy(KR.il(z.until).date):''):'';
 let QZ={id:null,ans:[],ord:{}},qzSel=null;
 const qzList=()=>state.cls.quizzes||[];
 function qzShuffle(id,qi,n){const k=id+'|'+qi+'|'+(ME||0);let h=2166136261;for(const c of k){h^=c.charCodeAt(0);h=Math.imul(h,16777619)>>>0}const a=[...Array(n).keys()];for(let i=n-1;i>0;i--){h=Math.imul(h^(h>>>13),1597334677)>>>0;const j=h%(i+1);[a[i],a[j]]=[a[j],a[i]]}return a}
 function renderQz(){const L=qzList();
   const cs=$('qzCardS');if(cs){const on=L.length>0;cs.classList.toggle('hide',!on);
-    if(on)$('qzStuBody').innerHTML=L.map(z=>`<div class="qzrow"><span>${esc(z.title)}</span>${ROLE==='teacher'?`<button class="btn" style="width:auto;padding:8px 16px;margin-inline-start:auto" onclick="qzOpen('${z.id}')">תצוגה</button>`:z.mine?`<b>${z.mine.sc!=null?z.mine.sc:'✓'}</b>`:ROLE==='student'?`<button class="btn" style="width:auto;padding:8px 16px;margin-inline-start:auto" onclick="qzOpen('${z.id}')">להתחיל</button>`:'<b class="no">עוד לא ענה</b>'}</div>`).join('')+'<div class="sub" style="margin-top:8px">אין על המבדקים נקודות. המחנך רואה את הציון.</div>'}
+    if(on)$('qzStuBody').innerHTML=L.map(z=>`<div class="qzrow"><span>${esc(z.title)}</span>${ROLE==='teacher'?`<button class="btn" style="width:auto;padding:8px 16px;margin-inline-start:auto" onclick="qzOpen('${z.id}')">תצוגה</button>`:z.mine?`<b>${z.mine.sc!=null?z.mine.sc:'✓'}</b>`:ROLE==='student'?(qzLate(z)?'<b class="no">הזמן נגמר</b>':`<button class="btn" style="width:auto;padding:8px 16px;margin-inline-start:auto" onclick="qzOpen('${z.id}')">להתחיל${z.until?' · '+qzUntilTxt(z):''}</button>`):'<b class="no">עוד לא ענה</b>'}</div>`).join('')+'<div class="sub" style="margin-top:8px">אין על המבדקים נקודות. המחנך רואה את הציון.</div>'}
   const tb=$('qzTBody');if(tb){if(!L.length){tb.innerHTML='<div class="sub">עוד אין מבדקים</div>';return}if(!L.find(z=>z.id===qzSel))qzSel=L[0].id;const z=L.find(x=>x.id===qzSel),res=z.res||{};
     const done=Object.values(res).filter(r=>r.sc!=null),avg=done.length?Math.round(done.reduce((a,r)=>a+r.sc,0)/done.length):null;
     tb.innerHTML=`<div class="qzsel">${L.map(x=>`<button class="${x.id===qzSel?'on':''}" onclick="qzSel='${x.id}';renderQz()">${esc(x.title)}</button>`).join('')}</div>
-      <div class="sub" style="font-weight:700;margin-bottom:8px">${done.length} מתוך ${state.students.length} ענו${avg!=null?` · ממוצע ${avg}`:''} · ${z.open?'🟢 פתוח':'🔒 סגור'}</div>
+      <div class="sub" style="font-weight:700;margin-bottom:8px">${done.length} מתוך ${state.students.length} ענו${avg!=null?` · ממוצע ${avg}`:''} · ${z.open?(qzLate(z)?'⏰ הזמן נגמר':'🟢 פתוח'+(z.until?' '+qzUntilTxt(z):'')):'🔒 סגור'}</div>
+      <div class="tq" style="grid-template-columns:1fr 120px;margin-bottom:8px"><span style="font:400 15px Gush;align-self:center">אפשר לענות עד השעה (היום):</span><input type="time" value="${z.until?fmtT(KR.il(z.until).min).padStart(5,'0'):''}" onchange="qzSetUntil('${z.id}',this.value)"></div>
       ${state.students.map((st,i)=>({st,i,r:res[i]})).sort((a,b)=>(b.r?1:0)-(a.r?1:0)||a.st.name.localeCompare(b.st.name,'he')).map(({st,i,r})=>`<div class="qzrow"><span>${esc(st.name)}</span>${r?`<b>${r.sc}</b>`:'<b class="no">לא ענה</b>'}</div>`).join('')}
       <div class="row" style="gap:8px;margin-top:10px"><button class="btn" onclick="act({t:'quizOpen',id:'${z.id}',open:${z.open?0:1}})">${z.open?'🔒 סגור את המבדק':'🟢 פתח מחדש'}</button><button class="btn" style="background:rgba(255,255,255,.15)!important;color:#fff!important" onclick="qzCopy()">📋 העתק ציונים</button></div>
       <button class="agnew" style="color:#f3c9a0" onclick="if(confirm('למחוק את המבדק וכל הציונים שלו?'))act({t:'quizDel',id:'${z.id}'})">מחיקת המבדק</button>`}}
+function qzSetUntil(id,v){if(!v){act({t:'quizUntil',id,until:0});return}const [h,m]=v.split(':').map(Number);const now=Date.now(),T=KR.il(now);act({t:'quizUntil',id,until:now+((h*60+m)-T.min)*60000-new Date(now).getSeconds()*1000})&&toast('⏰ עודכן')}
 function qzCopy(){const z=qzList().find(x=>x.id===qzSel);if(!z)return;const t=z.title+'\n'+state.students.map((s,i)=>s.name+'\t'+((z.res||{})[i]?z.res[i].sc:'לא ענה')).join('\n');
   (navigator.clipboard?navigator.clipboard.writeText(t):Promise.reject()).then(()=>toast('📋 הציונים הועתקו')).catch(()=>prompt('העתק:',t))}
 function qzParse(txt){const qs=[];let cur=null;txt.split(/\n/).map(l=>l.trim()).filter(Boolean).forEach(l=>{
@@ -1661,7 +1664,7 @@ function qzOpen(id){const z=qzList().find(x=>x.id===id);if(!z)return;QZ={id,ans:
 function qzClose(){$('qz').classList.remove('on');document.body.style.overflow=''}
 function qzDraw(){const z=qzList().find(x=>x.id===QZ.id);if(!z)return qzClose();const m=ROLE==='teacher'?null:z.mine;if(m&&m.sc!=null&&QZ.sent&&!QZ.popped){QZ.popped=1;qzScorePop(z)}let o=`<h2>${esc(z.title)}</h2>`;
   if(m){o+=m.sc!=null?`<div class="score">${m.sc}</div><div class="sub" style="text-align:center;color:#f3e3c8">${m.ok} מתוך ${z.qs.length} נכונות</div>`:'<div class="sub" style="color:#f3e3c8;text-align:center;font-size:18px;margin-top:14px">⏳ בודק את התשובות…</div>'}
-  else o+='<div class="sub" style="color:#f3e3c8">בוחרים תשובה אחת בכל שאלה. אפשר לשלוח רק פעם אחת.</div>';
+  else o+=`<div class="sub" style="color:#f3e3c8">בוחרים תשובה אחת בכל שאלה. אפשר לשלוח רק פעם אחת.${z.until?' <b>אפשר לענות '+qzUntilTxt(z)+'.</b>':''}</div>`;
   z.qs.forEach((x,qi)=>{const ord=qzShuffle(z.id,qi,x.o.length);o+=`<div class="qq">${qi+1}. ${esc(x.q)}</div>`+ord.map(oi=>{let c='';
       if(m){if(x.a===oi)c='ok';else if(m.ans[qi]===oi)c='bad'}else if(QZ.ans[qi]===oi)c='on';
       return `<button class="op ${c}" ${m?'disabled':`onclick="QZ.ans[${qi}]=${oi};qzDraw()"`}>${esc(x.o[oi])}</button>`}).join('')});
@@ -1673,7 +1676,7 @@ function qzScorePop(z){const m=z.mine,sc=m.sc;$('ovMedal').innerHTML=`<div style
   $('ovTitle').textContent=sc>=90?'מצוין! 🌟':sc>=75?'כל הכבוד! 👏':sc>=55?'יפה, אפשר עוד 💪':'שווה לחזור על החומר 📖';
   $('ovText').textContent=`הציון שלך ב${z.title}: ${m.ok} מתוך ${z.qs.length} תשובות נכונות. ${m.ok<z.qs.length?'סגור כדי לראות איפה טעית.':''}`;$('overlay').classList.add('show');if(sc>=75)confetti(sc>=90?280:160)}
 // a window once per new quiz
-function qzPop(){if(ROLE!=='student')return;const z=qzList().find(x=>x.open&&!x.mine);if(!z)return;const K='kr_qz_'+z.id;let seen=0;try{seen=localStorage.getItem(K)}catch(e){}if(seen)return;try{localStorage.setItem(K,1)}catch(e){}
+function qzPop(){if(ROLE!=='student')return;const z=qzList().find(x=>x.open&&!x.mine&&!qzLate(x));if(!z)return;const K='kr_qz_'+z.id;let seen=0;try{seen=localStorage.getItem(K)}catch(e){}if(seen)return;try{localStorage.setItem(K,1)}catch(e){}
   $('ovMedal').innerHTML='<div style="font-size:90px">📖</div>';$('ovTitle').textContent='מבדק הצלחה חדש!';$('ovText').textContent=z.title+' · '+z.qs.length+' שאלות';
   const b=$('ovBtn');b.textContent='להתחיל';b.onclick=()=>setTimeout(()=>qzOpen(z.id),50);$('overlay').classList.add('show')}
 // ===== class committee elections (ועד הכיתה) =====
